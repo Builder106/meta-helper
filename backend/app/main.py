@@ -11,7 +11,11 @@ load_dotenv()
 app = FastAPI(title="MetaHelper API")
 
 # Initialize services
-vision_service = VisionService(api_key=os.getenv("GOOGLE_API_KEY"))
+api_key = os.getenv("GOOGLE_API_KEY")
+if not api_key:
+    print("WARNING: GOOGLE_API_KEY is not set. Vision service will fail.")
+
+vision_service = VisionService(api_key=api_key)
 tts_service = TTSService()
 audio_processor = AudioProcessor()
 
