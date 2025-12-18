@@ -13,46 +13,84 @@ import java.io.ByteArrayOutputStream
  * Manager class that coordinates the flow between the glasses and the backend.
  * Updated for Meta Wearables SDK 0.3.0 using the StreamSession API.
  */
+import com.meta.wearable.dat.core.RegistrationState
+import com.meta.wearable.dat.camera.WearableCamera
+
 class GlassesManager(
     private val context: Context,
-    private val backendUrl: String = "http://172.21.100.50:8000"
+    private val backendUrl: String = "https://metahelper.onrender.com"
 ) {
     private val apiClient = ApiClient(backendUrl)
-    private val audioPlayer = AudioPlayer(context)
+    private val audioPlayer = AudioPlayer(context).apply {
+        onReplayRequested = { replayLastAudio() }
+    }
     private val volumeController = VolumeController(context)
+    private var lastAudioResponse: ByteArray? = null
     
     private var streamSession: StreamSession? = null
     private val serviceScope = CoroutineScope(Dispatchers.Main + Job())
 
     init {
-        // MANDATORY: Initialize the SDK (0.3.0)
         val result = Wearables.initialize(context)
         if (result.isSuccess) {
             Log.d("GlassesManager", "Meta Wearables SDK 0.3.0 Initialized")
-            startSession()
+            checkRegistrationAndStart()
         } else {
             Log.e("GlassesManager", "SDK Initialization failed: ${result.exceptionOrNull()?.message}")
         }
     }
 
-    private fun startSession() {
-        Log.d("GlassesManager", "Initializing session with AutoDeviceSelector...")
-
-        // 0.3.0: AutoDeviceSelector is ideal for single-device setups as it 
-        // maintains selection across availability changes.
-        // We use a simple comparator that prioritizes any detected device.
-        val deviceSelector = com.meta.wearable.dat.core.selectors.AutoDeviceSelector { _, _ -> 0 }
-
-        // The session will automatically transition to STREAMING when the glasses are found
-        streamSession = Wearables.startStreamSession(context, deviceSelector)
-
-        // Monitor session state
-        streamSession?.let { session ->
-            serviceScope.launch {
-                session.state.collect { state ->
-                    Log.d("GlassesManager", "Session state changed to: $state")
+    private fun checkRegistrationAndStart() {
+        serviceScope.launch {
+            // Check if the app is already registered with the Meta AI app
+            Wearables.registrationState.collect { state ->
+                when (state) {
+                    RegistrationState.REGISTERED -> {
+                        Log.d("GlassesManager", "App is REGISTERED. Starting session...")
+                        startSession()
+                    }
+                    RegistrationState.UNREGISTERED -> {
+                        Log.d("GlassesManager", "App is UNREGISTERED. Opening Meta AI for registration...")
+                        Wearables.startRegistration(context)
+                    }
+                    else -> Log.d("GlassesManager", "Registration state: $state")
                 }
             }
+        }
+    }
+
+    private fun startSession() {
+        Log.d("GlassesManager", "Initializing session with AutoDeviceSelector...")
+        val deviceSelector = com.meta.wearable.dat.core.selectors.AutoDeviceSelector { _, _ -> 0 }
+        streamSession = Wearables.startStreamSession(context, deviceSelector)
+
+        serviceScope.launch {
+            streamSession?.state?.collect { state ->
+                Log.d("GlassesManager", "Session state changed to: $state")
+                // When we transition to STREAMING, we should also register for 
+                // hardware button events specifically.
+                if (state.toString() == "STREAMING") {
+                    setupHardwareButtonListener()
+                }
+            }
+        }
+    }
+
+    private fun setupHardwareButtonListener() {
+        // In 0.3.0, you can get the camera from the session to listen for button events
+        // This bypasses the Meta AI gallery import
+        try {
+            val camera = WearableCamera.getInstance(Wearables.devices.value.first())
+            camera.registerCaptureListener(object : WearableCamera.CaptureListener {
+                override fun onImageCaptured(imageBuffer: java.nio.ByteBuffer) {
+                    val bytes = ByteArray(imageBuffer.remaining())
+                    imageBuffer.get(bytes)
+                    Log.d("GlassesManager", "INSTANT CAPTURE from button. Processing...")
+                    onPhotoCaptured(bytes)
+                }
+            })
+        } catch (e: Exception) {
+            Log.e("GlassesManager", "Failed to setup hardware button listener: ${e.message}")
         }
     }
 
@@ -105,6 +143,7 @@ class GlassesManager(
         volumeController.setQuietVolume()
         apiClient.processImage(imageBytes, object : ApiClient.ApiResponseCallback {
             override fun onSuccess(audioBytes: ByteArray) {
+                lastAudioResponse = audioBytes
                 Log.d("GlassesManager", "Playing AI response...")
                 audioPlayer.playAudio(audioBytes)
             }
@@ -114,8 +153,15 @@ class GlassesManager(
         })
     }
 
+    fun replayLastAudio() {
+        lastAudioResponse?.let {
+            Log.d("GlassesManager", "Replaying last audio response...")
+            audioPlayer.playAudio(it)
+        } ?: Log.w("GlassesManager", "No audio to replay")
+    }
+
     fun stopAll() {
-        audioPlayer.stop()
+        audioPlayer.release()
         streamSession?.close()
         serviceScope.cancel()
     }

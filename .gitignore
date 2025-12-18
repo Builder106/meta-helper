@@ -174,3 +174,4 @@ build/
 ehthumbs.db
 Thumbs.db
 
+*.hprof

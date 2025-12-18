@@ -21,13 +21,47 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.graphics.vector.ImageVector
 
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.os.Build
+import android.os.IBinder
+import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+
 class MainActivity : ComponentActivity() {
-    private lateinit var glassesManager: GlassesManager
+    private var glassesManager: GlassesManager? = null
+    private var isBound = false
+
+    private val connection = object : ServiceConnection {
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            val binder = service as WearableService.LocalBinder
+            glassesManager = binder.getService().glassesManager
+            isBound = true
+        }
+
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            isBound = false
+            glassesManager = null
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        glassesManager = GlassesManager(this, "https://metahelper.onrender.com")
+        // Start and bind the foreground service
+        val intent = Intent(this, WearableService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent)
+        } else {
+            startService(intent)
+        }
+        bindService(intent, connection, Context.BIND_AUTO_CREATE)
 
         setContent {
             MetaHelperTheme {
@@ -35,10 +69,34 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen(glassesManager)
+                    // Provide a way to access glassesManager once bound
+                    var currentManager by remember { mutableStateOf<GlassesManager?>(null) }
+                    
+                    LaunchedEffect(isBound) {
+                        if (isBound) {
+                            currentManager = glassesManager
+                        }
+                    }
+
+                    currentManager?.let { MainScreen(it) } ?: LoadingScreen()
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (isBound) {
+            unbindService(connection)
+            isBound = false
+        }
+    }
+}
+
+@Composable
+fun LoadingScreen() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator()
     }
 }
 
@@ -111,6 +169,19 @@ fun MainScreen(manager: GlassesManager) {
             Icon(Icons.Default.CameraAlt, contentDescription = null)
             Spacer(modifier = Modifier.width(12.dp))
             Text("Capture Manually", style = MaterialTheme.typography.titleMedium)
+        }
+
+        // Replay Button
+        OutlinedButton(
+            onClick = { manager.replayLastAudio() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            shape = CircleShape
+        ) {
+            Icon(Icons.Default.Replay, contentDescription = null)
+            Spacer(modifier = Modifier.width(12.dp))
+            Text("Replay Last Answer", style = MaterialTheme.typography.titleMedium)
         }
 
         Text(
