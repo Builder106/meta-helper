@@ -81,12 +81,13 @@ class MainActivity : ComponentActivity() {
             val manager = binder.getService().glassesManager
             
             manager.onStatusUpdate = { msg -> 
+                Log.d("MainActivity", "UI Status update from manager: $msg")
                 statusMessage = msg 
             }
             
             glassesManager = manager
             isBound = true
-            Toast.makeText(this@MainActivity, "Service Bound!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@MainActivity, "App connected to background service!", Toast.LENGTH_SHORT).show()
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {

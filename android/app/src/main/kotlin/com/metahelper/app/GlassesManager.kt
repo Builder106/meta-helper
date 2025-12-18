@@ -63,23 +63,28 @@ class GlassesManager(
     }
 
     private fun processGalleryImage(uri: Uri) {
-        updateStatus("New photo detected! Solving...")
+        Log.d("GlassesManager", "Starting processGalleryImage for URI: $uri")
+        updateStatus("New photo detected! Reading data...")
         try {
             val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
-            val bytes = inputStream?.readBytes()
-            if (bytes != null) {
-                onPhotoCaptured(bytes)
-            } else {
-                updateStatus("Error: Could not read photo data.")
+            if (inputStream == null) {
+                Log.e("GlassesManager", "InputStream is null for URI: $uri")
+                updateStatus("Error: Could not open photo stream.")
+                return
             }
+            val bytes = inputStream.readBytes()
+            inputStream.close()
+            Log.d("GlassesManager", "Successfully read ${bytes.size} bytes from gallery")
+            onPhotoCaptured(bytes)
         } catch (e: Exception) {
-            Log.e("GlassesManager", "Gallery process error: ${e.message}")
+            val errorMsg = "Gallery process error: ${e.message}"
+            Log.e("GlassesManager", errorMsg)
             updateStatus("Error reading photo: ${e.message}")
         }
     }
 
     private fun updateStatus(msg: String) {
-        Log.d("GlassesManager", "STATUS: $msg")
+        Log.d("GlassesManager", "UI STATUS UPDATE: $msg")
         serviceScope.launch(Dispatchers.Main) {
             onStatusUpdate?.invoke(msg)
         }
@@ -170,24 +175,30 @@ class GlassesManager(
     }
 
     private fun onPhotoCaptured(imageBytes: ByteArray) {
+        Log.d("GlassesManager", "onPhotoCaptured called with ${imageBytes.size} bytes")
         Toast.makeText(context, "Sending photo to AI...", Toast.LENGTH_SHORT).show()
         volumeController.setQuietVolume()
+        
+        Log.d("GlassesManager", "Calling apiClient.processImage")
         apiClient.processImage(imageBytes, object : ApiClient.ApiResponseCallback {
             override fun onSuccess(audioBytes: ByteArray) {
+                Log.d("GlassesManager", "apiClient success: received ${audioBytes.size} bytes")
                 lastAudioResponse = audioBytes
                 Toast.makeText(context, "AI Answer Ready!", Toast.LENGTH_SHORT).show()
                 
                 if (isStreaming) {
-                    Log.d("GlassesManager", "AI Solution ready. Playing...")
+                    Log.d("GlassesManager", "Glasses ARE connected. Playing audio immediately.")
                     audioPlayer.playAudio(audioBytes)
                 } else {
-                    Log.d("GlassesManager", "AI Solution ready, but glasses disconnected. Saving for later.")
+                    Log.d("GlassesManager", "Glasses NOT connected (isStreaming=false). Saving to pending.")
                     pendingAudioResponse = audioBytes
                     updateStatus("Answer Ready! Waiting for glasses connection...")
                 }
             }
             override fun onError(message: String) {
-                Log.e("GlassesManager", "Pipeline Error: $message")
+                Log.e("GlassesManager", "apiClient error: $message")
+                Toast.makeText(context, "AI Error: $message", Toast.LENGTH_LONG).show()
+                updateStatus("AI Error: $message")
             }
         })
     }

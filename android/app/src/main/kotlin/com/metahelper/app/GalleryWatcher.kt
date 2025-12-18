@@ -41,6 +41,7 @@ class GalleryWatcher(
     }
 
     private fun fetchLatestImage() {
+        Log.d("GalleryWatcher", "fetchLatestImage() called")
         val projection = arrayOf(
             MediaStore.Images.Media._ID,
             MediaStore.Images.Media.DATE_ADDED,
@@ -49,25 +50,36 @@ class GalleryWatcher(
         
         val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
         
-        context.contentResolver.query(
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            projection,
-            null,
-            null,
-            sortOrder
-        )?.use { cursor ->
-            if (cursor.moveToFirst()) {
-                val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID))
-                val path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA))
-                val uri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id.toString())
-                
-                // Be more generous with the path filter to ensure we don't miss it
-                if (path.contains("Meta", ignoreCase = true)) {
-                    Log.d("GalleryWatcher", "New Meta image detected: $path")
-                    Toast.makeText(context, "Photo Detected: $path", Toast.LENGTH_SHORT).show()
-                    onNewImageDetected(uri)
+        try {
+            context.contentResolver.query(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                null,
+                null,
+                sortOrder
+            )?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID))
+                    val path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA))
+                    val uri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id.toString())
+                    
+                    Log.d("GalleryWatcher", "Checking most recent image: $path")
+                    
+                    // Be more generous with the path filter to ensure we don't miss it
+                    if (path.contains("Meta", ignoreCase = true)) {
+                        Log.d("GalleryWatcher", "MATCH! Meta image detected: $path")
+                        Toast.makeText(context, "Photo Detected: $path", Toast.LENGTH_SHORT).show()
+                        onNewImageDetected(uri)
+                    } else {
+                        Log.d("GalleryWatcher", "No match. Most recent image was: $path")
+                    }
+                } else {
+                    Log.d("GalleryWatcher", "MediaStore query returned no results.")
                 }
             }
+        } catch (e: Exception) {
+            Log.e("GalleryWatcher", "MediaStore query failed: ${e.message}")
+            e.printStackTrace()
         }
     }
 }

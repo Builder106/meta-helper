@@ -41,27 +41,35 @@ class AudioPlayer(private val context: Context) {
     }
 
     fun playAudio(audioBytes: ByteArray, onComplete: () -> Unit = {}) {
+        Log.d("AudioPlayer", "Attempting to play ${audioBytes.size} bytes of audio")
         try {
             stop()
             val tempFile = File.createTempFile("response", "mp3", context.cacheDir)
+            Log.d("AudioPlayer", "Created temp file: ${tempFile.absolutePath}")
             tempFile.deleteOnExit()
             val fos = FileOutputStream(tempFile)
             fos.write(audioBytes)
             fos.close()
+            Log.d("AudioPlayer", "Audio data written to temp file")
 
             mediaPlayer = MediaPlayer().apply {
                 setDataSource(tempFile.absolutePath)
+                Log.d("AudioPlayer", "DataSource set. Preparing...")
                 prepare()
+                Log.d("AudioPlayer", "Player prepared. Starting playback...")
                 setOnCompletionListener {
+                    Log.d("AudioPlayer", "Playback completed naturally")
                     onComplete()
                     tempFile.delete()
                     stop()
                 }
                 start()
             }
-            Log.d("AudioPlayer", "Started playing audio response")
+            Log.d("AudioPlayer", "MediaPlayer.start() called successfully")
         } catch (e: Exception) {
-            Log.e("AudioPlayer", "Error playing audio: ${e.message}")
+            val errorMsg = "Error playing audio: ${e.message}"
+            Log.e("AudioPlayer", errorMsg)
+            e.printStackTrace()
         }
     }
 
