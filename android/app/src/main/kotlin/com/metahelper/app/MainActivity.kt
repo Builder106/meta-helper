@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         
         // Initialize the manager (Using your local IP for real device testing)
-        glassesManager = GlassesManager(this, "http://172.21.100.50:8000")
+        glassesManager = GlassesManager(this, "https://metahelper.onrender.com")
 
         setContent {
             MetaHelperTheme {
