@@ -92,71 +92,32 @@ class GlassesManager(
     }
 
     private fun checkRegistrationAndStart() {
+        // No longer starting a full StreamSession to avoid "Experience Started" sounds
+        monitorConnectionState()
+    }
+
+    private fun monitorConnectionState() {
         serviceScope.launch {
             Wearables.registrationState.collect { state ->
-                when (state) {
-                    is RegistrationState.Registered -> {
-                        updateStatus("App Registered. Starting session...")
-                        startSession()
-                    }
-                    is RegistrationState.Available -> {
-                        updateStatus("ACTION REQUIRED: In Meta AI app, go to Settings -> App Access -> Enable 'POV Access' for MetaHelper")
-                        Wearables.startRegistration(context)
-                    }
-                    else -> updateStatus("Registration state: ${state.javaClass.simpleName}")
+                // Registered means the phone and glasses are communicating
+                isGlassesConnected = (state is RegistrationState.Registered)
+                updateStatus(if (isGlassesConnected) "Glasses Connected" else "Glasses Disconnected")
+                
+                if (isGlassesConnected && pendingAudioResponse != null) {
+                    Log.d("GlassesManager", "Glasses detected. Playing pending answer...")
+                    audioPlayer.playAudio(pendingAudioResponse!!)
+                    pendingAudioResponse = null
                 }
             }
         }
     }
 
     private fun startSession() {
-        updateStatus("Searching for glasses...")
-        val deviceSelector = AutoDeviceSelector { _, _ -> 0 }
-        
-        try {
-            streamSession = Wearables.startStreamSession(context, deviceSelector)
-            serviceScope.launch {
-                streamSession?.state?.collect { state ->
-                    val stateName = state.javaClass.simpleName
-                    updateStatus("Stream state: $stateName")
-                    
-                    isStreaming = (stateName == "Streaming")
-                    
-                    // If we have an answer waiting and the glasses just reconnected, play it!
-                    if (isStreaming && pendingAudioResponse != null) {
-                        Log.d("GlassesManager", "Glasses reconnected. Playing pending answer...")
-                        audioPlayer.playAudio(pendingAudioResponse!!)
-                        pendingAudioResponse = null
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            updateStatus("Session Error: ${e.message}")
-        }
+        // Function removed to prevent audio cues
     }
 
-    /**
-     * Trigger a photo capture using the StreamSession API.
-     * This captures the POV image from the glasses.
-     */
     fun triggerPhotoCapture() {
-        val session = streamSession ?: run {
-            Log.e("GlassesManager", "Session not active.")
-            return
-        }
-
-        serviceScope.launch {
-            Log.d("GlassesManager", "Capturing photo...")
-            // As per StreamSession interface: capturePhoto() returns Result<PhotoData>
-            val result = session.capturePhoto()
-            
-            if (result.isSuccess) {
-                val photoData = result.getOrThrow()
-                processPhotoData(photoData)
-            } else {
-                Log.e("GlassesManager", "Capture failed: ${result.exceptionOrNull()?.message}")
-            }
-        }
+        updateStatus("Manual capture disabled in Gallery Mode.")
     }
 
     private fun processPhotoData(photoData: PhotoData) {
@@ -187,11 +148,11 @@ class GlassesManager(
                 lastAudioResponse = audioBytes
                 Toast.makeText(context, "AI Answer Ready!", Toast.LENGTH_SHORT).show()
                 
-                if (isStreaming) {
+                if (isGlassesConnected) {
                     Log.d("GlassesManager", "Glasses ARE connected. Playing audio immediately.")
                     audioPlayer.playAudio(audioBytes)
                 } else {
-                    Log.d("GlassesManager", "Glasses NOT connected (isStreaming=false). Saving to pending.")
+                    Log.d("GlassesManager", "Glasses NOT connected. Saving to pending.")
                     pendingAudioResponse = audioBytes
                     updateStatus("Answer Ready! Waiting for glasses connection...")
                 }
