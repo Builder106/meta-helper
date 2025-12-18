@@ -37,7 +37,18 @@ class GlassesManager(
                     if (result.isSuccess) {
                         Log.d("GlassesManager", "Connected to glasses!")
                         // Initialize camera access
-                        wearableCamera = WearableCamera.getInstance(glasses)
+                        val camera = WearableCamera.getInstance(glasses)
+                        wearableCamera = camera
+                        
+                        // Register for hardware button captures
+                        camera.registerCaptureListener(object : WearableCamera.CaptureListener {
+                            override fun onImageCaptured(imageBuffer: ByteBuffer) {
+                                val bytes = ByteArray(imageBuffer.remaining())
+                                imageBuffer.get(bytes)
+                                Log.d("GlassesManager", "Hardware button photo received. Processing...")
+                                onPhotoCaptured(bytes)
+                            }
+                        })
                     } else {
                         Log.e("GlassesManager", "Connection failed: ${result.exceptionOrNull()}")
                     }

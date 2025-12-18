@@ -9,7 +9,7 @@ class VisionService:
 
     def get_description(self, image_bytes: bytes) -> str:
         image = PIL.Image.open(io.BytesIO(image_bytes))
-        prompt = "Describe what is in this image briefly and concisely for someone wearing smart glasses."
+        prompt = "You are an AI assistant helping a student wearing smart glasses. Identify any practice question in this image. If a question is found, provide the correct answer and a very brief explanation (max 2 sentences) so the student can hear it quickly."
         response = self.model.generate_content([prompt, image])
         return response.text
 

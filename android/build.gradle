@@ -10,18 +10,3 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-        maven {
-            name = "MetaWearables"
-            url = uri("https://maven.pkg.github.com/facebook/meta-wearables-dat-android")
-            credentials {
-                username = "ignored"
-                password = "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"
-            }
-        }
-    }
-}
