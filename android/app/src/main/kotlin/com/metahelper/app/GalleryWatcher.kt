@@ -8,6 +8,8 @@ import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 
+import android.widget.Toast
+
 class GalleryWatcher(
     private val context: Context,
     private val onNewImageDetected: (Uri) -> Unit
@@ -17,10 +19,10 @@ class GalleryWatcher(
             super.onChange(selfChange, uri)
             Log.d("GalleryWatcher", "Gallery change detected: $uri")
             
-            // Wait 1 second to ensure the file is fully written by Meta AI
+            // Wait 1.5 seconds to ensure the file is fully written by Meta AI
             Handler(Looper.getMainLooper()).postDelayed({
                 fetchLatestImage()
-            }, 1000)
+            }, 1500)
         }
     }
 
@@ -59,12 +61,11 @@ class GalleryWatcher(
                 val path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA))
                 val uri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id.toString())
                 
-                // Specific filter for "Meta AI" in the Download folder
-                if (path.contains("Download/Meta AI", ignoreCase = true)) {
-                    Log.d("GalleryWatcher", "New Meta AI image detected in Downloads: $path")
+                // Be more generous with the path filter to ensure we don't miss it
+                if (path.contains("Meta", ignoreCase = true)) {
+                    Log.d("GalleryWatcher", "New Meta image detected: $path")
+                    Toast.makeText(context, "Photo Detected: $path", Toast.LENGTH_SHORT).show()
                     onNewImageDetected(uri)
-                } else {
-                    Log.d("GalleryWatcher", "Ignored image outside Meta AI folder: $path")
                 }
             }
         }

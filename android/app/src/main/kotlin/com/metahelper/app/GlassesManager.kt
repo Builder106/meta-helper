@@ -32,6 +32,9 @@ class GlassesManager(
     private var streamSession: StreamSession? = null
     private val serviceScope = CoroutineScope(Dispatchers.Main + Job())
 
+    private var pendingAudioResponse: ByteArray? = null
+    private var isStreaming = false
+
     private var lastProcessedUri: Uri? = null
 
     private val galleryWatcher = GalleryWatcher(context) { uri ->
@@ -108,7 +111,17 @@ class GlassesManager(
             streamSession = Wearables.startStreamSession(context, deviceSelector)
             serviceScope.launch {
                 streamSession?.state?.collect { state ->
-                    updateStatus("Stream state: ${state.javaClass.simpleName}")
+                    val stateName = state.javaClass.simpleName
+                    updateStatus("Stream state: $stateName")
+                    
+                    isStreaming = (stateName == "Streaming")
+                    
+                    // If we have an answer waiting and the glasses just reconnected, play it!
+                    if (isStreaming && pendingAudioResponse != null) {
+                        Log.d("GlassesManager", "Glasses reconnected. Playing pending answer...")
+                        audioPlayer.playAudio(pendingAudioResponse!!)
+                        pendingAudioResponse = null
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -157,12 +170,21 @@ class GlassesManager(
     }
 
     private fun onPhotoCaptured(imageBytes: ByteArray) {
+        Toast.makeText(context, "Sending photo to AI...", Toast.LENGTH_SHORT).show()
         volumeController.setQuietVolume()
         apiClient.processImage(imageBytes, object : ApiClient.ApiResponseCallback {
             override fun onSuccess(audioBytes: ByteArray) {
                 lastAudioResponse = audioBytes
-                Log.d("GlassesManager", "AI Solution ready. Playing...")
-                audioPlayer.playAudio(audioBytes)
+                Toast.makeText(context, "AI Answer Ready!", Toast.LENGTH_SHORT).show()
+                
+                if (isStreaming) {
+                    Log.d("GlassesManager", "AI Solution ready. Playing...")
+                    audioPlayer.playAudio(audioBytes)
+                } else {
+                    Log.d("GlassesManager", "AI Solution ready, but glasses disconnected. Saving for later.")
+                    pendingAudioResponse = audioBytes
+                    updateStatus("Answer Ready! Waiting for glasses connection...")
+                }
             }
             override fun onError(message: String) {
                 Log.e("GlassesManager", "Pipeline Error: $message")
