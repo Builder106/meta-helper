@@ -11,13 +11,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.metahelper.app.ui.theme.MetaHelperTheme
 
+import androidx.compose.animation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bluetooth
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.vector.ImageVector
+
 class MainActivity : ComponentActivity() {
     private lateinit var glassesManager: GlassesManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Initialize the manager (Using your local IP for real device testing)
         glassesManager = GlassesManager(this, "https://metahelper.onrender.com")
 
         setContent {
@@ -26,10 +35,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen(onTestCapture = {
-                        // Now triggers an actual photo capture from the glasses camera
-                        glassesManager.triggerPhotoCapture()
-                    })
+                    MainScreen(glassesManager)
                 }
             }
         }
@@ -37,42 +43,80 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreen(onTestCapture: () -> Unit) {
+fun MainScreen(manager: GlassesManager) {
+    // We can observe state from the manager if we expose it
+    // For now, let's build the UI structure
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        Text(
-            text = "MetaHelper",
-            style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.primary
-        )
-        
-        Spacer(modifier = Modifier.height(8.dp))
-        
-        Text(
-            text = "AI Companion for Meta Glasses",
-            style = MaterialTheme.typography.bodyMedium
-        )
-
-        Spacer(modifier = Modifier.height(48.dp))
-
-        Button(
-            onClick = onTestCapture,
-            modifier = Modifier.fillMaxWidth().height(56.dp)
-        ) {
-            Text("Simulate Photo Capture")
+        // Header Area
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                imageVector = Icons.Default.Bluetooth,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(48.dp)
+            )
+            Text(
+                text = "MetaHelper",
+                style = MaterialTheme.typography.displaySmall,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Text(
+                text = "Smart Glasses Companion",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.secondary
+            )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Status Card
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "HARDWARE READY",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = Color(0xFF4CAF50) // Success Green
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Press the physical button on your glasses to solve a practice question.",
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+
+        // Action Button (Alternative to glasses button)
+        Button(
+            onClick = { manager.triggerPhotoCapture() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(64.dp),
+            shape = CircleShape
+        ) {
+            Icon(Icons.Default.CameraAlt, contentDescription = null)
+            Spacer(modifier = Modifier.width(12.dp))
+            Text("Capture Manually", style = MaterialTheme.typography.titleMedium)
+        }
 
         Text(
-            text = "Note: This will send a dummy request to the backend to test the audio pipeline.",
+            text = "Cloud: Connected to Render",
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.secondary
+            color = MaterialTheme.colorScheme.outline
         )
     }
 }
