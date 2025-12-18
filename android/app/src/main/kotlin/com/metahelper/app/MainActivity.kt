@@ -20,24 +20,22 @@ import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.graphics.vector.ImageVector
-
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
-import android.os.Build
-import android.os.IBinder
-import androidx.compose.foundation.layout.Box
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 
 class MainActivity : ComponentActivity() {
-    private var glassesManager: GlassesManager? = null
+    private var glassesManager by mutableStateOf<GlassesManager?>(null)
     private var isBound = false
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        if (permissions.all { it.value }) {
+            startWearableService()
+        }
+    }
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
@@ -47,14 +45,50 @@ class MainActivity : ComponentActivity() {
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
-            isBound = false
             glassesManager = null
+            isBound = false
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
+        checkAndRequestPermissions()
+
+        setContent {
+            MetaHelperTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    glassesManager?.let { MainScreen(it) } ?: LoadingScreen()
+                }
+            }
+        }
+    }
+
+    private fun checkAndRequestPermissions() {
+        val permissions = mutableListOf(
+            Manifest.permission.BLUETOOTH_CONNECT,
+            Manifest.permission.BLUETOOTH_SCAN,
+        )
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+        }
+
+        val missingPermissions = permissions.filter {
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        }
+
+        if (missingPermissions.isEmpty()) {
+            startWearableService()
+        } else {
+            requestPermissionLauncher.launch(missingPermissions.toTypedArray())
+        }
+    }
+
+    private fun startWearableService() {
         // Start and bind the foreground service
         val intent = Intent(this, WearableService::class.java)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -63,26 +97,6 @@ class MainActivity : ComponentActivity() {
             startService(intent)
         }
         bindService(intent, connection, Context.BIND_AUTO_CREATE)
-
-        setContent {
-            MetaHelperTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    // Provide a way to access glassesManager once bound
-                    var currentManager by remember { mutableStateOf<GlassesManager?>(null) }
-                    
-                    LaunchedEffect(isBound) {
-                        if (isBound) {
-                            currentManager = glassesManager
-                        }
-                    }
-
-                    currentManager?.let { MainScreen(it) } ?: LoadingScreen()
-                }
-            }
-        }
     }
 
     override fun onDestroy() {

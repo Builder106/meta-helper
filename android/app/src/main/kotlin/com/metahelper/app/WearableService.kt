@@ -21,7 +21,8 @@ class WearableService : Service() {
     override fun onCreate() {
         super.onCreate()
         Log.d("WearableService", "Service created")
-        glassesManager = GlassesManager(this)
+        // NOTE: Default points to Render. For local testing, use "http://10.0.2.2:8000"
+        glassesManager = GlassesManager(this, "https://metahelper.onrender.com")
         createNotificationChannel()
         startForeground(1, createNotification())
     }
