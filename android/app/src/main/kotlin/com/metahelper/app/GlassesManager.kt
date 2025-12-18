@@ -2,20 +2,20 @@ package com.metahelper.app
 
 import android.content.Context
 import android.util.Log
-import com.meta.wearable.dat.core.  Wearables
+import com.meta.wearable.dat.core.Wearables
 import com.meta.wearable.dat.camera.StreamSession
 import com.meta.wearable.dat.camera.startStreamSession
 import com.meta.wearable.dat.camera.types.PhotoData
+import com.meta.wearable.dat.camera.WearableCamera
+import com.meta.wearable.dat.core.types.RegistrationState
 import kotlinx.coroutines.*
 import java.io.ByteArrayOutputStream
+import java.nio.ByteBuffer
 
 /**
  * Manager class that coordinates the flow between the glasses and the backend.
  * Updated for Meta Wearables SDK 0.3.0 using the StreamSession API.
  */
-import com.meta.wearable.dat.core.RegistrationState
-import com.meta.wearable.dat.camera.WearableCamera
-
 class GlassesManager(
     private val context: Context,
     private val backendUrl: String = "https://metahelper.onrender.com"
@@ -69,7 +69,7 @@ class GlassesManager(
                 Log.d("GlassesManager", "Session state changed to: $state")
                 // When we transition to STREAMING, we should also register for 
                 // hardware button events specifically.
-                if (state.toString() == "STREAMING") {
+                if (state.toString().contains("STREAMING")) {
                     setupHardwareButtonListener()
                 }
             }
@@ -80,9 +80,12 @@ class GlassesManager(
         // In 0.3.0, you can get the camera from the session to listen for button events
         // This bypasses the Meta AI gallery import
         try {
-            val camera = WearableCamera.getInstance(Wearables.devices.value.first())
+            val deviceId = Wearables.devices.value.firstOrNull() ?: return
+            val camera = WearableCamera.getInstance(deviceId)
+            
+            // v0.3.0 correct signature: onPhotoCaptured (replaces onImageCaptured)
             camera.registerCaptureListener(object : WearableCamera.CaptureListener {
-                override fun onImageCaptured(imageBuffer: java.nio.ByteBuffer) {
+                override fun onPhotoCaptured(imageBuffer: ByteBuffer) {
                     val bytes = ByteArray(imageBuffer.remaining())
                     imageBuffer.get(bytes)
                     Log.d("GlassesManager", "INSTANT CAPTURE from button. Processing...")
@@ -96,7 +99,7 @@ class GlassesManager(
 
     private fun convertBitmapToByteArray(bitmap: android.graphics.Bitmap): ByteArray {
         val outputStream = ByteArrayOutputStream()
-        bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, outputStream)
+        bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 90, outputStream)
         return outputStream.toByteArray()
     }
 
@@ -125,7 +128,6 @@ class GlassesManager(
                     is PhotoData.Bitmap -> {
                         val bitmap = photoData.bitmap // Extract Android Bitmap
                         Log.d("GlassesManager", "Photo captured as Bitmap (${bitmap.width}x${bitmap.height}). Processing...")
-                        // Here you can save or process the bitmap (e.g., converting to JPEG or PNG)
                         val bytes = convertBitmapToByteArray(bitmap) // Convert bitmap to ByteArray
                         onPhotoCaptured(bytes)
                     }
