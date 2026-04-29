@@ -1,0 +1,16 @@
+[project]
+name = "metahelper"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Builder106",email = "vaughanolayinka@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12,<3.15"
+dependencies = [
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
