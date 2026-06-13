@@ -1,7 +1,11 @@
-from fastapi.testclient import TestClient
+# Alias the import: pytest.ini sets `python_classes = Test*`, so a bare
+# `TestClient` symbol gets picked up as a test class and errors out on its
+# __init__ ("cannot collect test class 'TestClient'") — which is what put
+# tests/test_main.py::TestClient in the lastfailed cache.
+from fastapi.testclient import TestClient as APIClient
 from app.main import app
 
-client = TestClient(app)
+client = APIClient(app)
 
 def test_read_root():
     response = client.get("/")
