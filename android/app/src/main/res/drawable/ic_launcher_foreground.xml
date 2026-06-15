@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- MetaHelper launcher foreground: glasses fused with a </> code glyph.
+     Authored from assets/logo.svg; the original 64-unit artwork is scaled and
+     centered into the adaptive-icon 108-unit canvas (within the 72-unit safe
+     zone) via the group transform below. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <group
+        android:scaleX="1.25"
+        android:scaleY="1.25"
+        android:translateX="14"
+        android:translateY="15.25">
+
+        <!-- glasses: two rounded lenses + bridge + temple stubs, accent gradient stroke -->
+        <path
+            android:pathData="M15.5,22 h6 a7,7 0 0 1 7,7 v6 a7,7 0 0 1 -7,7 h-6 a7,7 0 0 1 -7,-7 v-6 a7,7 0 0 1 7,-7 z M42.5,22 h6 a7,7 0 0 1 7,7 v6 a7,7 0 0 1 -7,7 h-6 a7,7 0 0 1 -7,-7 v-6 a7,7 0 0 1 7,-7 z M28.5,30 Q32,27 35.5,30 M8.5,30 L3.5,27.5 M55.5,30 L60.5,27.5"
+            android:fillColor="#00000000"
+            android:strokeWidth="3.4"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round">
+            <aapt:attr name="android:strokeColor">
+                <gradient
+                    android:type="linear"
+                    android:startX="8.5" android:startY="22"
+                    android:endX="55.5" android:endY="42">
+                    <item android:offset="0" android:color="#FF818CF8"/>
+                    <item android:offset="1" android:color="#FF6366F1"/>
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <!-- code chevrons inside the lenses: < and > -->
+        <path
+            android:pathData="M21,28 L15.5,32 L21,36 M43,28 L48.5,32 L43,36"
+            android:fillColor="#00000000"
+            android:strokeColor="#FFE0E7FF"
+            android:strokeWidth="2.6"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"/>
+
+        <!-- slash through the bridge -->
+        <path
+            android:pathData="M35,26 L29,38"
+            android:fillColor="#00000000"
+            android:strokeColor="#FFA5B4FC"
+            android:strokeWidth="2.6"
+            android:strokeLineCap="round"/>
+    </group>
+</vector>
