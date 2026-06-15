@@ -4,10 +4,19 @@ import io
 
 class VisionService:
     def __init__(self, api_key: str):
-        self.client = genai.Client(api_key=api_key)
         self.model_id = 'gemini-3-pro-preview'
+        # Defer client creation when no key is configured so the app can still
+        # import and start (matching main.py's "Vision service will fail"
+        # warning). This keeps the module importable in CI and for contributors
+        # who haven't created a .env yet; get_description still fails loudly if
+        # called without a key.
+        self.client = genai.Client(api_key=api_key) if api_key else None
 
     def get_description(self, image_bytes: bytes) -> str:
+        if self.client is None:
+            raise RuntimeError(
+                "VisionService is not configured: set GOOGLE_API_KEY in the environment."
+            )
         print(f"Calling Gemini with model: {self.model_id}")
         image = Image.open(io.BytesIO(image_bytes))
         prompt = """You are an AI assistant helping a student with a Computer Science practice exam, specifically focusing on C programming.
