@@ -38,6 +38,11 @@ jobs:
           cache: pip
           cache-dependency-path: backend/requirements.txt
 
+      - name: Install ffmpeg
+        # pydub shells out to ffmpeg to read/export MP3 (audio.py); the runner
+        # image doesn't guarantee it. The Docker image bakes it in separately.
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
+
       - name: Install dependencies
         run: pip install -r requirements.txt
 
