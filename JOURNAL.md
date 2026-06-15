@@ -4,6 +4,10 @@
 > things happen — retrospectives need this raw material to land.
 > Reverse-chronological; one paragraph max per entry.
 
+## 2026-06-14 — CI's first run caught a boot-crash and a missing ffmpeg dep #incident
+
+The new CI workflow earned its keep on the first push to `main`, catching two real problems that local runs had masked. (1) `main.py` builds `VisionService` at import and `genai.Client` raised `ValueError` on a missing `GOOGLE_API_KEY`, so app import — and pytest collection — crashed whenever no key was present; local runs passed only because `backend/.env` quietly supplied one. Fixed by deferring the client to `None` when unconfigured, matching the existing "Vision service will fail" warning (`get_description` now raises a clear error instead). (2) `test_audio_amplitude_scaling` needs `ffmpeg` for pydub's MP3 export, which the GitHub runner doesn't ship; added an apt install step (the Docker image already bakes it in). Backend and Android jobs both green afterward.
+
 ## 2026-06-14 — Repo baseline + reframed as a programming assistant #milestone #decision
 
 Scaffolded the standard repo baseline in one pass: added `LICENSE` (MIT), a rewritten `README.md`, `CONTRIBUTING.md`, this `JOURNAL.md`, and a CI workflow at `.github/workflows/ci.yml`. Restored the missing Gradle wrapper (`android/gradlew`, now present and executable) so the Android module builds from a clean checkout. The biggest content decision was reframing the docs: the old README described MetaHelper as a generic "describe my surroundings" tool, but the code tells a different story — the Gemini Vision prompt is tuned to read and solve programming problems (C-focused). Everything now frames the product as "look at a coding problem through Meta Ray-Ban glasses, take a photo, hear the explanation." Asset paths were standardized (`assets/banner-{dark,light}.svg`, `assets/logo.svg`) so README references resolve.
