@@ -1,7 +1,7 @@
 <picture>
   <source media="(prefers-color-scheme: dark)"  srcset="assets/banner-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="assets/banner-light.svg">
-  <img alt="MetaHelper — see a coding problem through your glasses, hear the solution" src="assets/banner-dark.svg">
+  <img alt="MetaHelper — hear the code in front of you, read aloud through your Meta Ray-Ban glasses" src="assets/banner-dark.svg">
 </picture>
 
 [![CI](https://github.com/Builder106/MetaHelper/actions/workflows/ci.yml/badge.svg)](https://github.com/Builder106/MetaHelper/actions/workflows/ci.yml)
@@ -10,11 +10,11 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](#license)
 [![Backend: live](https://img.shields.io/badge/backend-live-success.svg)](https://metahelper.onrender.com)
 
-**An AI programming assistant for Meta Ray-Ban glasses — look at a coding problem, hear the solution.**
+**Hear the code in front of you** — an audio-first programming assistant for Meta Ray-Ban glasses.
 
-MetaHelper turns the camera in your Meta Ray-Ban glasses into a hands-free coding tutor. Point at a programming problem on a screen, whiteboard, textbook, or printout and take a photo; MetaHelper reads the question with Gemini Vision and speaks back a worked solution. The vision prompt is intentionally tuned for reading and solving programming exercises (currently C-focused), so you get both a verbatim read-out of the code you can transcribe and a plain-English explanation of the logic — not a generic "describe my surroundings" caption.
+MetaHelper reads code, error messages, and technical text aloud through your Meta Ray-Ban glasses — an audio-first way to access code that isn't already digital text on your device. Look at code on a screen, whiteboard, projector, or printed page and take a photo; MetaHelper reads it back **verbatim** (so you can follow or transcribe it) and explains what it does in plain English, via Gemini Vision — not a generic "describe my surroundings" caption. It's aimed at developers and CS students who are blind or have low vision, and anyone who needs hands-free, audio access to code in the world around them.
 
-> **Demo:** coming soon.
+> **Status:** the vision prompt is currently tuned for C programming; generalizing it to any language is the next step toward the accessibility-first goal above. **Demo:** coming soon.
 
 ## How it works
 
