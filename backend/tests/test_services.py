@@ -29,6 +29,45 @@ def test_vision_service_generate_description():
             description = service.get_description(b"fake_image_bytes")
             assert description == "I see a person wearing glasses."
 
+def test_vision_service_unreadable_image_returns_guidance():
+    # Corrupt bytes -> PIL raises UnidentifiedImageError, which get_description
+    # catches and turns into retake-the-photo guidance.
+    with patch("app.services.vision.genai.Client"):
+        service = VisionService(api_key="mock_key")
+        description = service.get_description(b"this is not an image")
+        assert "couldn't read that image" in description
+
+
+def test_vision_service_generate_content_error_returns_guidance():
+    # generate_content raises -> get_description returns the "had trouble
+    # analyzing" guidance string.
+    with patch("PIL.Image.open") as mock_open:
+        mock_open.return_value = MagicMock()
+
+        with patch("app.services.vision.genai.Client") as mock_client_class:
+            mock_client = mock_client_class.return_value
+            mock_client.models.generate_content.side_effect = Exception("upstream 503")
+
+            service = VisionService(api_key="mock_key")
+            description = service.get_description(b"fake_image_bytes")
+            assert "had trouble analyzing" in description
+
+
+def test_vision_service_empty_response_returns_guidance():
+    # response.text is None (e.g. a safety block) -> get_description returns the
+    # "couldn't generate an answer" guidance string.
+    with patch("PIL.Image.open") as mock_open:
+        mock_open.return_value = MagicMock()
+
+        with patch("app.services.vision.genai.Client") as mock_client_class:
+            mock_client = mock_client_class.return_value
+            mock_client.models.generate_content.return_value.text = None
+
+            service = VisionService(api_key="mock_key")
+            description = service.get_description(b"fake_image_bytes")
+            assert "couldn't generate an answer" in description
+
+
 def test_audio_amplitude_scaling():
     # Generate 1 second of a 440Hz sine wave instead of silence
     from pydub.generators import Sine
