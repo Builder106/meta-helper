@@ -4,6 +4,10 @@
 > things happen — retrospectives need this raw material to land.
 > Reverse-chronological; one paragraph max per entry.
 
+## 2026-06-16 — Committed to gallery polling; retired the SDK capture path #decision #pivot
+
+Made the capture-strategy call explicit and removed the straddle. The Meta SDK `StreamSession` direct-capture path had been dead code since the Dec 2025 pivot and is blocked anyway on a registered `APPLICATION_ID` (still the `"0"` placeholder) that only a hardware-registration step can supply — so GalleryWatcher (MediaStore polling) is now the committed shipping path. Deleted `processPhotoData`/`startSession`/`triggerPhotoCapture`, the no-op "Capture Manually" button, and the `mwdat-camera` dependency (kept `mwdat-core` for connection state); reviving SDK capture later is a few hours' work once an app id exists, and the build.gradle comment says how. This session also hardened the runtime (Android HTTP timeouts, main-thread toasts, `prepareAsync`, volume restore; backend error handling + non-blocking pipeline) and added real tests (backend 4→9; Android unit tests for the trigger predicate and the volume-restore invariant). Still open: GalleryWatcher detection hardening, which needs an on-device run to learn Meta AI's real save folder/filename.
+
 ## 2026-06-14 — CI's first run caught a boot-crash and a missing ffmpeg dep #incident
 
 The new CI workflow earned its keep on the first push to `main`, catching two real problems that local runs had masked. (1) `main.py` builds `VisionService` at import and `genai.Client` raised `ValueError` on a missing `GOOGLE_API_KEY`, so app import — and pytest collection — crashed whenever no key was present; local runs passed only because `backend/.env` quietly supplied one. Fixed by deferring the client to `None` when unconfigured, matching the existing "Vision service will fail" warning (`get_description` now raises a clear error instead). (2) `test_audio_amplitude_scaling` needs `ffmpeg` for pydub's MP3 export, which the GitHub runner doesn't ship; added an apt install step (the Docker image already bakes it in). Backend and Android jobs both green afterward.
