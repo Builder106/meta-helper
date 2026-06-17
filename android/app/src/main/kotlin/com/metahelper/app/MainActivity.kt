@@ -26,10 +26,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.metahelper.app.ui.theme.MetaHelperTheme
-import com.meta.wearable.dat.core.Wearables
-import com.meta.wearable.dat.core.types.Permission
-import com.meta.wearable.dat.core.types.PermissionStatus
-import com.meta.wearable.dat.core.types.RegistrationState
 
 import android.widget.Toast
 
@@ -42,35 +38,10 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         if (permissions.all { it.value }) {
-            statusMessage = "Permissions granted. Requesting Meta access..."
-            requestMetaPermissions()
+            statusMessage = "Permissions granted. Starting service..."
+            startWearableService()
         } else {
             statusMessage = "Android permissions denied."
-        }
-    }
-
-    private val metaPermissionLauncher = registerForActivityResult(
-        Wearables.RequestPermissionContract()
-    ) { result ->
-        Log.d("MainActivity", "Meta Permission Result: $result")
-        
-        // Unwrap the result using the pattern found in GlassesManager.kt
-        if (result.isSuccess) {
-            val status = result.getOrThrow()
-            if (status is PermissionStatus.Granted) {
-                statusMessage = "Meta Permission Granted! Starting Service..."
-                Toast.makeText(this, "Meta Permission Granted!", Toast.LENGTH_SHORT).show()
-                startWearableService()
-            } else {
-                statusMessage = "Meta Permission Denied: $status"
-                Log.e("MainActivity", "Meta permission denied: $status")
-                Toast.makeText(this, "Permission Denied: $status", Toast.LENGTH_LONG).show()
-            }
-        } else {
-            val error = result.exceptionOrNull()?.message ?: "Unknown Error"
-            statusMessage = "Meta SDK Error: $error"
-            Log.e("MainActivity", "Meta SDK Error: $error")
-            Toast.makeText(this, "Meta SDK Error: $error", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -131,32 +102,15 @@ class MainActivity : ComponentActivity() {
         }
 
         if (missingPermissions.isEmpty()) {
-            checkMetaPermissions()
+            // Capture is via GalleryWatcher, not the DAT camera API, so we don't
+            // request a DAT camera permission (that path was retired and would
+            // bounce the user to the Meta AI app). Start the service directly;
+            // GlassesManager initializes the Wearables SDK and observes
+            // registration state for the connection indicator.
+            startWearableService()
         } else {
             requestPermissionLauncher.launch(missingPermissions.toTypedArray())
         }
-    }
-
-    private fun checkMetaPermissions() {
-        // Initialize Wearables if not already initialized
-        Wearables.initialize(this)
-        
-        // If the glasses are already registered, we don't need to ask for permissions again
-        val state = Wearables.registrationState.value
-        Log.d("MainActivity", "Current Meta Registration State: $state")
-        
-        if (state is RegistrationState.Registered) {
-            Log.d("MainActivity", "Meta Registration already active. Starting service directly.")
-            startWearableService()
-        } else {
-            Log.d("MainActivity", "Meta Registration not active ($state). Requesting access...")
-            requestMetaPermissions()
-        }
-    }
-
-    private fun requestMetaPermissions() {
-        // Request CAMERA permission through the Meta SDK
-        metaPermissionLauncher.launch(Permission.CAMERA)
     }
 
     private fun startWearableService() {
