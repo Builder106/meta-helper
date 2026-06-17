@@ -26,7 +26,6 @@ class GlassesManager(
     
     private val serviceScope = CoroutineScope(Dispatchers.Main + Job())
 
-    private var pendingAudioResponse: ByteArray? = null
     private var isGlassesConnected = false
 
     private var lastProcessedUri: Uri? = null
@@ -104,12 +103,6 @@ class GlassesManager(
                 // Registered means the phone and glasses are communicating
                 isGlassesConnected = (state is RegistrationState.Registered)
                 updateStatus(if (isGlassesConnected) "Glasses Connected" else "Glasses Disconnected")
-                
-                if (isGlassesConnected && pendingAudioResponse != null) {
-                    Log.d("GlassesManager", "Glasses detected. Playing pending answer...")
-                    audioPlayer.playAudio(pendingAudioResponse!!) { volumeController.restoreVolume() }
-                    pendingAudioResponse = null
-                }
             }
         }
     }
@@ -125,15 +118,13 @@ class GlassesManager(
                 Log.d("GlassesManager", "apiClient success: received ${audioBytes.size} bytes")
                 lastAudioResponse = audioBytes
                 toast("AI Answer Ready!")
-
-                if (isGlassesConnected) {
-                    Log.d("GlassesManager", "Glasses ARE connected. Playing audio immediately.")
-                    audioPlayer.playAudio(audioBytes) { volumeController.restoreVolume() }
-                } else {
-                    Log.d("GlassesManager", "Glasses NOT connected. Saving to pending.")
-                    pendingAudioResponse = audioBytes
-                    updateStatus("Answer Ready! Waiting for glasses connection...")
-                }
+                // Play as soon as the answer arrives. Capture is via the gallery,
+                // not a DAT session, so playback isn't gated on glasses
+                // registration; MediaPlayer routes to whatever audio output is
+                // active (phone speaker or connected glasses). Tap Replay to repeat.
+                Log.d("GlassesManager", "Playing answer.")
+                updateStatus("Playing answer...")
+                audioPlayer.playAudio(audioBytes) { volumeController.restoreVolume() }
             }
             override fun onError(message: String) {
                 Log.e("GlassesManager", "apiClient error: $message")
