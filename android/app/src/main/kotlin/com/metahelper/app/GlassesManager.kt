@@ -100,9 +100,15 @@ class GlassesManager(
     private fun monitorConnectionState() {
         serviceScope.launch {
             Wearables.registrationState.collect { state ->
-                // Registered means the phone and glasses are communicating
+                // Registration state reflects optional Meta DAT pairing, not
+                // capture readiness — gallery capture works whether or not the
+                // glasses are "linked", so avoid an alarming "Disconnected" that
+                // reads as if the app is broken.
                 isGlassesConnected = (state is RegistrationState.Registered)
-                updateStatus(if (isGlassesConnected) "Glasses Connected" else "Glasses Disconnected")
+                updateStatus(
+                    if (isGlassesConnected) "Glasses linked · watching for photos"
+                    else "Watching gallery for new photos"
+                )
             }
         }
     }
