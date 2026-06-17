@@ -1,10 +1,14 @@
 from google import genai
 from PIL import Image
 import io
+import os
 
 class VisionService:
     def __init__(self, api_key: str):
-        self.model_id = 'gemini-3-pro-preview'
+        # Default to a free-tier vision model. Pro preview models (e.g.
+        # gemini-3-pro-preview) return HTTP 429 "limit: 0" without billing
+        # enabled on the key. Override via GEMINI_MODEL on a billed key.
+        self.model_id = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
         # Defer client creation when no key is configured so the app can still
         # import and start (matching main.py's "Vision service will fail"
         # warning). This keeps the module importable in CI and for contributors
