@@ -1,16 +1,19 @@
-FROM python:3.13-slim
+FROM eclipse-temurin:21-jdk-jammy
 
-# Install ffmpeg for pydub (audio processing)
-RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    python3 \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install edge-tts --break-system-packages
 
 WORKDIR /app
+COPY build.gradle.kts settings.gradle.kts gradlew ./
+COPY gradle gradle
+COPY . .
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN ./gradlew build -x test
 
-COPY ./app ./app
-
-EXPOSE 8000
-
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "build/libs/metahelper-backend-0.0.1-SNAPSHOT.jar"]
