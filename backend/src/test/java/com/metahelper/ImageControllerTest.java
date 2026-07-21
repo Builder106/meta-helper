@@ -57,4 +57,51 @@ public class ImageControllerTest {
                 .andExpect(content().contentType("audio/mpeg"))
                 .andExpect(content().bytes(fakeScaledAudio));
     }
+
+    @Test
+    public void testRootEndpoint() throws Exception {
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/"))
+                .andExpect(status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath("$.message").value("MetaHelper API is running"));
+    }
+
+    @Test
+    public void testProcessImageFallbackDescription() throws Exception {
+        byte[] fakeImage = "fake_image_content".getBytes();
+        byte[] fakeAudio = "fake_audio_content".getBytes();
+        byte[] fakeScaledAudio = "fake_scaled_audio_content".getBytes();
+
+        when(visionService.getDescription(any(byte[].class))).thenReturn("");
+        when(ttsService.textToSpeech(any())).thenReturn(fakeAudio);
+        when(audioService.scaleAmplitude(any(byte[].class), anyDouble())).thenReturn(fakeScaledAudio);
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "test.jpg",
+                "image/jpeg",
+                fakeImage
+        );
+
+        mockMvc.perform(multipart("/process-image").file(file))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("audio/mpeg"))
+                .andExpect(content().bytes(fakeScaledAudio));
+    }
+
+    @Test
+    public void testProcessImageErrorHandling() throws Exception {
+        byte[] fakeImage = "fake_image_content".getBytes();
+
+        when(visionService.getDescription(any(byte[].class))).thenThrow(new RuntimeException("API Error"));
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "test.jpg",
+                "image/jpeg",
+                fakeImage
+        );
+
+        mockMvc.perform(multipart("/process-image").file(file))
+                .andExpect(status().isInternalServerError());
+    }
 }
