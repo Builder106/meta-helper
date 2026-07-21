@@ -29,10 +29,10 @@ jobs:
         working-directory: ./backend
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python 3.13
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.13'
           cache: pip
@@ -73,7 +73,7 @@ jobs:
 
       - name: Check out repository
         if: env.HAS_TOKEN == 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up JDK 17 (Temurin)
         if: env.HAS_TOKEN == 'true'
