@@ -22,30 +22,21 @@ jobs:
   # Backend — always runs and gates the workflow. Must be green on a fresh repo.
   # ---------------------------------------------------------------------------
   backend:
-    name: Backend (FastAPI / Python 3.13)
+    name: Backend (Spring Boot / Java 21)
     runs-on: ubuntu-24.04
-    defaults:
-      run:
-        working-directory: ./backend
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
 
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v7
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
         with:
-          python-version: '3.13'
-          cache: pip
-          cache-dependency-path: backend/requirements.txt
+          distribution: temurin
+          java-version: '21'
 
-      - name: Install ffmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Run tests
-        run: python -m pytest -q
+      - name: Run Spring Boot unit tests
+        working-directory: ./backend
+        run: ./gradlew test
 
   # ---------------------------------------------------------------------------
   # Android — Kotlin + Jetpack Compose. The Meta Wearables SDK is resolved from
