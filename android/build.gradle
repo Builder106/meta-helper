@@ -13,5 +13,5 @@ buildscript {
 }
 
 plugins {
-    id "org.jetbrains.kotlin.plugin.compose" version "2.1.0" // Use Compose Gradle Plugin
+    id "org.jetbrains.kotlin.plugin.compose" version "2.4.10" // Use Compose Gradle Plugin
 }
