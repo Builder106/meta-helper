@@ -65,7 +65,7 @@ dependencies {
     implementation 'androidx.compose.material:material-icons-extended'
     
     // Networking
-    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
+    implementation 'com.squareup.okhttp3:okhttp:5.4.0'
 
     // Meta Wearables SDK (DAT) — core only, for connection/registration state.
     // Capture is driven by GalleryWatcher, so the camera (StreamSession) artifact
