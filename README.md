@@ -4,7 +4,7 @@
   <img alt="MetaHelper — hear the code in front of you, read aloud through your Meta Ray-Ban glasses" src="assets/banner-dark.svg">
 </picture>
 
-[![CI](https://github.com/Builder106/MetaHelper/actions/workflows/ci.yml/badge.svg)](https://github.com/Builder106/MetaHelper/actions/workflows/ci.yml)
+[![CI](https://github.com/Builder106/meta-helper/actions/workflows/ci.yml/badge.svg)](https://github.com/Builder106/meta-helper/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.13%2B-blue.svg)](https://www.python.org/)
 [![Kotlin / Android](https://img.shields.io/badge/Android-Kotlin%20%2B%20Compose-3DDC84.svg?logo=android&logoColor=white)](https://developer.android.com/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](#license)

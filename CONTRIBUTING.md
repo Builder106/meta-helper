@@ -127,7 +127,7 @@ Please respect these project-specific constraints:
 1. Branch off `main` (e.g. `git checkout -b fix-gallery-debounce`).
 2. Make your change, keeping the backend and Android pieces consistent with the data flow above.
 3. Run the relevant tests locally before pushing (`python -m pytest` for backend changes, `./gradlew testDebugUnitTest` for Android changes).
-4. Open a PR against `main` at https://github.com/Builder106/MetaHelper with a clear description of what changed and why.
+4. Open a PR against `main` at https://github.com/Builder106/meta-helper with a clear description of what changed and why.
 5. CI (`.github/workflows/ci.yml`) must pass before a PR can be merged. Address any failures rather than disabling checks.
 
 ## Out of scope
