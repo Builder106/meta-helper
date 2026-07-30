@@ -32,8 +32,8 @@ Requires Python 3.13 and `ffmpeg` (pydub needs it for audio processing).
 ```bash
 cd backend
 cp .env.example .env          # then fill in GOOGLE_API_KEY
-pip install -r requirements.txt
-uvicorn app.main:app --reload
+uv sync --group dev
+uv run uvicorn app.main:app --reload
 ```
 
 Environment variables (see `backend/.env.example`):

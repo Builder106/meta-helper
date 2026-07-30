@@ -75,8 +75,8 @@ Requires Python 3.13+ and `ffmpeg` (used by `pydub` for audio export).
 
 ```bash
 cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --reload
+uv sync --group dev
+uv run uvicorn app.main:app --reload
 ```
 
 Copy `backend/.env.example` to `backend/.env` and fill in your values:
