@@ -52,7 +52,7 @@ sequenceDiagram
 
 ## Project structure
 
-```
+```text
 MetaHelper/
 ├── backend/   Python 3.13 · FastAPI — vision → TTS → audio pipeline
 │   └── app/
@@ -86,14 +86,14 @@ Copy `backend/.env.example` to `backend/.env` and fill in your values:
 | `GOOGLE_API_KEY` | yes | — | Google Gemini API key ([create one](https://aistudio.google.com/apikey)) |
 | `AUDIO_AMPLITUDE_MULTIPLIER` | no | `0.1` | Playback gain (0.0–1.0); lower keeps audio from overpowering the glasses' speakers |
 
-**API**
+## API
 
 | Method | Route | Body | Returns |
 | --- | --- | --- | --- |
 | `GET` | `/` | — | JSON health check |
 | `POST` | `/process-image` | multipart form, field `file` (image) | `audio/mpeg` MP3 bytes |
 
-**Tests**
+## Tests
 
 ```bash
 cd backend

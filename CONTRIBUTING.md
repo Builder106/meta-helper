@@ -15,7 +15,7 @@ Thanks for your interest in contributing. This guide covers how to set up both h
 
 ### How a request flows
 
-```
+```text
 Glasses photo
   → Android GalleryWatcher detects the new photo in the phone gallery
   → GlassesManager reads the image bytes
@@ -72,7 +72,7 @@ Toolchain: Gradle 8.13 (use the bundled `./gradlew` wrapper), Android Gradle Plu
 
 The Meta Wearables SDK (`com.meta.wearable:mwdat-core` / `mwdat-camera`, version `0.3.0`) is **not** on Maven Central. It is resolved from GitHub Packages at:
 
-```
+```text
 https://maven.pkg.github.com/facebook/meta-wearables-dat-android
 ```
 
