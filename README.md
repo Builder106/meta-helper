@@ -82,14 +82,14 @@ uv run uvicorn app.main:app --reload
 Copy `backend/.env.example` to `backend/.env` and fill in your values:
 
 | Variable | Required | Default | Purpose |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `GOOGLE_API_KEY` | yes | — | Google Gemini API key ([create one](https://aistudio.google.com/apikey)) |
 | `AUDIO_AMPLITUDE_MULTIPLIER` | no | `0.1` | Playback gain (0.0–1.0); lower keeps audio from overpowering the glasses' speakers |
 
 **API**
 
 | Method | Route | Body | Returns |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `GET` | `/` | — | JSON health check |
 | `POST` | `/process-image` | multipart form, field `file` (image) | `audio/mpeg` MP3 bytes |
 
@@ -141,7 +141,7 @@ docker build -t metahelper-backend ./backend
 docker run -p 8000:8000 --env-file backend/.env metahelper-backend
 ```
 
-The hosted backend at **https://metahelper.onrender.com** is deployed on [Render](https://render.com). Free-tier instances sleep when idle, so the first request after a quiet period may take a few seconds to wake.
+The hosted backend at **<https://metahelper.onrender.com>** is deployed on [Render](https://render.com). Free-tier instances sleep when idle, so the first request after a quiet period may take a few seconds to wake.
 
 ## License
 

@@ -44,7 +44,7 @@ justification (see below) and the kind Meta's review is set up to approve.
 
 ## Registration steps (Path C)
 
-1. Sign in at **https://wearables.developer.meta.com/** with a **Meta Managed Account**;
+1. Sign in at **<https://wearables.developer.meta.com/>** with a **Meta Managed Account**;
    set up your organization.
    - Gotcha: being signed into `developers.meta.com` can break `wearables.developer.meta.com`
      links (note `developer` vs `developers`). Sign out of the former first.
@@ -109,9 +109,9 @@ before submission — the docs and sample apps now target 0.7.x, and several pre
 
 ## Sources
 
-- https://wearables.developer.meta.com/ (Developer Center)
-- https://wearables.developer.meta.com/docs/develop/dat/manage-projects/
-- https://wearables.developer.meta.com/docs/develop/dat/build-integration-android/
-- https://developers.meta.com/wearables/faq/ (access status, regions, publishing)
-- https://developers.meta.com/blog/introducing-meta-wearables-device-access-toolkit/
-- https://github.com/facebook/meta-wearables-dat-android (issues #65, #30, #80, #94, #115)
+- <https://wearables.developer.meta.com/> (Developer Center)
+- <https://wearables.developer.meta.com/docs/develop/dat/manage-projects/>
+- <https://wearables.developer.meta.com/docs/develop/dat/build-integration-android/>
+- <https://developers.meta.com/wearables/faq/> (access status, regions, publishing)
+- <https://developers.meta.com/blog/introducing-meta-wearables-device-access-toolkit/>
+- <https://github.com/facebook/meta-wearables-dat-android> (issues #65, #30, #80, #94, #115)

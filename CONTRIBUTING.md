@@ -38,7 +38,7 @@ uv run uvicorn app.main:app --reload
 
 Environment variables (see `backend/.env.example`):
 
-- `GOOGLE_API_KEY` — **required**. A Google Gemini API key (create one at https://aistudio.google.com/apikey). Without it the vision service fails.
+- `GOOGLE_API_KEY` — **required**. A Google Gemini API key (create one at <https://aistudio.google.com/apikey>). Without it the vision service fails.
 - `AUDIO_AMPLITUDE_MULTIPLIER` — optional, defaults to `0.1`. Playback gain (0.0–1.0) applied to the synthesized speech so it doesn't overpower the glasses' speakers.
 
 ### Backend endpoints
@@ -62,7 +62,7 @@ docker build -t metahelper-backend ./backend
 docker run -p 8000:8000 --env-file backend/.env metahelper-backend
 ```
 
-The deployed backend lives at https://metahelper.onrender.com (Render).
+The deployed backend lives at <https://metahelper.onrender.com> (Render).
 
 ## Android setup (`android/`)
 
@@ -127,7 +127,7 @@ Please respect these project-specific constraints:
 1. Branch off `main` (e.g. `git checkout -b fix-gallery-debounce`).
 2. Make your change, keeping the backend and Android pieces consistent with the data flow above.
 3. Run the relevant tests locally before pushing (`python -m pytest` for backend changes, `./gradlew testDebugUnitTest` for Android changes).
-4. Open a PR against `main` at https://github.com/Builder106/meta-helper with a clear description of what changed and why.
+4. Open a PR against `main` at <https://github.com/Builder106/meta-helper> with a clear description of what changed and why.
 5. CI (`.github/workflows/ci.yml`) must pass before a PR can be merged. Address any failures rather than disabling checks.
 
 ## Out of scope
