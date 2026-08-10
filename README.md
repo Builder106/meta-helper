@@ -7,6 +7,7 @@
 [![CI](https://github.com/Builder106/meta-helper/actions/workflows/ci.yml/badge.svg)](https://github.com/Builder106/meta-helper/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.13%2B-blue.svg)](https://www.python.org/)
 [![Kotlin / Android](https://img.shields.io/badge/Android-Kotlin%20%2B%20Compose-3DDC84.svg?logo=android&logoColor=white)](https://developer.android.com/)
+[![iOS / Compose Multiplatform](https://img.shields.io/badge/iOS-Compose%20Multiplatform-000000.svg?logo=apple&logoColor=white)](https://www.jetbrains.com/lp/compose-multiplatform/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](#license)
 [![Backend: live](https://img.shields.io/badge/backend-live-success.svg)](https://metahelper.onrender.com)
 
@@ -18,22 +19,22 @@ MetaHelper reads code, error messages, and technical text aloud through your Met
 
 ## How it works
 
-When you take a photo on the glasses, it lands in the phone's gallery. MetaHelper's Android app watches for that new photo, ships it to the backend, and plays the spoken solution that comes back. Double-tap the glasses to replay the last answer.
+When you take a photo on the glasses, it lands in the phone's gallery. MetaHelper's Android/iOS app watches for that new photo, ships it to the backend, and plays the spoken solution that comes back. Double-tap the glasses to replay the last answer.
 
 ```mermaid
 sequenceDiagram
     actor User as User (glasses)
-    participant GW as Android · GalleryWatcher
-    participant GM as Android · GlassesManager
-    participant API as Android · ApiClient
-    participant BE as Backend · FastAPI
+    participant GW as Android · GalleryWatcher / iOS · PhotosObserver
+    participant GM as Android/iOS · GlassesManager
+    participant API as Android/iOS · ApiClient
+    participant BE as Backend · Spring Boot (Java)
     participant V as vision.py · Gemini
     participant T as tts.py · edge-tts
-    participant A as audio.py · pydub
-    participant AP as Android · AudioPlayer
+    participant A as audio.py · pydub / ffmpeg
+    participant AP as Android/iOS · AudioPlayer
 
     User->>GW: Take photo of a coding problem
-    GW->>GM: New gallery photo detected (MediaStore)
+    GW->>GM: New gallery photo detected (MediaStore / Photos framework)
     GM->>API: Read image bytes
     API->>BE: multipart POST /process-image (file)
     BE->>V: Read & solve the problem (gemini-3-pro-preview)
@@ -48,35 +49,47 @@ sequenceDiagram
     User->>AP: Double-tap glasses to replay
 ```
 
-> **Capture note:** Photo capture currently works through `GalleryWatcher`, a `MediaStore` `ContentObserver` that detects new glasses photos saved to the phone gallery. The Meta Wearables SDK's direct-capture path (`StreamSession`) is stubbed/in-progress and is the intended future approach.
+> **Capture note:** Photo capture currently works through **gallery polling** — the glasses take the photo through Meta AI natively and the app reads it from the phone gallery (`READ_MEDIA_IMAGES` on Android, Photos framework on iOS). The Meta Wearables SDK's direct-capture path (`StreamSession` on Android, `MWDAT` on iOS) is stubbed/in-progress and is the intended future approach.
 
 ## Project structure
 
 ```text
 MetaHelper/
-├── backend/   Python 3.13 · FastAPI — vision → TTS → audio pipeline
+├── backend/   Java 21 · Spring Boot 3 — vision → TTS → audio pipeline
 │   └── app/
 │       ├── main.py             GET / (health), POST /process-image
 │       └── services/
 │           ├── vision.py       Gemini (gemini-3-pro-preview) — reads & solves the problem
 │           ├── tts.py          edge-tts (en-US-GuyNeural + fallbacks)
 │           └── audio.py        pydub playback-gain scaling
-└── android/   Kotlin · Jetpack Compose — Meta Wearables SDK client
-    └── app/src/main/kotlin/com/metahelper/app/
-        ├── GalleryWatcher.kt   Detects new glasses photos via MediaStore
-        ├── GlassesManager.kt   Reads photo bytes, drives the flow
-        ├── ApiClient.kt        multipart POST /process-image
-        └── AudioPlayer.kt      Plays the returned MP3 (double-tap to replay)
+├── shared/    Kotlin Multiplatform — shared business logic
+│   └── src/
+│       ├── commonMain/kotlin/com/metahelper/shared/
+│       │   ├── GlassesManager.kt     Core flow coordinator
+│       │   ├── ApiClient.kt          Platform-agnostic HTTP client
+│       │   ├── GalleryWatcher.kt     expect/actual for photo detection
+│       │   ├── AudioPlayer.kt        expect/actual for audio playback
+│       │   ├── VolumeController.kt   expect/actual for volume control
+│       │   └── WearablesConnectionMonitor.kt  expect/actual for SDK connection
+│       ├── androidMain/...           Android implementations (MediaStore, MediaPlayer, etc.)
+│       └── iosMain/...               iOS implementations (Photos, AVFoundation, MWDAT)
+├── android/   Kotlin · Jetpack Compose — Meta Wearables SDK client
+│   └── app/src/main/kotlin/com/metahelper/app/
+│       ├── GalleryWatcher.kt   Detects new glasses photos via MediaStore
+│       ├── GlassesManager.kt   Reads photo bytes, drives the flow
+│       ├── ApiClient.kt        multipart POST /process-image
+│       └── AudioPlayer.kt      Plays the returned MP3 (double-tap to replay)
+├── iosApp/    iOS · Compose Multiplatform — shared UI + iOS platform code
+└── assets/    Shared brand assets (banner, logo) referenced by the README
 ```
 
 ## Backend — setup
 
-Requires Python 3.13+ and `ffmpeg` (used by `pydub` for audio export).
+Requires Java 21 and `ffmpeg` (used for audio export).
 
 ```bash
 cd backend
-uv sync --group dev
-uv run uvicorn app.main:app --reload
+./gradlew bootRun
 ```
 
 Copy `backend/.env.example` to `backend/.env` and fill in your values:
@@ -97,14 +110,14 @@ Copy `backend/.env.example` to `backend/.env` and fill in your values:
 
 ```bash
 cd backend
-python -m pytest
+./gradlew test
 ```
 
-(Tests live in `backend/tests/`; config in `backend/pytest.ini`.)
+(Tests live in `backend/src/test/`.)
 
 ## Android — setup
 
-Requires the Gradle wrapper (included: `./gradlew`), AGP 8.13.2, Kotlin 2.1.0; targets `compileSdk 36`, `minSdk 29`, `targetSdk 34`.
+Requires the Gradle wrapper (included: `./gradlew`), AGP 8.13.2, Kotlin 2.4.10; targets `compileSdk 36`, `minSdk 29`, `targetSdk 34`.
 
 ```bash
 cd android
@@ -134,7 +147,7 @@ Point the app's `ApiClient` at your backend — the live instance at `https://me
 
 ## Self-hosting
 
-The backend ships with a `Dockerfile` (Python 3.13 slim, `ffmpeg` baked in):
+The backend ships with a `Dockerfile` (Java 21, `ffmpeg` baked in):
 
 ```bash
 docker build -t metahelper-backend ./backend

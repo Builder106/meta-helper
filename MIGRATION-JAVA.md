@@ -2,18 +2,22 @@
 
 This document outlines the strategy for migrating the MetaHelper backend from Python (FastAPI) to Java (Spring Boot).
 
+## Status: COMPLETED ✅
+
+The migration has been fully implemented. The backend is now Java 21 + Spring Boot 3.
+
 ## Motivation
 
-Currently, MetaHelper is a split-ecosystem project: Kotlin on Android, Python on the backend. Moving the backend to Java unifies the project into a strict JVM ecosystem. Additionally, building a Spring Boot REST API for image processing, AI integration, and audio generation is an excellent showcase of enterprise-grade Java skills.
+Previously, MetaHelper was a split-ecosystem project: Kotlin on Android, Python on the backend. Moving the backend to Java unifies the project into a strict JVM ecosystem. Additionally, building a Spring Boot REST API for image processing, AI integration, and audio generation is an excellent showcase of enterprise-grade Java skills.
 
-## Target Architecture
+## Target Architecture (Implemented)
 
 - **Framework:** Java 21 + Spring Boot 3.x
-- **Build Tool:** Gradle (Kotlin DSL) or Maven
+- **Build Tool:** Gradle (Kotlin DSL)
 - **HTTP/Routing:** Spring Web (Multipart file handling)
 - **Deployment:** Dockerized Spring Boot app deployed on Render
 
-## Component Migration Strategy
+## Component Migration Strategy (Completed)
 
 ### 1. The Web Layer (`main.py` -> `ImageController.java`)
 
@@ -22,38 +26,66 @@ Currently, MetaHelper is a split-ecosystem project: Kotlin on Android, Python on
 
 ### 2. Gemini Vision (`vision.py` -> `VisionService.java`)
 
-**Current (Python):** Uses the `google-generativeai` python SDK to pass the image to `gemini-3-pro-preview`.
-**New (Java):**
-
-- We can use the official `google-cloud-vertexai` Java SDK, OR
-- Simply use Spring's `RestClient` or `WebClient` to make a direct REST call to the Gemini API (`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent`). The REST approach is often lighter than pulling in the full Google Cloud SDK if we are just using API keys rather than GCP service accounts.
+**Current (Python):** Uses the `google-generativeai` python SDK to pass the image to `gemini-1.5-flash`.
+**New (Java):** Uses Spring's `RestClient` to make a direct REST call to the Gemini API (`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`). The REST approach is lighter than pulling in the full Google Cloud SDK when using API keys rather than GCP service accounts.
 
 ### 3. Text-to-Speech (`tts.py` -> `TtsService.java`)
 
 **Current (Python):** Uses the `edge-tts` Python package (an unofficial wrapper for Microsoft Edge's Read Aloud API) to get free, high-quality TTS.
-**New (Java):**
-Since `edge-tts` is unique to Python, we have three choices:
-
-1. **(Recommended for ease):** Shell out to the Python `edge-tts` CLI from Java using `ProcessBuilder`. Since we already bake `ffmpeg` into our Docker image, we can just ensure Python/edge-tts is also installed in the Dockerfile.
-2. **(Pure Java, Paid):** Use the official Azure Cognitive Services Java SDK or Google Cloud TTS Java SDK.
-3. **(Pure Java, Free but complex):** Reverse engineer the websocket protocol `edge-tts` uses and implement it in Java using a library like `Java-WebSocket`.
+**New (Java):** Shells out to the Python `edge-tts` CLI from Java using `ProcessBuilder`. Since we already bake `ffmpeg` into our Docker image, we also ensure Python/edge-tts is installed in the Dockerfile.
 
 ### 4. Audio Processing (`audio.py` -> `AudioService.java`)
 
 **Current (Python):** Uses `pydub`, which shells out to `ffmpeg`, to scale the audio amplitude (gain control) so it doesn't blast the user's ears.
-**New (Java):**
-Use Java's `ProcessBuilder` to run `ffmpeg` directly.
+**New (Java):** Uses Java's `ProcessBuilder` to run `ffmpeg` directly.
 `ffmpeg -i input.mp3 -filter:a "volume=0.1" output.mp3`
 This removes the need for a middleman library and keeps the audio processing fast and native.
 
-## Step-by-Step Execution Plan
+## Completed Implementation
 
-1. **Bootstrap:** Use Spring Initializr to generate a Java 21 project with `Spring Web` and `Lombok`.
-2. **Docker Setup:** Update the `Dockerfile` to use a JDK base image (e.g., `eclipse-temurin:21`), but ensure `ffmpeg` and `python3-pip` (for `edge-tts`) are installed via `apt-get`.
-3. **Implement Services:**
-   - Create `VisionService` to handle the Gemini REST call.
-   - Create `TtsService` to invoke `edge-tts`.
-   - Create `AudioService` to invoke `ffmpeg`.
-4. **Wire Controller:** Build the `/process-image` endpoint to string these services together.
-5. **Testing:** Write `@SpringBootTest` integration tests that mock the Gemini API and verify the audio byte response.
-6. **Swap Android Client:** Update the Android `ApiClient` base URL if testing locally, otherwise the Android code requires zero changes (the API contract remains identical).
+### Files Created/Modified:
+- `backend/build.gradle.kts` - Spring Boot 3.3.0, Java 21, Lombok
+- `backend/settings.gradle.kts` - Project settings
+- `backend/src/main/java/com/metahelper/MetaHelperApplication.java` - Main entry point
+- `backend/src/main/java/com/metahelper/controller/ImageController.java` - REST endpoint
+- `backend/src/main/java/com/metahelper/service/VisionService.java` - Gemini Vision integration
+- `backend/src/main/java/com/metahelper/service/TtsService.java` - edge-tts via ProcessBuilder
+- `backend/src/main/java/com/metahelper/service/AudioService.java` - ffmpeg via ProcessBuilder
+- `backend/src/main/resources/application.properties` - Configuration
+- `backend/.env.example` - Environment template
+- `backend/Dockerfile` - Multi-stage build with Python/edge-tts + ffmpeg
+- `backend/.dockerignore` - Updated for Java
+- `backend/src/test/java/com/metahelper/...` - Unit tests for all services
+
+### Documentation Updated:
+- `README.md` - Updated to Java backend, added iOS/Compose Multiplatform badge, updated project structure
+- `CONTRIBUTING.md` - Updated all setup instructions for Java backend + iOS
+- `.github/workflows/ci.yml` - Added shared and iOS jobs, updated comments
+- `.gitignore` - Added iOS/Xcode and Java artifacts
+- `MIGRATION-JAVA.md` - This file (marked complete)
+
+### Backwards Compatibility:
+- The API contract (`POST /process-image` returning `audio/mpeg`) is identical
+- Android client requires zero changes
+- Environment variables are the same (`GOOGLE_API_KEY`, `AUDIO_AMPLITUDE_MULTIPLIER`)
+
+## Verification
+
+```bash
+# Build and run tests
+cd backend
+./gradlew test
+
+# Run locally
+./gradlew bootRun
+
+# Docker build
+docker build -t metahelper-backend ./backend
+docker run -p 8080:8080 --env-file backend/.env metahelper-backend
+```
+
+## Future Considerations
+
+1. **Pure Java TTS**: If a free, pure-Java TTS solution becomes viable, replace the `edge-tts` shell-out.
+2. **Google Cloud SDK**: If migrating to GCP service accounts, consider `google-cloud-vertexai` Java SDK.
+3. **Performance**: Current `ProcessBuilder` approach is fast enough; the Python `edge-tts` CLI is the bottleneck.

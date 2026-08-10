@@ -1,10 +1,12 @@
 name: CI
 
 # MetaHelper CI — an AI programming assistant for Meta Ray-Ban glasses.
-# Backend: Python 3.13 FastAPI vision -> speech pipeline (the gating job).
+# Backend: Spring Boot 3 (Java 21) vision -> speech pipeline (the gating job).
 # Android: Kotlin + Jetpack Compose app that talks to the backend; its build
 # needs the Meta Wearables SDK from GitHub Packages, so it only runs once the
 # GH_PACKAGES_TOKEN secret (a PAT with read:packages) is configured.
+# Shared: Kotlin Multiplatform module with shared business logic.
+# iOS: Compose Multiplatform app (macOS runner required for CocoaPods).
 
 on:
   push:
@@ -48,6 +50,29 @@ jobs:
       - name: Run Spring Boot unit tests
         working-directory: ./backend
         run: ./gradlew test
+
+  # ---------------------------------------------------------------------------
+  # Shared — Kotlin Multiplatform module. Runs on macOS for CocoaPods/iOS targets.
+  # ---------------------------------------------------------------------------
+  shared:
+    name: Shared (KMP)
+    runs-on: macos-14
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Build shared module (all targets)
+        working-directory: ./shared
+        run: ./gradlew build
 
   # ---------------------------------------------------------------------------
   # Android — Kotlin + Jetpack Compose. The Meta Wearables SDK is resolved from
@@ -96,3 +121,26 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
         run: ./gradlew testDebugUnitTest assembleDebug
+
+  # ---------------------------------------------------------------------------
+  # iOS — Compose Multiplatform app. Requires macOS for Xcode/CocoaPods.
+  # ---------------------------------------------------------------------------
+  ios:
+    name: iOS (Compose Multiplatform)
+    runs-on: macos-14
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Build iOS app
+        working-directory: ./iosApp
+        run: ./gradlew build

@@ -27,8 +27,6 @@ share/python-wheels/
 MANIFEST
 
 # PyInstaller
-#  Usually these files are written by a python script, and contain the exe packager
-#  package, but they can also contain information for the script to use.
 *.manifest
 *.spec
 
@@ -47,9 +45,6 @@ coverage.xml
 *.py,cover
 .stats
 .pytest_cache/
-# Only ignore a root-level local pytest.ini; backend/pytest.ini is real project
-# config (sets pythonpath/testpaths) and must be tracked so CI can run the suite.
-/pytest.ini
 
 # Flask stuff:
 instance/
@@ -73,26 +68,19 @@ profile_default/
 ipython_config.py
 
 # pyenv
-#   For a library or package, you might want to ignore these files since the Python version is usually managed by the user.
-#   For a specialized environment, you can include them.
 # .python-version
 
 # pipenv
-#   According to pypa/pipenv#1127, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if you choose not to, uncomment the following line.
 # Pipfile.lock
 
 # poetry
-#   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
-#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
 # poetry.lock
 
 # pdm
-#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
 # .pdm-python
 # .pdm-build/
 
-# PEP 582; used by e.g. github.com/davidhalter/jedi, github.com/pdm-project/pdm
+# PEP 582
 __pypackages__/
 
 # Celery stuff
@@ -167,6 +155,21 @@ build/
 *.ap_
 *.dex
 
+# iOS / Xcode
+*.xcodeproj/
+*.xcworkspace/
+*.pbxuser
+*.xcuserstate
+*.xcscmblueprint
+build/
+DerivedData/
+*.hmap
+*.ipa
+*.dSYM/
+*.mobileprovision
+*.provisionprofile
+Pods/
+
 # OS generated files
 .DS_Store
 .DS_Store?
@@ -179,3 +182,17 @@ Thumbs.db
 *.hprof
 
 .claude/
+
+# Java
+*.class
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+
+# Docker
+.docker/
