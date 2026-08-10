@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: metahelper-backend
+    runtime: docker
+    dockerfilePath: Dockerfile
+    dockerContext: ./backend
+    buildCommand: ""
+    startCommand: ""
+    envVars:
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: AUDIO_AMPLITUDE_MULTIPLIER
+        value: "0.1"
+    healthCheckPath: /
+    autoDeploy: true
