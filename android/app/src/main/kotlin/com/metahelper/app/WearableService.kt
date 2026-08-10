@@ -8,6 +8,10 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import android.util.Log
+import com.meta.wearable.dat.core.Wearables
+import com.meta.wearable.dat.core.types.RegistrationState
+import com.metahelper.shared.GlassesManager
+import kotlinx.coroutines.*
 
 class WearableService : Service() {
     private val binder = LocalBinder()
@@ -21,20 +25,29 @@ class WearableService : Service() {
     override fun onCreate() {
         super.onCreate()
         Log.d("WearableService", "Service onCreate - starting foreground IMMEDIATELY")
-        
+
         createNotificationChannel()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             startForeground(
-                1, 
-                createNotification(), 
+                1,
+                createNotification(),
                 android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
             )
         } else {
             startForeground(1, createNotification())
         }
 
-        Log.d("WearableService", "Initializing GlassesManager...")
-        glassesManager = GlassesManager(this, "https://metahelper.onrender.com")
+        Log.d("WearableService", "Initializing Meta Wearables SDK...")
+        val result = Wearables.initialize(this)
+        if (result.isSuccess) {
+            Log.d("WearableService", "Meta Wearables SDK Initialized")
+        } else {
+            val error = result.exceptionOrNull()?.message ?: "Unknown Error"
+            Log.e("WearableService", "SDK Initialization failed: $error")
+        }
+
+        Log.d("WearableService", "Initializing shared GlassesManager...")
+        glassesManager = GlassesManager(backendUrl = "https://metahelper.onrender.com", context = this)
         Log.d("WearableService", "Service fully initialized")
     }
 
@@ -76,4 +89,3 @@ class WearableService : Service() {
         const val CHANNEL_ID = "WearableServiceChannel"
     }
 }
-
