@@ -1,0 +1,35 @@
+# Dependencies & build artifacts
+.gradle
+build
+*.jar
+
+# IDE & OS
+.idea
+.vscode
+*.iml
+.DS_Store
+
+# Source control
+.git
+.gitignore
+
+# Environment & secrets
+.env
+.env.*
+local.properties
+
+# Logs
+*.log
+
+# Test reports
+*.xml
+*.html
+jacoco
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Python cache (not needed in build)
+__pycache__
+*.pyc
