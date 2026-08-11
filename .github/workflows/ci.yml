@@ -122,6 +122,27 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
         run: ./gradlew testDebugUnitTest assembleDebug
 
+      - name: Enable KVM
+        if: env.HAS_TOKEN == 'true'
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Boot emulator and smoke-test app install/launch
+        if: env.HAS_TOKEN == 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          script: |
+            adb install android/app/build/outputs/apk/debug/app-debug.apk
+            adb shell am start -n com.metahelper.app/.MainActivity
+            sleep 5
+            adb shell dumpsys activity activities | grep -q "com.metahelper.app" || (echo "App did not stay foregrounded" && exit 1)
+
   # ---------------------------------------------------------------------------
   # iOS — Compose Multiplatform app. Requires macOS for Xcode/CocoaPods.
   # ---------------------------------------------------------------------------

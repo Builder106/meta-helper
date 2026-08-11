@@ -38,6 +38,8 @@ dependencyResolutionManagement {
     }
 }
 
+rootProject.name = "MetaHelper-Android"
+
 include(":app")
 include(":shared")
 project(":shared").projectDir = settingsDir.resolve("../shared")
