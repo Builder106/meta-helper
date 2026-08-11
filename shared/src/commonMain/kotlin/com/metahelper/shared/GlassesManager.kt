@@ -1,129 +1,106 @@
 package com.metahelper.shared
 
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Core manager that coordinates the flow between the glasses/camera and the backend.
  * Handles gallery watching, API communication, audio playback, and volume management.
  */
-class GlassesManager(
-    private val backendUrl: String = "https://metahelper.onrender.com",
-    private val context: Any // Platform-specific context (Android Context, iOS nil)
-) {
-    private val apiClient = ApiClient(backendUrl)
-    private val audioPlayer = createAudioPlayer(context)
-    private val volumeController = createVolumeController(context)
-    private val galleryWatcher = createGalleryWatcher(context) { imageUri ->
-        onNewGalleryImage(imageUri)
-    }
-    private val wearablesMonitor = createWearablesConnectionMonitor(context)
-    private var lastAudioResponse: ByteArray? = null
-    private var lastProcessedUri: Any? = null
-    private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+interface GlassesManager {
+    var onStatusUpdate: ((String) -> Unit)?
+    var onConnectionStateChange: ((ConnectionState) -> Unit)?
 
-    var onStatusUpdate: ((String) -> Unit)? = null
-    var onConnectionStateChange: ((ConnectionState) -> Unit)? = null
-
-    init {
-        updateStatus("Initializing...")
-        start()
-    }
-
-    private fun start() {
-        updateStatus("Monitoring gallery for new photos...")
-        galleryWatcher.startWatching()
-        wearablesMonitor.start()
-        observeConnectionState()
-    }
-
-    private fun observeConnectionState() {
-        serviceScope.launch {
-            wearablesMonitor.connectionState.collect { state ->
-                onConnectionStateChange?.invoke(state)
-            }
-        }
-    }
-
-    private fun onNewGalleryImage(imageUri: Any) {
-        if (imageUri == lastProcessedUri) return
-        lastProcessedUri = imageUri
-        Log.d("GlassesManager", "Processing new gallery image: $imageUri")
-        processGalleryImage(imageUri)
-    }
-
-    private fun processGalleryImage(imageUri: Any) {
-        updateStatus("New photo detected! Reading data...")
-        // Platform-specific image loading
-        loadImageBytes(imageUri) { bytes ->
-            if (bytes != null) {
-                Log.d("GlassesManager", "Successfully read ${bytes.size} bytes from gallery")
-                onPhotoCaptured(bytes)
-            } else {
-                updateStatus("Error: Could not read photo data.")
-            }
-        }
-    }
-
-    /**
-     * Platform-specific image loading from URI/identifier.
-     * Actual implementation in platform-specific source sets.
-     */
-    expect fun loadImageBytes(imageUri: Any, callback: (ByteArray?) -> Unit)
-
-    private fun updateStatus(msg: String) {
-        Log.d("GlassesManager", "UI STATUS UPDATE: $msg")
-        serviceScope.launch(Dispatchers.Main) {
-            onStatusUpdate?.invoke(msg)
-        }
-    }
-
-    private fun onPhotoCaptured(imageBytes: ByteArray) {
-        Log.d("GlassesManager", "onPhotoCaptured called with ${imageBytes.size} bytes")
-        toast("Sending photo to AI...")
-        volumeController.setQuietVolume()
-
-        Log.d("GlassesManager", "Calling apiClient.processImage")
-        apiClient.processImage(imageBytes, object : ApiClient.ApiResponseCallback {
-            override fun onSuccess(audioBytes: ByteArray) {
-                Log.d("GlassesManager", "apiClient success: received ${audioBytes.size} bytes")
-                lastAudioResponse = audioBytes
-                toast("AI Answer Ready!")
-                Log.d("GlassesManager", "Playing answer.")
-                updateStatus("Playing answer...")
-                audioPlayer.playAudio(audioBytes) { volumeController.restoreVolume() }
-            }
-            override fun onError(message: String) {
-                Log.e("GlassesManager", "apiClient error: $message")
-                toast("AI Error: $message", long = true)
-                volumeController.restoreVolume()
-                updateStatus("AI Error: $message")
-            }
-        })
-    }
-
-    fun replayLastAudio() {
-        lastAudioResponse?.let {
-            Log.d("GlassesManager", "Replaying last explanation...")
-            audioPlayer.playAudio(it)
-        }
-    }
-
-    fun stopAll() {
-        audioPlayer.release()
-        galleryWatcher.stopWatching()
-        wearablesMonitor.stop()
-        serviceScope.cancel()
-    }
-
-    // Platform-specific toast/logging
-    private expect fun toast(msg: String, long: Boolean = false)
+    fun replayLastAudio()
+    fun stopAll()
 }
+
+/**
+ * Factory for creating platform-specific GlassesManager implementations.
+ */
+expect fun createGlassesManager(backendUrl: String, context: Any): GlassesManager
+
+/**
+ * Platform-specific image loading from URI/identifier.
+ * Actual implementation in platform-specific source sets.
+ */
+expect fun loadImageBytes(imageUri: Any, callback: (ByteArray?) -> Unit)
+
+/**
+ * Interface for playing audio responses from the backend.
+ * Platform-specific implementations handle the actual audio playback.
+ */
+interface AudioPlayer {
+    fun playAudio(audioBytes: ByteArray, onComplete: () -> Unit = {})
+    fun stop()
+    fun release()
+
+    var onReplayRequested: (() -> Unit)?
+}
+
+/**
+ * Factory for creating platform-specific AudioPlayer implementations.
+ */
+expect fun createAudioPlayer(context: Any): AudioPlayer
+
+/**
+ * Interface for controlling device media volume during audio playback.
+ * Allows setting a quiet volume for the response and restoring the user's
+ * original volume afterward.
+ */
+interface VolumeController {
+    fun setQuietVolume()
+    fun restoreVolume()
+}
+
+/**
+ * Factory for creating platform-specific VolumeController implementations.
+ */
+expect fun createVolumeController(context: Any): VolumeController
+
+/**
+ * Interface for monitoring Meta Wearables SDK connection state.
+ * Android implementation uses mwdat-core; iOS implementation can use mwdat-ios when available.
+ */
+interface WearablesConnectionMonitor {
+    val connectionState: StateFlow<ConnectionState>
+
+    fun start()
+    fun stop()
+}
+
+sealed interface ConnectionState {
+    data class Connected(val applicationId: String) : ConnectionState
+    object Disconnected : ConnectionState
+    data class Error(val message: String) : ConnectionState
+}
+
+/**
+ * Factory for creating platform-specific WearablesConnectionMonitor implementations.
+ */
+expect fun createWearablesConnectionMonitor(context: Any): WearablesConnectionMonitor
+
+/**
+ * Interface for watching the photo gallery for new Meta AI / Ray-Ban photos.
+ */
+interface GalleryWatcher {
+    fun startWatching()
+    fun stopWatching()
+}
+
+/**
+ * Factory for creating platform-specific GalleryWatcher implementations.
+ */
+expect fun createGalleryWatcher(context: Any, onNewImageDetected: (String) -> Unit): GalleryWatcher
 
 /**
  * Logging utility (expect/actual for platform-specific logging)
  */
-internal object Log {
-    expect fun d(tag: String, msg: String)
-    expect fun e(tag: String, msg: String)
-}
+expect fun logDebug(tag: String, msg: String)
+expect fun logError(tag: String, msg: String)
+
+/**
+ * Platform-specific toast/logging
+ */
+expect fun toast(msg: String, long: Boolean)
