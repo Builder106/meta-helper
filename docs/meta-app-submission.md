@@ -22,38 +22,57 @@ justification (see below) and the kind Meta's review is set up to approve.
 ## Access status (developer preview)
 
 - The Device Access Toolkit is in **public developer preview** — openly downloadable, no
+
   individual waitlist to build/test.
+
 - **Publishing to the general public is gated** to "select partners" during preview;
+
   general availability is planned for **2026**. In preview you can create a **release
   channel** and invite named testers, but not ship to the public.
+
 - The **Developer Center (project registration, real Application ID) is limited to
+
   countries where the AI glasses are supported.** Confirm by attempting signup.
+
 - **Voice invocation / Meta AI commands are NOT in the preview** — camera, microphone,
+
   and speaker only. (MetaHelper uses none of the mic path.)
 
 ## Prerequisites
 
-- **Meta AI app** (`com.facebook.stella`) **v254+** on the phone, glasses paired through it.
+- **Meta AI app**(`com.facebook.stella`)**v254+** on the phone, glasses paired through it.
 - Supported glasses (Ray-Ban Meta Gen 1/2, Oakley Meta, Meta Ray-Ban Display) on current
+
   firmware; **Android 10+** phone.
+
 - **Developer Mode** enabled in the Meta AI app: tap the app version number 5× to reveal
+
   the toggle, enable it for the linked glasses. (May reset after app/firmware updates.)
+
 - A **GitHub personal access token (classic) with `read:packages`** to pull the SDK from
+
   GitHub Packages (`maven.pkg.github.com/facebook/meta-wearables-dat-android`) — already
-  wired in this repo via `github_token` in `local.properties`.
+  wired in this repo via `github_token`in`local.properties`.
 
 ## Registration steps (Path C)
 
-1. Sign in at **<https://wearables.developer.meta.com/>** with a **Meta Managed Account**;
+1. Sign in at **<https://wearables.developer.meta.com/>**with a**Meta Managed Account**;
+
    set up your organization.
-   - Gotcha: being signed into `developers.meta.com` can break `wearables.developer.meta.com`
-     links (note `developer` vs `developers`). Sign out of the former first.
-2. **New project** → name + description.
-3. **Configuration** tab → add the Android app: **package name** (`com.metahelper.app`) and
+
+- Gotcha: being signed into `developers.meta.com`can break`wearables.developer.meta.com`
+
+     links (note `developer`vs`developers`). Sign out of the former first.
+
+1. **New project** → name + description.
+2. **Configuration**tab → add the Android app:**package name** (`com.metahelper.app`) and
+
    the **app-signing certificate hash**. The portal then shows the assigned
    **Application ID** *and* a **CLIENT_TOKEN**.
-4. **Permissions** tab → request the access the app needs, with the justification below.
-5. **Release Channel** (e.g. "Internal") → assign an app version, invite testers by their
+
+3. **Permissions** tab → request the access the app needs, with the justification below.
+4. **Release Channel** (e.g. "Internal") → assign an app version, invite testers by their
+
    Meta-account email (testers need a pre-existing meta.ai account).
 
 ## Manifest changes for the real credentials
@@ -66,7 +85,7 @@ hardcoding:
 <meta-data android:name="com.meta.wearable.mwdat.CLIENT_TOKEN"   android:value="${mwdat_client_token}" />
 ```
 
-supplied from `local.properties` (alongside `github_token`). **Critical gotcha (repo
+supplied from `local.properties`(alongside`github_token`). **Critical gotcha (repo
 issue #65):** a bare numeric `android:value="0"` (and real Application IDs are all-numeric)
 is parsed as an Integer, so the SDK's `Bundle.getString()` returns null and silently
 ignores it. **Escape it as a string** (`"\0"`) or use a string resource — otherwise the ID
@@ -75,7 +94,7 @@ the attestation/production path.
 
 ## Permission justification to submit
 
-**Important nuance:** MetaHelper currently captures via **gallery polling** — the glasses
+**Important nuance:**MetaHelper currently captures via**gallery polling** — the glasses
 take the photo through Meta AI natively and the app reads it from the Android gallery
 (`READ_MEDIA_IMAGES`). It does **not** call the DAT camera/StreamSession API, so it may not
 require the DAT **camera** permission at all — only DAT registration (connection state).
@@ -105,6 +124,7 @@ before submission — the docs and sample apps now target 0.7.x, and several pre
 - Exact Developer Center button/sidebar labels (portal is login-gated).
 - Whether your country is in the supported list for the Developer Center.
 - Whether the preview-era attestation/`NO_ELIGIBLE_DEVICE` issues still occur on 0.7.0
+
   (those reports are from 0.4.0–0.5.0; relevant only if you revive the SDK capture path).
 
 ## Sources

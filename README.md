@@ -15,7 +15,7 @@
 
 MetaHelper reads code, error messages, and technical text aloud through your Meta Ray-Ban glasses — an audio-first way to access code that isn't already digital text on your device. Look at code on a screen, whiteboard, projector, or printed page and take a photo; MetaHelper reads it back **verbatim** (so you can follow or transcribe it) and explains what it does in plain English, via Gemini Vision — not a generic "describe my surroundings" caption. It's aimed at developers and CS students who are blind or have low vision, and anyone who needs hands-free, audio access to code in the world around them.
 
-> **Status:** the assistant reads and explains code in any language (plus error output and diagrams), not just C; not yet validated end-to-end on real glasses. **Demo:** coming soon.
+> **Status:**the assistant reads and explains code in any language (plus error output and diagrams), not just C; not yet validated end-to-end on real glasses.**Demo:** coming soon.
 
 ## How it works
 
@@ -49,7 +49,7 @@ sequenceDiagram
     User->>AP: Double-tap glasses to replay
 ```
 
-> **Capture note:** Photo capture currently works through **gallery polling** — the glasses take the photo through Meta AI natively and the app reads it from the phone gallery (`READ_MEDIA_IMAGES` on Android, Photos framework on iOS). The Meta Wearables SDK's direct-capture path (`StreamSession` on Android, `MWDAT` on iOS) is stubbed/in-progress and is the intended future approach.
+> **Capture note:**Photo capture currently works through**gallery polling** — the glasses take the photo through Meta AI natively and the app reads it from the phone gallery (`READ_MEDIA_IMAGES` on Android, Photos framework on iOS). The Meta Wearables SDK's direct-capture path (`StreamSession`on Android,`MWDAT` on iOS) is stubbed/in-progress and is the intended future approach.
 
 ## Project structure
 
@@ -92,7 +92,7 @@ cd backend
 ./gradlew bootRun
 ```
 
-Copy `backend/.env.example` to `backend/.env` and fill in your values:
+Copy `backend/.env.example`to`backend/.env` and fill in your values:
 
 | Variable | Required | Default | Purpose |
 | --- | --- | --- | --- |
@@ -104,7 +104,7 @@ Copy `backend/.env.example` to `backend/.env` and fill in your values:
 | Method | Route | Body | Returns |
 | --- | --- | --- | --- |
 | `GET` | `/` | — | JSON health check |
-| `POST` | `/process-image` | multipart form, field `file` (image) | `audio/mpeg` MP3 bytes |
+| `POST` | `/process-image` | multipart form, field`file`(image) | `audio/mpeg` MP3 bytes |
 
 ## Tests
 
@@ -125,7 +125,7 @@ cd android
 ./gradlew testDebugUnitTest    # run unit tests
 ```
 
-**Meta Wearables SDK access (required).** The app depends on the Meta Wearables SDK (`com.meta.wearable:mwdat-core` / `mwdat-camera` `0.3.0`), which is published to **GitHub Packages** at `https://maven.pkg.github.com/facebook/meta-wearables-dat-android`. GitHub Packages requires authentication even for read access, so you must supply a **GitHub Personal Access Token with the `read:packages` scope** or Gradle cannot resolve the SDK and the build will fail.
+**Meta Wearables SDK access (required).**The app depends on the Meta Wearables SDK (`com.meta.wearable:mwdat-core`/`mwdat-camera` `0.3.0`), which is published to**GitHub Packages**at `https://maven.pkg.github.com/facebook/meta-wearables-dat-android`. GitHub Packages requires authentication even for read access, so you must supply a**GitHub Personal Access Token with the `read:packages` scope** or Gradle cannot resolve the SDK and the build will fail.
 
 Provide the token one of two ways:
 
@@ -141,13 +141,13 @@ Provide the token one of two ways:
   export GITHUB_TOKEN=ghp_yourTokenWithReadPackagesScope
   ```
 
-On sync, the build log prints `SUCCESS: github_token loaded (...)` when the token is found, or an `ERROR: github_token NOT FOUND` message when it is missing.
+On sync, the build log prints `SUCCESS: github_token loaded (...)`when the token is found, or an`ERROR: github_token NOT FOUND` message when it is missing.
 
-Point the app's `ApiClient` at your backend — the live instance at `https://metahelper.onrender.com`, or your own local/self-hosted server.
+Point the app's `ApiClient`at your backend — the live instance at`https://metahelper.onrender.com`, or your own local/self-hosted server.
 
 ## Self-hosting
 
-The backend ships with a `Dockerfile` (Java 21, `ffmpeg` baked in):
+The backend ships with a `Dockerfile`(Java 21,`ffmpeg` baked in):
 
 ```bash
 docker build -t metahelper-backend ./backend

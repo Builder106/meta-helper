@@ -29,7 +29,7 @@ Glasses photo
 
 ## Backend setup (`backend/`)
 
-Requires Java 21, `ffmpeg` (for audio processing), and Python 3.13+ (for `edge-tts` CLI).
+Requires Java 21, `ffmpeg`(for audio processing), and Python 3.13+ (for`edge-tts` CLI).
 
 ```bash
 cd backend
@@ -40,13 +40,13 @@ cp .env.example .env          # then fill in GOOGLE_API_KEY
 Environment variables (see `backend/.env.example`):
 
 - `GOOGLE_API_KEY` — **required**. A Google Gemini API key (create one at <https://aistudio.google.com/apikey>). Without it the vision service fails.
-- `GEMINI_MODEL` — optional, defaults to `gemini-1.5-flash`. Model to use for vision.
-- `AUDIO_AMPLITUDE_MULTIPLIER` — optional, defaults to `0.1`. Playback gain (0.0–1.0) applied to the synthesized speech so it doesn't overpower the glasses' speakers.
+- `GEMINI_MODEL`— optional, defaults to`gemini-1.5-flash`. Model to use for vision.
+- `AUDIO_AMPLITUDE_MULTIPLIER`— optional, defaults to`0.1`. Playback gain (0.0–1.0) applied to the synthesized speech so it doesn't overpower the glasses' speakers.
 
 ### Backend endpoints
 
-- `GET /` — health check. Returns `{"message": "MetaHelper API is running"}`.
-- `POST /process-image` — accepts a multipart upload with form field `file` (a JPEG image) and returns `audio/mpeg` MP3 bytes.
+- `GET /`— health check. Returns`{"message": "MetaHelper API is running"}`.
+- `POST /process-image`— accepts a multipart upload with form field`file`(a JPEG image) and returns`audio/mpeg` MP3 bytes.
 
 ### Backend tests
 
@@ -86,11 +86,11 @@ cd shared
 
 ## Android setup (`android/`)
 
-Toolchain: Gradle 8.13 (use the bundled `./gradlew` wrapper), Android Gradle Plugin 8.13.2, Kotlin 2.4.10, Jetpack Compose. `compileSdk 37`, `minSdk 29`, `targetSdk 34`. Application id `com.metahelper.app`.
+Toolchain: Gradle 8.13 (use the bundled `./gradlew`wrapper), Android Gradle Plugin 8.13.2, Kotlin 2.4.10, Jetpack Compose.`compileSdk 37`, `minSdk 29`, `targetSdk 34`. Application id `com.metahelper.app`.
 
 ### Meta Wearables SDK — GitHub token required
 
-The Meta Wearables SDK (`com.meta.wearable:mwdat-core` version `0.3.0`) is **not** on Maven Central. It is resolved from GitHub Packages at:
+The Meta Wearables SDK (`com.meta.wearable:mwdat-core`version`0.3.0`) is **not** on Maven Central. It is resolved from GitHub Packages at:
 
 ```text
 https://maven.pkg.github.com/facebook/meta-wearables-dat-android
@@ -141,7 +141,7 @@ This will:
 
 ### Photo-capture flow (important context)
 
-Photo capture currently works through **gallery polling** — the glasses take the photo through Meta AI natively and the app reads it from the phone gallery (`READ_MEDIA_IMAGES` on Android, Photos framework on iOS). The Meta Wearables SDK's direct-capture path (`StreamSession` on Android, `MWDAT` on iOS) is stubbed/in-progress and is the intended future approach.
+Photo capture currently works through **gallery polling** — the glasses take the photo through Meta AI natively and the app reads it from the phone gallery (`READ_MEDIA_IMAGES` on Android, Photos framework on iOS). The Meta Wearables SDK's direct-capture path (`StreamSession`on Android,`MWDAT` on iOS) is stubbed/in-progress and is the intended future approach.
 
 When contributing here, document and target the **real** `GalleryWatcher`/`PhotosObserver` flow — but note that the SDK direct-capture path is the intended/future approach, and changes that move us toward it are welcome (just keep the existing flow working until the SDK path is reliable).
 
@@ -149,12 +149,12 @@ When contributing here, document and target the **real** `GalleryWatcher`/`Photo
 
 Please respect these project-specific constraints:
 
-- **Keep secrets out of git.** `android/local.properties` holds the `github_token` and `backend/.env` holds `GOOGLE_API_KEY`; both are gitignored and must stay that way. Never paste tokens or API keys into source files, tests, commit messages, or PR descriptions. If a secret is ever committed, treat it as compromised and rotate it.
+- **Keep secrets out of git.** `android/local.properties`holds the`github_token`and`backend/.env`holds`GOOGLE_API_KEY`; both are gitignored and must stay that way. Never paste tokens or API keys into source files, tests, commit messages, or PR descriptions. If a secret is ever committed, treat it as compromised and rotate it.
 - **The Gemini prompt is intentionally code-focused.** The prompt in `backend/src/main/java/com/metahelper/service/VisionService.java` is tuned to read and explain code and technical content aloud (any language), including the dual-layer "read it verbatim, then explain it" audio format. Do not relax it into a generic "describe my surroundings" prompt. Prompt changes are fine, but keep MetaHelper a code assistant, not a general scene describer.
 - **The GalleryWatcher/PhotosObserver capture path is a known workaround.** Don't delete it in favor of the SDK `StreamSession`/`MWDAT` direct-capture path until that path is actually working end-to-end. Document the real behavior, not the aspirational one.
 - **Keep audio TTS-friendly.** Backend output is read aloud by TTS, so avoid LaTeX, markdown, or notation that doesn't speak well — favor plain spoken English.
 - **Java 21 + Spring Boot 3 only.** The backend is now Java. Don't add Python dependencies for the main API.
-- **Shared module is the source of truth.** Platform-specific code should only implement `expect` interfaces from `commonMain`. Business logic belongs in the shared module.
+- **Shared module is the source of truth.** Platform-specific code should only implement `expect`interfaces from`commonMain`. Business logic belongs in the shared module.
 
 ## Commit messages
 
@@ -165,15 +165,17 @@ Please respect these project-specific constraints:
 
 ## Pull request process
 
-1. Branch off `main` (e.g. `git checkout -b fix-gallery-debounce`).
+1. Branch off `main`(e.g.`git checkout -b fix-gallery-debounce`).
 2. Make your change, keeping the backend, shared, Android, and iOS pieces consistent with the data flow above.
 3. Run the relevant tests locally before pushing:
-   - `./gradlew test` for backend changes
-   - `./gradlew build` for shared changes
-   - `./gradlew testDebugUnitTest` for Android changes
-   - `./gradlew build` in iosApp for iOS changes
-4. Open a PR against `main` at <https://github.com/Builder106/meta-helper> with a clear description of what changed and why.
-5. CI (`.github/workflows/ci.yml`) must pass before a PR can be merged. Address any failures rather than disabling checks.
+
+- `./gradlew test` for backend changes
+- `./gradlew build` for shared changes
+- `./gradlew testDebugUnitTest` for Android changes
+- `./gradlew build` in iosApp for iOS changes
+
+1. Open a PR against `main` at <https://github.com/Builder106/meta-helper> with a clear description of what changed and why.
+2. CI (`.github/workflows/ci.yml`) must pass before a PR can be merged. Address any failures rather than disabling checks.
 
 ## Out of scope
 
