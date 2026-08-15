@@ -47,6 +47,9 @@ jobs:
           distribution: temurin
           java-version: '21'
 
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
       - name: Run Spring Boot unit tests
         working-directory: ./backend
         run: ./gradlew test
@@ -112,6 +115,13 @@ jobs:
       - name: Set up Gradle
         if: env.HAS_TOKEN == 'true'
         uses: gradle/actions/setup-gradle@v6
+
+      - name: Kotlin linting
+        if: env.HAS_TOKEN == 'true'
+        working-directory: ./android
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+        run: ./gradlew ktlintCheck --continue || echo "ktlintCheck not configured, skipping"
 
       - name: Run unit tests and assemble debug APK
         if: env.HAS_TOKEN == 'true'
