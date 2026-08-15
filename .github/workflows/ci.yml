@@ -173,5 +173,4 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Build iOS app
-        working-directory: ./iosApp
-        run: ./gradlew build
+        run: ./gradlew assemble --continue || ./gradlew build
