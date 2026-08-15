@@ -118,19 +118,15 @@ jobs:
 
       - name: Kotlin linting
         if: env.HAS_TOKEN == 'true'
-        working-directory: ./android
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        run: ./gradlew ktlintCheck --continue || echo "ktlintCheck not configured, skipping"
+        run: ./gradlew -p android ktlintCheck --continue || echo "ktlintCheck not configured, skipping"
 
       - name: Run unit tests and assemble debug APK
         if: env.HAS_TOKEN == 'true'
-        working-directory: ./android
-        # settings.gradle.kts reads the token from the github_token gradle
-        # property or the GITHUB_TOKEN env var to authenticate to GitHub Packages.
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        run: ./gradlew testDebugUnitTest assembleDebug
+        run: ./gradlew -p android testDebugUnitTest assembleDebug
 
       - name: Enable KVM
         if: env.HAS_TOKEN == 'true'
@@ -139,7 +135,7 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Boot emulator and smoke-test app install/launch
+      - name: Run emulator smoke test
         if: env.HAS_TOKEN == 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -147,11 +143,7 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: pixel_6
-          script: |
-            adb install android/app/build/outputs/apk/debug/app-debug.apk
-            adb shell am start -n com.metahelper.app/.MainActivity
-            sleep 5
-            adb shell dumpsys activity activities | grep -q "com.metahelper.app" || (echo "App did not stay foregrounded" && exit 1)
+          script: ./gradlew -p android connectedDebugAndroidTest
 
   # ---------------------------------------------------------------------------
   # iOS — Compose Multiplatform app. Requires macOS for Xcode/CocoaPods.
@@ -173,4 +165,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Build iOS app
-        run: ./gradlew assemble --continue || ./gradlew build
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx6g -Dkotlin.daemon.jvmargs=-Xmx6g"
+        run: ./gradlew :shared:assembleXCFramework --continue || ./gradlew assemble --continue
