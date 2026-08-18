@@ -11,15 +11,19 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](#license)
 [![Backend: live](https://img.shields.io/badge/backend-live-success.svg)](https://metahelper.onrender.com)
 
-**Hear the code in front of you** — an audio-first programming assistant for Meta Ray-Ban glasses.
+> **Hands-free audio programming assistant for Meta Ray-Ban smart glasses.** Snap a photo of code on a screen, whiteboard, or paper, and hear the explanation spoken directly into your ears.
 
-MetaHelper reads code, error messages, and technical text aloud through your Meta Ray-Ban glasses — an audio-first way to access code that isn't already digital text on your device. Look at code on a screen, whiteboard, projector, or printed page and take a photo; MetaHelper reads it back **verbatim** (so you can follow or transcribe it) and explains what it does in plain English, via Gemini Vision — not a generic "describe my surroundings" caption. It's aimed at developers and CS students who are blind or have low vision, and anyone who needs hands-free, audio access to code in the world around them.
+## 💡 What is MetaHelper?
 
-> **Status:**the assistant reads and explains code in any language (plus error output and diagrams), not just C; not yet validated end-to-end on real glasses.**Demo:** coming soon.
+Reading code on physical whiteboards, presentation slides, or printed handouts can be difficult for developers with visual impairments or when working hands-free.
+
+MetaHelper turns Meta Ray-Ban smart glasses into an audio coding companion. When you capture a photo of code, the app reads the syntax verbatim, identifies syntax errors or logic bugs using Gemini Vision AI, and speaks a clear explanation directly through the open-ear glasses speakers.
+
+**Backend status:** Live on Render ([metahelper.onrender.com](https://metahelper.onrender.com))
 
 ## How it works
 
-When you take a photo on the glasses, it lands in the phone's gallery. MetaHelper's Android/iOS app watches for that new photo, ships it to the backend, and plays the spoken solution that comes back. Double-tap the glasses to replay the last answer.
+When you take a photo with your glasses, the photo syncs to your phone. MetaHelper's mobile companion app detects the new image, sends it to the cloud vision engine, and speaks the solution through the glasses. Double-tapping the glasses stem replays the audio.
 
 ```mermaid
 sequenceDiagram
