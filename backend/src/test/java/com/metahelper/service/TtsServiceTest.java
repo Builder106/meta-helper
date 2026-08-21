@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TtsServiceTest {
 
-    private final TtsService ttsService = new TtsService();
+    private final TtsService ttsService = new TtsService("", "", "en-US-GuyNeural");
 
     @Test
     public void testTextToSpeechEmptyOrNull() throws Exception {

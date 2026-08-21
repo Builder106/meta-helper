@@ -26,6 +26,12 @@ repositories {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation(
+        group = "com.microsoft.cognitiveservices.speech",
+        name = "client-sdk",
+        version = "1.51.0",
+        ext = "jar"
+    )
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
