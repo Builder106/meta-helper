@@ -4,6 +4,10 @@
 > things happen — retrospectives need this raw material to land.
 > Reverse-chronological; one paragraph max per entry.
 
+## 2026-08-21 — Replaced edge-tts with Azure Speech Java SDK #decision
+
+Replaced the Python `edge-tts` subprocess with the official Azure Speech Java SDK. `TtsService` now requests 24 kHz MP3 bytes directly, retains markdown cleanup and voice fallback, and requires `AZURE_SPEECH_KEY` plus `AZURE_SPEECH_REGION`; the backend image no longer installs Python or `edge-tts`.
+
 ## 2026-06-17 — Production 503s and cold-start latency #incident
 
 After everything else worked, the live app intermittently spoke "I had trouble analyzing that image" — a transient `503 UNAVAILABLE`"high demand" on gemini-3.5-flash that the code turned into an instant fallback with no retry. Added retry-with-backoff on transient errors (503/429/500, 1.5s then 3s) plus a fallback to gemini-2.5-flash-lite; a live POST then recovered a real ~540 KB answer (HTTP 200). Watch-item: that request took ~92s — Render free-tier cold start (the instance sleeps after ~15 min idle) plus the retry/fallback path — which is under the Android 120s read timeout but not by much. A warm instance returns in ~10–25s; if cold-start timeouts become a problem, keep Render warm (a cron ping or a paid plan) or trim the retry backoff. Also confirmed Render`autoDeploy` is on (commit trigger on main), so every push this session deployed automatically.

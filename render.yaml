@@ -9,6 +9,12 @@ services:
     envVars:
       - key: GOOGLE_API_KEY
         sync: false
+      - key: AZURE_SPEECH_KEY
+        sync: false
+      - key: AZURE_SPEECH_REGION
+        value: westus2
+      - key: AZURE_SPEECH_VOICE
+        value: en-US-GuyNeural
       - key: AUDIO_AMPLITUDE_MULTIPLIER
         value: "0.1"
     healthCheckPath: /

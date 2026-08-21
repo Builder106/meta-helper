@@ -8,7 +8,7 @@ Thanks for your interest in contributing. This guide covers how to set up both h
 
 | Path | What it is |
 | --- | --- |
-| `backend/` | Java 21 + Spring Boot 3 service. Gemini Vision reads the problem, edge-tts synthesizes speech, ffmpeg adjusts gain, and the endpoint returns MP3 bytes. |
+| `backend/` | Java 21 + Spring Boot 3 service. Gemini Vision reads the problem, Azure Speech synthesizes speech, ffmpeg adjusts gain, and the endpoint returns MP3 bytes. |
 | `shared/` | Kotlin Multiplatform module with shared business logic (gallery watching, API client, audio playback, volume control, connection monitoring). |
 | `android/` | Kotlin + Jetpack Compose app using the Meta Wearables SDK. Detects glasses photos, posts them to the backend, and plays the spoken response. |
 | `iosApp/` | iOS + Compose Multiplatform app using the shared module and mwdat-ios SDK. |
@@ -23,13 +23,13 @@ Glasses photo
   → GlassesManager reads the image bytes
   → ApiClient sends a multipart POST to /process-image
   → Backend: Gemini Vision reads the problem
-  → edge-tts synthesizes speech → ffmpeg applies gain → returns MP3
+  → Azure Speech synthesizes speech → ffmpeg applies gain → returns MP3
   → Android/iOS AudioPlayer plays it (double-tap / next-track on glasses to replay)
 ```
 
 ## Backend setup (`backend/`)
 
-Requires Java 21, `ffmpeg`(for audio processing), and Python 3.13+ (for`edge-tts` CLI).
+Requires Java 21 and `ffmpeg` (for audio processing). Azure Speech credentials are required for TTS.
 
 ```bash
 cd backend
@@ -42,6 +42,9 @@ Environment variables (see `backend/.env.example`):
 - `GOOGLE_API_KEY` — **required**. A Google Gemini API key (create one at <https://aistudio.google.com/apikey>). Without it the vision service fails.
 - `GEMINI_MODEL`— optional, defaults to`gemini-1.5-flash`. Model to use for vision.
 - `AUDIO_AMPLITUDE_MULTIPLIER`— optional, defaults to`0.1`. Playback gain (0.0–1.0) applied to the synthesized speech so it doesn't overpower the glasses' speakers.
+- `AZURE_SPEECH_KEY`— **required**. The key for an Azure Speech resource.
+- `AZURE_SPEECH_REGION`— **required**. The Azure region for that Speech resource.
+- `AZURE_SPEECH_VOICE`— optional, defaults to`en-US-GuyNeural`.
 
 ### Backend endpoints
 
@@ -153,7 +156,7 @@ Please respect these project-specific constraints:
 - **The Gemini prompt is intentionally code-focused.** The prompt in `backend/src/main/java/com/metahelper/service/VisionService.java` is tuned to read and explain code and technical content aloud (any language), including the dual-layer "read it verbatim, then explain it" audio format. Do not relax it into a generic "describe my surroundings" prompt. Prompt changes are fine, but keep MetaHelper a code assistant, not a general scene describer.
 - **The GalleryWatcher/PhotosObserver capture path is a known workaround.** Don't delete it in favor of the SDK `StreamSession`/`MWDAT` direct-capture path until that path is actually working end-to-end. Document the real behavior, not the aspirational one.
 - **Keep audio TTS-friendly.** Backend output is read aloud by TTS, so avoid LaTeX, markdown, or notation that doesn't speak well — favor plain spoken English.
-- **Java 21 + Spring Boot 3 only.** The backend is now Java. Don't add Python dependencies for the main API.
+- **Java 21 + Spring Boot 3 only.** The backend is Java, including TTS through the Azure Speech Java SDK. Don't add Python dependencies for the main API.
 - **Shared module is the source of truth.** Platform-specific code should only implement `expect`interfaces from`commonMain`. Business logic belongs in the shared module.
 
 ## Commit messages
@@ -181,7 +184,7 @@ Please respect these project-specific constraints:
 
 To keep the project focused, the following changes will generally be declined unless discussed in an issue first:
 
-- **Adding unrelated AI providers.** MetaHelper uses Gemini for vision and edge-tts for speech. Don't swap in or bolt on additional LLM/vision/TTS providers without prior agreement.
+- **Adding unrelated AI providers.** MetaHelper uses Gemini for vision and Azure Speech for speech. Don't swap in or bolt on additional LLM/vision/TTS providers without prior agreement.
 - **Broadening beyond the programming-assistant scope.** General object recognition, scene description, translation, OCR-for-anything, or other "look at the world" features are out of scope. The product is "read and explain code aloud."
 - **Removing the GalleryWatcher/PhotosObserver path** before the SDK direct-capture path is proven to work.
 - **Committing secrets, build artifacts, or generated files** (APKs, `.env`, `local.properties`, `__pycache__/`, `build/`, `DerivedData/`, `Pods/`).

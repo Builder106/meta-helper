@@ -5,7 +5,6 @@
 </picture>
 
 [![CI](https://github.com/Builder106/meta-helper/actions/workflows/ci.yml/badge.svg)](https://github.com/Builder106/meta-helper/actions/workflows/ci.yml)
-[![Python](https://img.shields.io/badge/python-3.13%2B-blue.svg)](https://www.python.org/)
 [![Kotlin / Android](https://img.shields.io/badge/Android-Kotlin%20%2B%20Compose-3DDC84.svg?logo=android&logoColor=white)](https://developer.android.com/)
 [![iOS / Compose Multiplatform](https://img.shields.io/badge/iOS-Compose%20Multiplatform-000000.svg?logo=apple&logoColor=white)](https://www.jetbrains.com/lp/compose-multiplatform/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](#license)
@@ -33,7 +32,7 @@ sequenceDiagram
     participant API as Android/iOS · ApiClient
     participant BE as Backend · Spring Boot (Java)
     participant V as vision.py · Gemini
-    participant T as tts.py · edge-tts
+    participant T as Azure Speech · Java SDK
     participant A as audio.py · pydub / ffmpeg
     participant AP as Android/iOS · AudioPlayer
 
@@ -64,7 +63,7 @@ MetaHelper/
 │       ├── main.py             GET / (health), POST /process-image
 │       └── services/
 │           ├── vision.py       Gemini (gemini-3-pro-preview) — reads & solves the problem
-│           ├── tts.py          edge-tts (en-US-GuyNeural + fallbacks)
+│           ├── TtsService.java  Azure Speech neural voice + fallback
 │           └── audio.py        pydub playback-gain scaling
 ├── shared/    Kotlin Multiplatform — shared business logic
 │   └── src/
@@ -89,7 +88,7 @@ MetaHelper/
 
 ## Backend — setup
 
-Requires Java 21 and `ffmpeg` (used for audio export).
+Requires Java 21 and `ffmpeg` (used for audio export). Azure Speech is used for text-to-speech.
 
 ```bash
 cd backend
@@ -101,6 +100,9 @@ Copy `backend/.env.example`to`backend/.env` and fill in your values:
 | Variable | Required | Default | Purpose |
 | --- | --- | --- | --- |
 | `GOOGLE_API_KEY` | yes | — | Google Gemini API key ([create one](https://aistudio.google.com/apikey)) |
+| `AZURE_SPEECH_KEY` | yes | — | Azure Speech resource key |
+| `AZURE_SPEECH_REGION` | yes | — | Azure Speech resource region, such as `westus2` |
+| `AZURE_SPEECH_VOICE` | no | `en-US-GuyNeural` | Azure neural voice |
 | `AUDIO_AMPLITUDE_MULTIPLIER` | no | `0.1` | Playback gain (0.0–1.0); lower keeps audio from overpowering the glasses' speakers |
 
 ## API

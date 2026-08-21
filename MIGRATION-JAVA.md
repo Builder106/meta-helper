@@ -32,7 +32,7 @@ Previously, MetaHelper was a split-ecosystem project: Kotlin on Android, Python 
 ### 3. Text-to-Speech (`tts.py`->`TtsService.java`)
 
 **Current (Python):** Uses the `edge-tts` Python package (an unofficial wrapper for Microsoft Edge's Read Aloud API) to get free, high-quality TTS.
-**New (Java):** Shells out to the Python `edge-tts`CLI from Java using`ProcessBuilder`. Since we already bake `ffmpeg` into our Docker image, we also ensure Python/edge-tts is installed in the Dockerfile.
+**New (Java):** Uses the official Azure Speech Java SDK directly and requests MP3 output. No Python runtime is required.
 
 ### 4. Audio Processing (`audio.py`->`AudioService.java`)
 
@@ -50,11 +50,11 @@ This removes the need for a middleman library and keeps the audio processing fas
 - `backend/src/main/java/com/metahelper/MetaHelperApplication.java` - Main entry point
 - `backend/src/main/java/com/metahelper/controller/ImageController.java` - REST endpoint
 - `backend/src/main/java/com/metahelper/service/VisionService.java` - Gemini Vision integration
-- `backend/src/main/java/com/metahelper/service/TtsService.java` - edge-tts via ProcessBuilder
+- `backend/src/main/java/com/metahelper/service/TtsService.java` - Azure Speech Java SDK
 - `backend/src/main/java/com/metahelper/service/AudioService.java` - ffmpeg via ProcessBuilder
 - `backend/src/main/resources/application.properties` - Configuration
 - `backend/.env.example` - Environment template
-- `backend/Dockerfile` - Multi-stage build with Python/edge-tts + ffmpeg
+- `backend/Dockerfile` - Multi-stage Java build with ffmpeg
 - `backend/.dockerignore` - Updated for Java
 - `backend/src/test/java/com/metahelper/...` - Unit tests for all services
 
@@ -93,6 +93,6 @@ docker run -p 8080:8080 --env-file backend/.env metahelper-backend
 
 ## Future Considerations
 
-1. **Pure Java TTS**: If a free, pure-Java TTS solution becomes viable, replace the `edge-tts` shell-out.
+1. **Speech provider**: Azure Speech is the current Java-native TTS provider; revisit it if voice quality, quotas, or cost requirements change.
 2. **Google Cloud SDK**: If migrating to GCP service accounts, consider `google-cloud-vertexai` Java SDK.
-3. **Performance**: Current `ProcessBuilder`approach is fast enough; the Python`edge-tts` CLI is the bottleneck.
+3. **Performance**: The Azure SDK returns MP3 bytes directly; continue monitoring synthesis latency in production.
