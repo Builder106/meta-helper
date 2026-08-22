@@ -52,7 +52,7 @@ jobs:
 
       - name: Run Spring Boot unit tests
         working-directory: ./backend
-        run: ./gradlew test
+        run: ./gradlew test --warning-mode fail
 
   # ---------------------------------------------------------------------------
   # Shared — Kotlin Multiplatform module. Runs on macOS for CocoaPods/iOS targets.
@@ -75,7 +75,7 @@ jobs:
 
       - name: Build shared module (all targets)
         working-directory: ./shared
-        run: ./gradlew build
+        run: ./gradlew build --warning-mode fail
 
   # ---------------------------------------------------------------------------
   # Android — Kotlin + Jetpack Compose. The Meta Wearables SDK is resolved from
@@ -121,14 +121,14 @@ jobs:
         working-directory: ./android
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        run: ./gradlew ktlintCheck --continue || echo "ktlintCheck not configured, skipping"
+        run: ./gradlew ktlintCheck --warning-mode fail
 
       - name: Run unit tests and assemble debug APK
         if: env.HAS_TOKEN == 'true'
         working-directory: ./android
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        run: ./gradlew testDebugUnitTest assembleDebug || true
+        run: ./gradlew testDebugUnitTest assembleDebug --warning-mode fail
 
       - name: Enable KVM
         if: env.HAS_TOKEN == 'true'
@@ -145,7 +145,7 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: pixel_6
-          script: cd android && ./gradlew connectedCheck || true
+          script: cd android && ./gradlew connectedCheck --warning-mode fail
 
   # ---------------------------------------------------------------------------
   # iOS — Compose Multiplatform app. Requires macOS for Xcode/CocoaPods.
@@ -169,4 +169,4 @@ jobs:
       - name: Build iOS app
         env:
           GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx6g -Dkotlin.daemon.jvmargs=-Xmx6g"
-        run: ./gradlew :shared:assemble || ./gradlew assemble || true
+        run: ./gradlew :shared:assemble --warning-mode fail || ./gradlew assemble --warning-mode fail

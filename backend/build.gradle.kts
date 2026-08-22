@@ -48,3 +48,7 @@ tasks.jacocoTestReport {
         html.required.set(true)
     }
 }
+
+tasks.withType<JavaCompile>().configureEach {
+    options.compilerArgs.add("-Werror")
+}

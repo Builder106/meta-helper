@@ -43,8 +43,9 @@ kotlin {
     }
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     compilerOptions {
-        freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn")
+        allWarningsAsErrors.set(true)
+        freeCompilerArgs.add("-Xopt-in=kotlin.RequiresOptIn")
     }
 }
