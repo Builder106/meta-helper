@@ -4,6 +4,11 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
     }
+    plugins {
+        id("org.jetbrains.kotlin.multiplatform") version "2.4.10"
+        id("org.jetbrains.kotlin.plugin.compose") version "2.4.10"
+        id("com.android.application") version "9.3.1"
+    }
 }
 
 val localProperties = java.util.Properties()
