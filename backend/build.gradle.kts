@@ -49,6 +49,27 @@ tasks.jacocoTestReport {
     }
 }
 
+tasks.jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            element = "BUNDLE"
+            limit {
+                counter = "LINE"
+                value = "COVEREDRATIO"
+                minimum = "1.0".toBigDecimal()
+            }
+        }
+    }
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    finalizedBy(tasks.jacocoTestCoverageVerification)
+}
+
 tasks.withType<JavaCompile>().configureEach {
     options.compilerArgs.add("-Werror")
 }

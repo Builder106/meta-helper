@@ -52,7 +52,7 @@ jobs:
 
       - name: Run Spring Boot unit tests
         working-directory: ./backend
-        run: ./gradlew test --warning-mode fail
+        run: ./gradlew test jacocoTestCoverageVerification --warning-mode fail
 
   # ---------------------------------------------------------------------------
   # Shared — Kotlin Multiplatform module. Runs on macOS for CocoaPods/iOS targets.
