@@ -6,6 +6,7 @@ group = "com.metahelper"
 version = "1.0"
 
 kotlin {
+    androidTarget()
     iosArm64() {
         binaries.framework {
             baseName = "MetaHelperShared"
