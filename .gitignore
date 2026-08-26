@@ -126,6 +126,7 @@ cython_debug/
 # Android
 *.iml
 .gradle
+/android/.kotlin/
 /local.properties
 /.idea/caches
 /.idea/libraries
