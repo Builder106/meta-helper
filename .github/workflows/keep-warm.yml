@@ -18,6 +18,9 @@ concurrency:
   group: keep-warm
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   ping:
     runs-on: ubuntu-24.04
