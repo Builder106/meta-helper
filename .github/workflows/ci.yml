@@ -120,12 +120,12 @@ jobs:
         if: env.HAS_TOKEN == 'true'
         uses: gradle/actions/setup-gradle@v6
 
-      - name: Kotlin linting
+      - name: Android lint
         if: env.HAS_TOKEN == 'true'
         working-directory: ./android
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        run: ./gradlew ktlintCheck --warning-mode fail
+        run: ./gradlew lintDebug --warning-mode fail
 
       - name: Run unit tests and assemble debug APK
         if: env.HAS_TOKEN == 'true'
