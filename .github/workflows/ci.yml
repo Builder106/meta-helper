@@ -78,8 +78,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Build shared module (all targets)
-        working-directory: ./shared
-        run: ./gradlew build --warning-mode fail
+        run: ./gradlew :shared:build --warning-mode fail
 
   # ---------------------------------------------------------------------------
   # Android — Kotlin + Jetpack Compose. The Meta Wearables SDK is resolved from
