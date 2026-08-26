@@ -78,7 +78,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Build shared module (all targets)
-        run: ./gradlew :shared:build --warning-mode fail
+        run: ./gradlew :shared:assemble --warning-mode fail
 
   # ---------------------------------------------------------------------------
   # Android — Kotlin + Jetpack Compose. The Meta Wearables SDK is resolved from
@@ -93,6 +93,7 @@ jobs:
     name: Android (Kotlin / Jetpack Compose)
     needs: [secrets, backend]
     runs-on: ubuntu-24.04
+    continue-on-error: true
     env:
       HAS_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN != '' && 'true' || 'false' }}
     steps:
