@@ -34,7 +34,7 @@ kotlin {
             implementation("io.ktor:ktor-client-content-negotiation:3.0.3")
             implementation("io.ktor:ktor-client-serialization:3.0.3")
             implementation("io.ktor:ktor-serialization-kotlinx-json:3.0.3")
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
         }
     }
 }
