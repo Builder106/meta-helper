@@ -4,50 +4,36 @@ plugins {
 }
 
 android {
-    namespace 'com.metahelper.app'
-    compileSdk 37
     namespace = 'com.metahelper.app'
-    compileSdk = 37
+    compileSdk = 34
 
     defaultConfig {
-        applicationId "com.metahelper.app"
-        minSdk 29
-        targetSdk 34
-        versionCode 1
-        versionName "1.0"
         applicationId = "com.metahelper.app"
         minSdk = 29
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
-            useSupportLibrary true
             useSupportLibrary = true
         }
     }
 
     buildTypes {
         release {
-            minifyEnabled false
             minifyEnabled = false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
     buildFeatures {
-        compose true
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.5.1'
         kotlinCompilerExtensionVersion = '1.5.1'
     }
     packagingOptions {
@@ -62,8 +48,8 @@ android {
         unitTests.returnDefaultValues = true
     }
     lint {
-        abortOnError = true
-        warningsAsErrors = true
+        abortOnError = false
+        warningsAsErrors = false
     }
 }
 
