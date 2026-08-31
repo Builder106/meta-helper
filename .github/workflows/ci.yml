@@ -79,6 +79,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Build shared module (all targets)
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx6g -Dkotlin.daemon.jvmargs=-Xmx6g"
         run: ./gradlew :shared:assemble --warning-mode fail
 
   # ---------------------------------------------------------------------------
