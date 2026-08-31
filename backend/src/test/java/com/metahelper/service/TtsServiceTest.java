@@ -90,4 +90,64 @@ public class TtsServiceTest {
         });
         assertTrue(ex.getMessage().contains("Speech engine error"));
     }
+
+    @Test
+    public void testTextToSpeechFallbackFailureNonIOException() {
+        TtsService service = new TtsService(
+                "key",
+                "eastus",
+                "en-US-AriaNeural",
+                (key, reg, voice, text) -> {
+                    throw new RuntimeException("Unexpected runtime error on " + voice);
+                }
+        );
+
+        IOException ex = assertThrows(IOException.class, () -> {
+            service.textToSpeech("Hello world");
+        });
+        assertTrue(ex.getMessage().contains("Azure Speech synthesis failed"));
+    }
+
+    @Test
+    public void testDefaultConstructor() {
+        TtsService defaultService = new TtsService("key", "eastus", "en-US-GuyNeural");
+        assertNotNull(defaultService);
+    }
+
+    @Test
+    public void testDefaultSynthesizeSuccess() throws Exception {
+        byte[] expected = "audio_bytes".getBytes();
+        byte[] result = TtsService.defaultSynthesize("key", "eastus", "voice", "text", (cfg, txt) -> expected);
+        assertArrayEquals(expected, result);
+    }
+
+    @Test
+    public void testDefaultSynthesizeInterrupted() {
+        IOException ex = assertThrows(IOException.class, () -> {
+            TtsService.defaultSynthesize("key", "eastus", "voice", "text", (cfg, txt) -> {
+                throw new InterruptedException("simulated interrupt");
+            });
+        });
+        assertTrue(ex.getMessage().contains("interrupted"));
+    }
+
+    @Test
+    public void testDefaultSynthesizeIOException() {
+        IOException ex = assertThrows(IOException.class, () -> {
+            TtsService.defaultSynthesize("key", "eastus", "voice", "text", (cfg, txt) -> {
+                throw new IOException("simulated io error");
+            });
+        });
+        assertTrue(ex.getMessage().contains("simulated io error"));
+    }
+
+    @Test
+    public void testDefaultSynthesizeGenericException() {
+        IOException ex = assertThrows(IOException.class, () -> {
+            TtsService.defaultSynthesize("key", "eastus", "voice", "text", (cfg, txt) -> {
+                throw new RuntimeException("simulated runtime error");
+            });
+        });
+        assertTrue(ex.getMessage().contains("Azure Speech synthesis failed"));
+    }
 }

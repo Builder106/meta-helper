@@ -25,6 +25,9 @@ public class TtsService {
         byte[] synthesize(String subscriptionKey, String region, String voice, String text) throws Exception;
     }
 
+    private final String subscriptionKey;
+    private final String region;
+    private final String defaultVoice;
     private final SpeechSynthesizerFunction speechSynthesizerFunction;
 
     public TtsService(
@@ -70,20 +73,40 @@ public class TtsService {
         }
     }
 
-    private static byte[] defaultSynthesize(String subscriptionKey, String region, String voice, String text) throws Exception {
+    @FunctionalInterface
+    interface SynthesizerExecutor {
+        byte[] execute(SpeechConfig speechConfig, String text) throws Exception;
+    }
+
+    static SynthesizerExecutor defaultSynthesizerExecutor = (speechConfig, text) -> {
+        try (SpeechSynthesizer synthesizer = new SpeechSynthesizer(speechConfig);
+             SpeechSynthesisResult result = synthesizer.SpeakTextAsync(text).get()) {
+            if (result.getReason() != ResultReason.SynthesizingAudioCompleted) {
+                throw new IOException("Azure Speech synthesis did not complete: " + result.getReason());
+            }
+            byte[] audioData = result.getAudioData();
+            if (audioData == null || audioData.length == 0) {
+                throw new IOException("Azure Speech returned no audio data");
+            }
+            return audioData;
+        }
+    };
+
+    static byte[] defaultSynthesize(String subscriptionKey, String region, String voice, String text) throws Exception {
+        return defaultSynthesize(subscriptionKey, region, voice, text, defaultSynthesizerExecutor);
+    }
+
+    static byte[] defaultSynthesize(
+            String subscriptionKey,
+            String region,
+            String voice,
+            String text,
+            SynthesizerExecutor executor) throws Exception {
         try (SpeechConfig speechConfig = SpeechConfig.fromSubscription(subscriptionKey, region)) {
             speechConfig.setSpeechSynthesisVoiceName(voice);
             speechConfig.setSpeechSynthesisOutputFormat(SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3);
-            try (SpeechSynthesizer synthesizer = new SpeechSynthesizer(speechConfig);
-                 SpeechSynthesisResult result = synthesizer.SpeakTextAsync(text).get()) {
-                if (result.getReason() != ResultReason.SynthesizingAudioCompleted) {
-                    throw new IOException("Azure Speech synthesis did not complete: " + result.getReason());
-                }
-                byte[] audioData = result.getAudioData();
-                if (audioData == null || audioData.length == 0) {
-                    throw new IOException("Azure Speech returned no audio data");
-                }
-                return audioData;
+            try {
+                return executor.execute(speechConfig, text);
             } catch (InterruptedException interruptedException) {
                 Thread.currentThread().interrupt();
                 throw new IOException("Azure Speech synthesis was interrupted", interruptedException);

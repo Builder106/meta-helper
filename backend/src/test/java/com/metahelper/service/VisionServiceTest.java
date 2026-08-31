@@ -112,4 +112,52 @@ public class VisionServiceTest {
         assertEquals("Recovered after retry", result);
         server.verify();
     }
+
+    @Test
+    public void testDefaultConstructor() {
+        VisionService defaultService = new VisionService("dummy-key", "gemini-1.5-flash", new ObjectMapper());
+        assertNotNull(defaultService);
+    }
+
+    @Test
+    public void testGetDescriptionJsonParseException() {
+        RestClient.Builder builder = RestClient.builder().baseUrl("https://generativelanguage.googleapis.com");
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        VisionService visionService = new VisionService("test-key", "gemini-1.5-flash", new ObjectMapper(), builder.build());
+
+        server.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=test-key"))
+                .andRespond(withSuccess("invalid-json{", MediaType.APPLICATION_JSON));
+        server.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=test-key"))
+                .andRespond(withSuccess("invalid-json{", MediaType.APPLICATION_JSON));
+
+        String result = visionService.getDescription("fake_image".getBytes());
+        assertTrue(result.contains("trouble analyzing") || result.contains("retake the photo"));
+        server.verify();
+    }
+
+    @Test
+    public void testGetDescriptionNullOrEmptyParts() {
+        RestClient.Builder builder = RestClient.builder().baseUrl("https://generativelanguage.googleapis.com");
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        VisionService visionService = new VisionService("test-key", "gemini-1.5-flash", new ObjectMapper(), builder.build());
+
+        String mockResponseBody = """
+            {
+              "candidates": [
+                {
+                  "content": {
+                    "parts": []
+                  }
+                }
+              ]
+            }
+            """;
+
+        server.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=test-key"))
+                .andRespond(withSuccess(mockResponseBody, MediaType.APPLICATION_JSON));
+
+        String result = visionService.getDescription("fake_image".getBytes());
+        assertTrue(result.contains("retake the photo"));
+        server.verify();
+    }
 }
