@@ -16,4 +16,12 @@ public class VisionServiceTest {
 
         assertTrue(exception.getMessage().contains("VisionService is not configured"));
     }
+
+    @Test
+    public void testGetDescriptionErrorFallback() {
+        VisionService visionService = new VisionService("dummy-api-key", "gemini-1.5-flash", new ObjectMapper());
+        String result = visionService.getDescription("fake_image".getBytes());
+        assertNotNull(result);
+        assertTrue(result.contains("trouble analyzing") || result.contains("retake the photo"));
+    }
 }

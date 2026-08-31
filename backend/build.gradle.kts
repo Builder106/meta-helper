@@ -52,15 +52,17 @@ tasks.jacocoTestReport {
 tasks.jacocoTestCoverageVerification {
     violationRules {
         rule {
-            element = "BUNDLE"
+            element = "PACKAGE"
+            includes = listOf("com.metahelper.service*", "com.metahelper.controller*")
             limit {
                 counter = "LINE"
                 value = "COVEREDRATIO"
-                minimum = "0.30".toBigDecimal()
+                minimum = "1.00".toBigDecimal()
             }
         }
     }
 }
+
 
 tasks.test {
     finalizedBy(tasks.jacocoTestReport)
