@@ -20,17 +20,29 @@ public class TtsService {
     private static final Pattern HEADING = Pattern.compile("(?m)^\\s{0,3}#{1,6}\\s+");
     private static final Pattern BULLET = Pattern.compile("(?m)^\\s*[-*+]\\s+");
 
-    private final String subscriptionKey;
-    private final String region;
-    private final String defaultVoice;
+    @FunctionalInterface
+    interface SpeechSynthesizerFunction {
+        byte[] synthesize(String subscriptionKey, String region, String voice, String text) throws Exception;
+    }
+
+    private final SpeechSynthesizerFunction speechSynthesizerFunction;
 
     public TtsService(
             @Value("$" + "{azure.speech.key:}") String subscriptionKey,
             @Value("$" + "{azure.speech.region:}") String region,
             @Value("$" + "{azure.speech.voice:en-US-GuyNeural}") String defaultVoice) {
+        this(subscriptionKey, region, defaultVoice, TtsService::defaultSynthesize);
+    }
+
+    TtsService(
+            String subscriptionKey,
+            String region,
+            String defaultVoice,
+            SpeechSynthesizerFunction speechSynthesizerFunction) {
         this.subscriptionKey = subscriptionKey;
         this.region = region;
         this.defaultVoice = defaultVoice;
+        this.speechSynthesizerFunction = speechSynthesizerFunction;
     }
 
     public byte[] textToSpeech(String text) throws IOException {
@@ -44,12 +56,12 @@ public class TtsService {
         }
         logger.info("Synthesizing speech for " + cleanText.length() + " characters...");
         try {
-            return synthesize(cleanText, defaultVoice);
+            return speechSynthesizerFunction.synthesize(subscriptionKey, region, defaultVoice, cleanText);
         } catch (Exception firstFailure) {
             String fallbackVoice = defaultVoice.equals("en-US-AriaNeural") ? "en-US-GuyNeural" : "en-US-AriaNeural";
             logger.warning("TTS Error with " + defaultVoice + ": " + firstFailure.getMessage());
             try {
-                return synthesize(cleanText, fallbackVoice);
+                return speechSynthesizerFunction.synthesize(subscriptionKey, region, fallbackVoice, cleanText);
             } catch (Exception fallbackFailure) {
                 logger.severe("Final TTS Failure: " + fallbackFailure.getMessage());
                 if (fallbackFailure instanceof IOException ioException) throw ioException;
@@ -58,7 +70,7 @@ public class TtsService {
         }
     }
 
-    private byte[] synthesize(String text, String voice) throws IOException {
+    private static byte[] defaultSynthesize(String subscriptionKey, String region, String voice, String text) throws Exception {
         try (SpeechConfig speechConfig = SpeechConfig.fromSubscription(subscriptionKey, region)) {
             speechConfig.setSpeechSynthesisVoiceName(voice);
             speechConfig.setSpeechSynthesisOutputFormat(SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3);

@@ -3,6 +3,9 @@ package com.metahelper.service;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,21 +32,15 @@ public class AudioServiceTest {
     }
 
     @Test
-    public void testScaleAmplitudeSuccess() {
-        try {
-            ProcessBuilder pb = new ProcessBuilder(
-                    "ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono", "-t", "0.1", "-f", "mp3", "pipe:1"
-            );
-            Process p = pb.start();
-            byte[] silentMp3 = p.getInputStream().readAllBytes();
-            p.waitFor();
-            if (silentMp3.length > 0) {
-                byte[] scaled = audioService.scaleAmplitude(silentMp3, 0.5);
-                assertNotNull(scaled);
-                assertTrue(scaled.length > 0);
-            }
-        } catch (Exception e) {
-            // If ffmpeg is not available in environment, ignore
-        }
+    public void testScaleAmplitudeSuccessWithCommandRunner() throws Exception {
+        AudioService customAudioService = new AudioService(pb -> {
+            String outputPath = pb.command().get(pb.command().size() - 1);
+            Files.write(Paths.get(outputPath), "scaled_audio_bytes".getBytes());
+            return 0;
+        });
+
+        byte[] scaled = customAudioService.scaleAmplitude(new byte[]{1, 2, 3}, 0.5);
+        assertNotNull(scaled);
+        assertArrayEquals("scaled_audio_bytes".getBytes(), scaled);
     }
 }

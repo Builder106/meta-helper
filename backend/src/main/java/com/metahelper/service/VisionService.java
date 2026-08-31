@@ -51,10 +51,17 @@ public class VisionService {
     public VisionService(@Value("${google.api.key:}") String apiKey,
                          @Value("${gemini.model:gemini-1.5-flash}") String modelId,
                          ObjectMapper objectMapper) {
+        this(apiKey, modelId, objectMapper, RestClient.create("https://generativelanguage.googleapis.com"));
+    }
+
+    VisionService(String apiKey,
+                  String modelId,
+                  ObjectMapper objectMapper,
+                  RestClient restClient) {
         this.apiKey = apiKey;
         this.modelId = modelId;
         this.objectMapper = objectMapper;
-        this.restClient = RestClient.create("https://generativelanguage.googleapis.com");
+        this.restClient = restClient;
     }
 
     public String getDescription(byte[] imageBytes) {

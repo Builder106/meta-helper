@@ -9,7 +9,25 @@ import java.util.logging.Logger;
 
 @Service
 public class AudioService {
-    private static final Logger logger = Logger.getLogger(AudioService.class.getName());
+    @FunctionalInterface
+    interface CommandRunner {
+        int run(ProcessBuilder pb) throws IOException, InterruptedException;
+    }
+
+    private final CommandRunner commandRunner;
+
+    public AudioService() {
+        this(AudioService::defaultRun);
+    }
+
+    AudioService(CommandRunner commandRunner) {
+        this.commandRunner = commandRunner;
+    }
+
+    private static int defaultRun(ProcessBuilder pb) throws IOException, InterruptedException {
+        Process process = pb.start();
+        return process.waitFor();
+    }
 
     public byte[] scaleAmplitude(byte[] audioBytes, double multiplier) throws IOException, InterruptedException {
         if (audioBytes == null || audioBytes.length == 0) {
@@ -34,8 +52,7 @@ public class AudioService {
             
             // redirect error to discard it or log it
             pb.redirectError(ProcessBuilder.Redirect.DISCARD);
-            Process process = pb.start();
-            int exitCode = process.waitFor();
+            int exitCode = commandRunner.run(pb);
 
             if (exitCode != 0) {
                 throw new IOException("ffmpeg command failed with exit code " + exitCode);
