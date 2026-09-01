@@ -1,5 +1,5 @@
 # Build stage
-FROM eclipse-temurin:21-jdk-jammy AS builder
+FROM eclipse-temurin:26-jdk-jammy AS builder
 
 WORKDIR /app
 COPY build.gradle.kts settings.gradle.kts gradlew ./
@@ -10,7 +10,7 @@ COPY src src
 RUN ./gradlew build -x test --no-daemon
 
 # Runtime stage
-FROM eclipse-temurin:21-jre-jammy
+FROM eclipse-temurin:26-jre-jammy
 
 RUN apt-get update && apt-get install -y \
     ffmpeg \
@@ -22,7 +22,7 @@ WORKDIR /app
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 RUN chown -R appuser:appuser /app
 
-COPY --from=builder /app/build/libs/metahelper-backend-*.jar app.jar
+COPY --from=builder /app/build/libs/app.jar app.jar
 
 USER appuser
 
