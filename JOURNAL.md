@@ -4,6 +4,10 @@
 > things happen — retrospectives need this raw material to land.
 > Reverse-chronological; one paragraph max per entry.
 
+## 2026-09-01 — Upgraded the backend Java baseline #decision
+
+The backend baseline is now Java 26 with Gradle 9.7.1 and Spring Boot 4.1.1. Android, shared, and iOS retain their existing Java 21-compatible toolchains; this upgrade changes the backend platform only. Documentation records the new baseline without claiming that tests or builds passed.
+
 ## 2026-08-21 — Replaced edge-tts with Azure Speech Java SDK #decision
 
 Replaced the Python `edge-tts` subprocess with the official Azure Speech Java SDK. `TtsService` now requests 24 kHz MP3 bytes directly, retains markdown cleanup and voice fallback, and requires `AZURE_SPEECH_KEY` plus `AZURE_SPEECH_REGION`; the backend image no longer installs Python or `edge-tts`.
