@@ -1,6 +1,6 @@
 package com.metahelper.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -21,6 +21,12 @@ public class VisionServiceTest {
         });
 
         assertTrue(exception.getMessage().contains("VisionService is not configured"));
+
+        VisionService nullKeyService = new VisionService(null, "gemini-1.5-flash", new ObjectMapper());
+        Exception exNull = assertThrows(RuntimeException.class, () -> {
+            nullKeyService.getDescription("fake_image".getBytes());
+        });
+        assertTrue(exNull.getMessage().contains("VisionService is not configured"));
     }
 
     @Test
@@ -158,6 +164,152 @@ public class VisionServiceTest {
 
         String result = visionService.getDescription("fake_image".getBytes());
         assertTrue(result.contains("retake the photo"));
+        server.verify();
+    }
+
+    @Test
+    public void testGetDescriptionCandidateWithoutContent() {
+        RestClient.Builder builder = RestClient.builder().baseUrl("https://generativelanguage.googleapis.com");
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        VisionService visionService = new VisionService("test-key", "gemini-1.5-flash", new ObjectMapper(), builder.build());
+
+        String mockResponseBody = """
+            {
+              "candidates": [
+                {}
+              ]
+            }
+            """;
+
+        server.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=test-key"))
+                .andRespond(withSuccess(mockResponseBody, MediaType.APPLICATION_JSON));
+
+        String result = visionService.getDescription("fake_image".getBytes());
+        assertTrue(result.contains("retake the photo"));
+        server.verify();
+    }
+
+    @Test
+    public void testGetDescriptionCandidatePartWithoutText() {
+        RestClient.Builder builder = RestClient.builder().baseUrl("https://generativelanguage.googleapis.com");
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        VisionService visionService = new VisionService("test-key", "gemini-1.5-flash", new ObjectMapper(), builder.build());
+
+        String mockResponseBody = """
+            {
+              "candidates": [
+                {
+                  "content": {
+                    "parts": [
+                      {}
+                    ]
+                  }
+                }
+              ]
+            }
+            """;
+
+        server.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=test-key"))
+                .andRespond(withSuccess(mockResponseBody, MediaType.APPLICATION_JSON));
+
+        String result = visionService.getDescription("fake_image".getBytes());
+        assertTrue(result.contains("retake the photo"));
+        server.verify();
+    }
+
+    @Test
+    public void testGetDescriptionTransientErrorAllKeywords() {
+        String[] errorKeywords = {"503", "UNAVAILABLE", "429", "RESOURCE_EXHAUSTED", "500", "high demand", "overloaded"};
+        for (String keyword : errorKeywords) {
+            RestClient.Builder builder = RestClient.builder().baseUrl("https://generativelanguage.googleapis.com");
+            MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+            VisionService visionService = new VisionService("test-key", "gemini-1.5-flash", new ObjectMapper(), builder.build());
+
+            server.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=test-key"))
+                    .andRespond(org.springframework.test.web.client.response.MockRestResponseCreators.withStatus(org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE).body(keyword));
+            server.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=test-key"))
+                    .andRespond(org.springframework.test.web.client.response.MockRestResponseCreators.withStatus(org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE).body(keyword));
+            server.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=test-key"))
+                    .andRespond(org.springframework.test.web.client.response.MockRestResponseCreators.withStatus(org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE).body(keyword));
+
+            server.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=test-key"))
+                    .andRespond(org.springframework.test.web.client.response.MockRestResponseCreators.withStatus(org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE).body(keyword));
+            server.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=test-key"))
+                    .andRespond(org.springframework.test.web.client.response.MockRestResponseCreators.withStatus(org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE).body(keyword));
+            server.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=test-key"))
+                    .andRespond(org.springframework.test.web.client.response.MockRestResponseCreators.withStatus(org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE).body(keyword));
+
+            String result = visionService.getDescription("fake_image".getBytes());
+            assertTrue(result.contains("trouble analyzing"));
+            server.verify();
+        }
+    }
+
+    @Test
+    public void testGetDescriptionNonTransientErrorBreaksEarly() {
+        RestClient.Builder builder = RestClient.builder().baseUrl("https://generativelanguage.googleapis.com");
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        VisionService visionService = new VisionService("test-key", "gemini-1.5-flash", new ObjectMapper(), builder.build());
+
+        server.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=test-key"))
+                .andRespond(org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest().body("INVALID_ARGUMENT"));
+        server.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=test-key"))
+                .andRespond(org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest().body("INVALID_ARGUMENT"));
+
+        String result = visionService.getDescription("fake_image".getBytes());
+        assertTrue(result.contains("trouble analyzing"));
+        server.verify();
+    }
+
+    @Test
+    public void testGetDescriptionSecondModelSuccess() {
+        RestClient.Builder builder = RestClient.builder().baseUrl("https://generativelanguage.googleapis.com");
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        VisionService visionService = new VisionService("test-key", "gemini-1.5-flash", new ObjectMapper(), builder.build());
+
+        server.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=test-key"))
+                .andRespond(org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest().body("BAD_REQUEST"));
+
+        String mockSuccessBody = """
+            {
+              "candidates": [
+                {
+                  "content": {
+                    "parts": [
+                      {
+                        "text": "Success from fallback model"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+            """;
+        server.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=test-key"))
+                .andRespond(withSuccess(mockSuccessBody, MediaType.APPLICATION_JSON));
+
+        String result = visionService.getDescription("fake_image".getBytes());
+        assertEquals("Success from fallback model", result);
+        server.verify();
+    }
+
+    @Test
+    public void testGetDescriptionInterruptedDuringSleep() {
+        RestClient.Builder builder = RestClient.builder().baseUrl("https://generativelanguage.googleapis.com");
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        VisionService visionService = new VisionService("test-key", "gemini-1.5-flash", new ObjectMapper(), builder.build());
+
+        server.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=test-key"))
+                .andRespond(org.springframework.test.web.client.response.MockRestResponseCreators.withStatus(org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE).body("503"));
+        server.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=test-key"))
+                .andRespond(org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest().body("BAD_REQUEST"));
+        server.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=test-key"))
+                .andRespond(org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest().body("BAD_REQUEST"));
+
+        Thread.currentThread().interrupt();
+        String result = visionService.getDescription("fake_image".getBytes());
+        assertTrue(result.contains("trouble analyzing"));
+        assertTrue(Thread.interrupted());
         server.verify();
     }
 }
