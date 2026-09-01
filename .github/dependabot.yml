@@ -1,33 +1,62 @@
 version: 2
 updates:
-  - package-ecosystem: "gradle"
-    directory: "/backend"
+  - package-ecosystem: gradle
+    directory: /backend
     schedule:
-      interval: "weekly"
+      interval: weekly
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
 
-  - package-ecosystem: "gradle"
-    directory: "/android"
+  - package-ecosystem: gradle
+    directory: /android
     schedule:
-      interval: "weekly"
+      interval: weekly
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
     ignore:
       - dependency-name: "com.meta.wearable:*"
 
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: github-actions
+    directory: /
     schedule:
-      interval: "weekly"
+      interval: weekly
     groups:
       actions:
-        patterns: ["*"]
+        patterns:
+          - "*"
 
-  - package-ecosystem: "gradle"
-    directory: "/"
+  - package-ecosystem: gradle
+    directory: /
     schedule:
-      interval: "weekly"
+      interval: weekly
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
     ignore:
       - dependency-name: "com.meta.wearable:*"
 
-  - package-ecosystem: "docker"
-    directory: "/backend"
+  - package-ecosystem: docker
+    directory: /backend
     schedule:
-      interval: "weekly"
+      interval: weekly
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
