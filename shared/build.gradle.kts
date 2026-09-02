@@ -52,20 +52,6 @@ kotlin {
     }
 }
 
-android {
-    namespace = "com.metahelper.shared"
-    compileSdk = 34
-
-    defaultConfig {
-        minSdk = 29
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-}
-
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     compilerOptions {
         allWarningsAsErrors.set(true)
