@@ -67,7 +67,7 @@ internal class AndroidGalleryWatcher(
         }
     }
 
-    private fun checkForNewMetaImage() {
+    private suspend fun checkForNewMetaImage() {
         mutex.lock()
         try {
             val projection = arrayOf(
