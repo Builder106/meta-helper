@@ -9,8 +9,6 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import android.util.Log
 import com.meta.wearable.dat.core.Wearables
-import com.meta.wearable.dat.core.types.RegistrationState
-import com.metahelper.shared.GlassesManager
 import kotlinx.coroutines.*
 
 class WearableService : Service() {

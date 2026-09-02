@@ -24,7 +24,7 @@ public class AudioService {
         this.commandRunner = commandRunner;
     }
 
-    private static int defaultRun(ProcessBuilder pb) throws IOException, InterruptedException {
+    static int defaultRun(ProcessBuilder pb) throws IOException, InterruptedException {
         Process process = pb.start();
         return process.waitFor();
     }

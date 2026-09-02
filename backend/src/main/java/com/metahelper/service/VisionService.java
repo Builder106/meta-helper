@@ -1,7 +1,8 @@
 package com.metahelper.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,7 @@ public class VisionService {
         - Don't comment on image quality unless it is actually unreadable.
         """;
 
+    @Autowired
     public VisionService(@Value("${google.api.key:}") String apiKey,
                          @Value("${gemini.model:gemini-1.5-flash}") String modelId,
                          ObjectMapper objectMapper) {

@@ -53,12 +53,12 @@ class ApiClient(private val baseUrl: String) {
             override fun onResponse(call: Call, response: Response) {
                 Log.d("ApiClient", "Response received. Code: ${response.code}")
                 if (response.isSuccessful) {
-                    val audioBytes = response.body?.bytes()
-                    if (audioBytes != null) {
+                    val audioBytes = response.body.bytes()
+                    if (audioBytes.isNotEmpty()) {
                         Log.d("ApiClient", "Success! Received ${audioBytes.size} audio bytes")
                         callback.onSuccess(audioBytes)
                     } else {
-                        Log.e("ApiClient", "Error: Response body is null")
+                        Log.e("ApiClient", "Error: Response body is empty")
                         callback.onError("Empty response body")
                     }
                 } else {
@@ -70,4 +70,3 @@ class ApiClient(private val baseUrl: String) {
         })
     }
 }
-

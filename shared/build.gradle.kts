@@ -1,13 +1,20 @@
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
-    id("com.android.library")
+    id("com.android.kotlin.multiplatform.library")
 }
 
 group = "com.metahelper"
 version = "1.0"
 
 kotlin {
-    androidTarget()
+    android {
+        namespace = "com.metahelper.shared"
+        compileSdk = 34
+        minSdk = 29
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
+        }
+    }
 
     iosArm64() {
         binaries.framework {

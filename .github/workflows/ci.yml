@@ -1,7 +1,7 @@
 name: CI
 
 # MetaHelper CI — an AI programming assistant for Meta Ray-Ban glasses.
-# Backend: Spring Boot 3 (Java 21) vision -> speech pipeline (the gating job).
+# Backend: Spring Boot 4 (Java 26) vision -> speech pipeline (the gating job).
 # Android: Kotlin + Jetpack Compose app that talks to the backend; its build
 # needs the Meta Wearables SDK from GitHub Packages, so it only runs once the
 # GH_PACKAGES_TOKEN secret (a PAT with read:packages) is configured.
@@ -39,24 +39,24 @@ jobs:
   # Backend — always runs and gates the workflow. Must be green on a fresh repo.
   # ---------------------------------------------------------------------------
   backend:
-    name: Backend (Spring Boot / Java 21)
+    name: Backend (Spring Boot / Java 26)
     runs-on: ubuntu-24.04
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
 
-      - name: Set up JDK 21
+      - name: Set up JDK 26
         uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '26'
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
 
       - name: Run Spring Boot unit tests
         working-directory: ./backend
-        run: ./gradlew test jacocoTestCoverageVerification --warning-mode fail
+        run: ./gradlew clean test jacocoTestReport jacocoTestCoverageVerification --warning-mode fail
 
   # ---------------------------------------------------------------------------
   # Shared — Kotlin Multiplatform module. Runs on macOS for CocoaPods/iOS targets.
@@ -79,6 +79,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Build shared module (all targets)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
         run: ./gradlew :shared:assemble --warning-mode fail
 
   # ---------------------------------------------------------------------------
@@ -175,5 +177,6 @@ jobs:
 
       - name: Build iOS app
         env:
+          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
           GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx6g -Dkotlin.daemon.jvmargs=-Xmx6g"
         run: ./gradlew :shared:assemble --warning-mode fail || ./gradlew assemble --warning-mode fail

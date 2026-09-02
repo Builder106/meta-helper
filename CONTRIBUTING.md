@@ -8,7 +8,7 @@ Thanks for your interest in contributing. This guide covers how to set up both h
 
 | Path | What it is |
 | --- | --- |
-| `backend/` | Java 21 + Spring Boot 3 service. Gemini Vision reads the problem, Azure Speech synthesizes speech, ffmpeg adjusts gain, and the endpoint returns MP3 bytes. |
+| `backend/` | Java 26 + Spring Boot 4.1.1 service. Gemini Vision reads the problem, Azure Speech synthesizes speech, ffmpeg adjusts gain, and the endpoint returns MP3 bytes. |
 | `shared/` | Kotlin Multiplatform module with shared business logic (gallery watching, API client, audio playback, volume control, connection monitoring). |
 | `android/` | Kotlin + Jetpack Compose app using the Meta Wearables SDK. Detects glasses photos, posts them to the backend, and plays the spoken response. |
 | `iosApp/` | iOS + Compose Multiplatform app using the shared module and mwdat-ios SDK. |
@@ -29,7 +29,7 @@ Glasses photo
 
 ## Backend setup (`backend/`)
 
-Requires Java 21 and `ffmpeg` (for audio processing). Azure Speech credentials are required for TTS.
+Requires Java 26, Gradle 9.7.1, and `ffmpeg` (for audio processing). Azure Speech credentials are required for TTS.
 
 ```bash
 cd backend
@@ -156,7 +156,8 @@ Please respect these project-specific constraints:
 - **The Gemini prompt is intentionally code-focused.** The prompt in `backend/src/main/java/com/metahelper/service/VisionService.java` is tuned to read and explain code and technical content aloud (any language), including the dual-layer "read it verbatim, then explain it" audio format. Do not relax it into a generic "describe my surroundings" prompt. Prompt changes are fine, but keep MetaHelper a code assistant, not a general scene describer.
 - **The GalleryWatcher/PhotosObserver capture path is a known workaround.** Don't delete it in favor of the SDK `StreamSession`/`MWDAT` direct-capture path until that path is actually working end-to-end. Document the real behavior, not the aspirational one.
 - **Keep audio TTS-friendly.** Backend output is read aloud by TTS, so avoid LaTeX, markdown, or notation that doesn't speak well — favor plain spoken English.
-- **Java 21 + Spring Boot 3 only.** The backend is Java, including TTS through the Azure Speech Java SDK. Don't add Python dependencies for the main API.
+- **Backend baseline: Java 26 + Spring Boot 4.1.1.** The backend is Java, including TTS through the Azure Speech Java SDK. Don't add Python dependencies for the main API.
+- **Keep Android, shared, and iOS on their existing Java 21-compatible toolchains.** The backend Java 26 upgrade does not change those modules.
 - **Shared module is the source of truth.** Platform-specific code should only implement `expect`interfaces from`commonMain`. Business logic belongs in the shared module.
 
 ## Commit messages
