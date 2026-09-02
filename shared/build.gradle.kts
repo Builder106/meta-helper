@@ -1,11 +1,14 @@
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
+    id("com.android.library")
 }
 
 group = "com.metahelper"
 version = "1.0"
 
 kotlin {
+    androidTarget()
+
     iosArm64() {
         binaries.framework {
             baseName = "MetaHelperShared"
@@ -28,6 +31,9 @@ kotlin {
         commonMain.dependencies {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
         }
+        androidMain.dependencies {
+            implementation("com.meta.wearable:mwdat-core:0.3.0")
+        }
         iosArm64Main.dependencies {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
             implementation("io.ktor:ktor-client-darwin:3.5.2")
@@ -36,6 +42,20 @@ kotlin {
             implementation("io.ktor:ktor-serialization-kotlinx-json:3.5.2")
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
         }
+    }
+}
+
+android {
+    namespace = "com.metahelper.shared"
+    compileSdk = 34
+
+    defaultConfig {
+        minSdk = 29
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
 
