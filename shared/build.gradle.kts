@@ -1,11 +1,21 @@
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
+    id("com.android.kotlin.multiplatform.library")
 }
 
 group = "com.metahelper"
 version = "1.0"
 
 kotlin {
+    android {
+        namespace = "com.metahelper.shared"
+        compileSdk = 34
+        minSdk = 29
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
+        }
+    }
+
     iosArm64() {
         binaries.framework {
             baseName = "MetaHelperShared"
@@ -27,6 +37,9 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
+        }
+        androidMain.dependencies {
+            implementation("com.meta.wearable:mwdat-core:0.3.0")
         }
         iosArm64Main.dependencies {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")

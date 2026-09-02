@@ -79,6 +79,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Build shared module (all targets)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
         run: ./gradlew :shared:assemble --warning-mode fail
 
   # ---------------------------------------------------------------------------
@@ -175,5 +177,6 @@ jobs:
 
       - name: Build iOS app
         env:
+          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
           GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx6g -Dkotlin.daemon.jvmargs=-Xmx6g"
         run: ./gradlew :shared:assemble --warning-mode fail || ./gradlew assemble --warning-mode fail

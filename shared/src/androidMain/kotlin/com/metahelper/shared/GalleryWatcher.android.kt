@@ -129,9 +129,9 @@ fun isMetaImagePath(path: String): Boolean =
 
 actual fun createGalleryWatcher(
     context: Any,
-    onNewImageDetected: (Any) -> Unit
+    onNewImageDetected: (String) -> Unit
 ): GalleryWatcher {
     return AndroidGalleryWatcher(context as Context) { uri ->
-        onNewImageDetected(uri)
+        onNewImageDetected(uri.toString())
     }
 }
