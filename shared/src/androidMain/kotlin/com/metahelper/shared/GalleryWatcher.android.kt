@@ -67,7 +67,7 @@ internal class AndroidGalleryWatcher(
         }
     }
 
-    private fun checkForNewMetaImage() {
+    private suspend fun checkForNewMetaImage() {
         mutex.lock()
         try {
             val projection = arrayOf(
@@ -109,7 +109,7 @@ internal class AndroidGalleryWatcher(
 
                     if (matchUri != null) {
                         Log.d(TAG, "New Meta image detected: $matchInfo")
-                        onNewImageDetected(matchUri!!)
+                        onNewImageDetected(matchUri)
                     } else {
                         Log.d(TAG, "Gallery change had no new Meta image (scanned $scanned new rows).")
                     }
@@ -129,9 +129,9 @@ fun isMetaImagePath(path: String): Boolean =
 
 actual fun createGalleryWatcher(
     context: Any,
-    onNewImageDetected: (Any) -> Unit
+    onNewImageDetected: (String) -> Unit
 ): GalleryWatcher {
     return AndroidGalleryWatcher(context as Context) { uri ->
-        onNewImageDetected(uri)
+        onNewImageDetected(uri.toString())
     }
 }

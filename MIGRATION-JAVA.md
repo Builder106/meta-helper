@@ -4,7 +4,7 @@ This document outlines the strategy for migrating the MetaHelper backend from Py
 
 ## Status: COMPLETED ✅
 
-The migration has been fully implemented. The backend is now Java 21 + Spring Boot 3.
+The migration has been fully implemented. The backend now uses Java 26, Gradle 9.7.1, and Spring Boot 4.1.1. Android, shared, and iOS modules retain their existing Java 21-compatible toolchains.
 
 ## Motivation
 
@@ -12,8 +12,8 @@ Previously, MetaHelper was a split-ecosystem project: Kotlin on Android, Python 
 
 ## Target Architecture (Implemented)
 
-- **Framework:** Java 21 + Spring Boot 3.x
-- **Build Tool:** Gradle (Kotlin DSL)
+- **Framework:** Java 26 + Spring Boot 4.1.1
+- **Build Tool:** Gradle 9.7.1 (Kotlin DSL)
 - **HTTP/Routing:** Spring Web (Multipart file handling)
 - **Deployment:** Dockerized Spring Boot app deployed on Render
 
@@ -45,7 +45,7 @@ This removes the need for a middleman library and keeps the audio processing fas
 
 ### Files Created/Modified
 
-- `backend/build.gradle.kts` - Spring Boot 3.3.0, Java 21, Lombok
+- `backend/build.gradle.kts` - Spring Boot 4.1.1, Java 26, Lombok
 - `backend/settings.gradle.kts` - Project settings
 - `backend/src/main/java/com/metahelper/MetaHelperApplication.java` - Main entry point
 - `backend/src/main/java/com/metahelper/controller/ImageController.java` - REST endpoint
@@ -70,9 +70,11 @@ This removes the need for a middleman library and keeps the audio processing fas
 
 - The API contract (`POST /process-image`returning`audio/mpeg`) is identical
 - Android client requires zero changes
-- Environment variables are the same (`GOOGLE_API_KEY`, `AUDIO_AMPLITUDE_MULTIPLIER`)
+- Environment variables are the same (`GOOGLE_API_KEY`, `AZURE_SPEECH_KEY`, `AZURE_SPEECH_REGION`, `AZURE_SPEECH_VOICE`, `GEMINI_MODEL`, and `AUDIO_AMPLITUDE_MULTIPLIER`)
 
 ## Verification
+
+The repository documents the Java 26 baseline and the commands below, but this documentation update does not claim that tests or builds passed.
 
 ```bash
 

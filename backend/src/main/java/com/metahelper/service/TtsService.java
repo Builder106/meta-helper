@@ -5,6 +5,7 @@ import com.microsoft.cognitiveservices.speech.SpeechConfig;
 import com.microsoft.cognitiveservices.speech.SpeechSynthesisOutputFormat;
 import com.microsoft.cognitiveservices.speech.SpeechSynthesisResult;
 import com.microsoft.cognitiveservices.speech.SpeechSynthesizer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,7 @@ public class TtsService {
     private final String defaultVoice;
     private final SpeechSynthesizerFunction speechSynthesizerFunction;
 
+    @Autowired
     public TtsService(
             @Value("$" + "{azure.speech.key:}") String subscriptionKey,
             @Value("$" + "{azure.speech.region:}") String region,
@@ -73,14 +75,47 @@ public class TtsService {
         }
     }
 
+    interface SpeechSynthesizerAdapter extends AutoCloseable {
+        SpeechSynthesisResult speakText(String text) throws Exception;
+        @Override
+        void close();
+    }
+
+    @FunctionalInterface
+    interface SpeechSynthesizerFactory {
+        SpeechSynthesizerAdapter create(SpeechConfig config);
+    }
+
+    @FunctionalInterface
+    interface SpeechSynthesizerCreator {
+        SpeechSynthesizer create(SpeechConfig config);
+    }
+
     @FunctionalInterface
     interface SynthesizerExecutor {
         byte[] execute(SpeechConfig speechConfig, String text) throws Exception;
     }
 
+    static SpeechSynthesizerCreator defaultSpeechSynthesizerCreator = SpeechSynthesizer::new;
+
+    static SpeechSynthesizerFactory defaultSynthesizerFactory = config -> {
+        SpeechSynthesizer synthesizer = defaultSpeechSynthesizerCreator.create(config);
+        return new SpeechSynthesizerAdapter() {
+            @Override
+            public SpeechSynthesisResult speakText(String text) throws Exception {
+                return synthesizer.SpeakTextAsync(text).get();
+            }
+
+            @Override
+            public void close() {
+                synthesizer.close();
+            }
+        };
+    };
+
     static SynthesizerExecutor defaultSynthesizerExecutor = (speechConfig, text) -> {
-        try (SpeechSynthesizer synthesizer = new SpeechSynthesizer(speechConfig);
-             SpeechSynthesisResult result = synthesizer.SpeakTextAsync(text).get()) {
+        try (SpeechSynthesizerAdapter synthesizer = defaultSynthesizerFactory.create(speechConfig);
+             SpeechSynthesisResult result = synthesizer.speakText(text)) {
             if (result.getReason() != ResultReason.SynthesizingAudioCompleted) {
                 throw new IOException("Azure Speech synthesis did not complete: " + result.getReason());
             }

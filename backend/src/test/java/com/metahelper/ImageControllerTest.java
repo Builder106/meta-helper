@@ -5,9 +5,9 @@ import com.metahelper.service.TtsService;
 import com.metahelper.service.VisionService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -25,13 +25,13 @@ public class ImageControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private VisionService visionService;
 
-    @MockBean
+    @MockitoBean
     private TtsService ttsService;
 
-    @MockBean
+    @MockitoBean
     private AudioService audioService;
 
     @Test
@@ -72,6 +72,29 @@ public class ImageControllerTest {
         byte[] fakeScaledAudio = "fake_scaled_audio_content".getBytes();
 
         when(visionService.getDescription(any(byte[].class))).thenReturn("");
+        when(ttsService.textToSpeech(any())).thenReturn(fakeAudio);
+        when(audioService.scaleAmplitude(any(byte[].class), anyDouble())).thenReturn(fakeScaledAudio);
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "test.jpg",
+                "image/jpeg",
+                fakeImage
+        );
+
+        mockMvc.perform(multipart("/process-image").file(file))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("audio/mpeg"))
+                .andExpect(content().bytes(fakeScaledAudio));
+    }
+
+    @Test
+    public void testProcessImageNullDescription() throws Exception {
+        byte[] fakeImage = "fake_image_content".getBytes();
+        byte[] fakeAudio = "fake_audio_content".getBytes();
+        byte[] fakeScaledAudio = "fake_scaled_audio_content".getBytes();
+
+        when(visionService.getDescription(any(byte[].class))).thenReturn(null);
         when(ttsService.textToSpeech(any())).thenReturn(fakeAudio);
         when(audioService.scaleAmplitude(any(byte[].class), anyDouble())).thenReturn(fakeScaledAudio);
 

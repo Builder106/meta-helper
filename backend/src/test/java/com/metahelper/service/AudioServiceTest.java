@@ -25,10 +25,24 @@ public class AudioServiceTest {
     }
 
     @Test
+    public void testDefaultRunSuccessWithJavaProcess() throws Exception {
+        String javaExecutable = Path.of(System.getProperty("java.home"), "bin", "java").toString();
+
+        int exitCode = AudioService.defaultRun(new ProcessBuilder(javaExecutable, "-version"));
+
+        assertEquals(0, exitCode);
+    }
+
+    @Test
     public void testScaleAmplitudeFfmpegFailure() {
-        assertThrows(IOException.class, () -> {
-            audioService.scaleAmplitude(new byte[]{1, 2, 3, 4, 5}, 0.5);
-        });
+        AudioService failingService = new AudioService(pb -> 1);
+
+        IOException exception = assertThrows(
+                IOException.class,
+                () -> failingService.scaleAmplitude(new byte[]{1, 2, 3, 4, 5}, 0.5)
+        );
+
+        assertEquals("ffmpeg command failed with exit code 1", exception.getMessage());
     }
 
     @Test

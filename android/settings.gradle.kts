@@ -8,6 +8,7 @@ pluginManagement {
         id("org.jetbrains.kotlin.multiplatform") version "2.4.10"
         id("org.jetbrains.kotlin.plugin.compose") version "2.4.10"
         id("com.android.application") version "9.3.2"
+        id("com.android.kotlin.multiplatform.library") version "9.3.2"
     }
 }
 

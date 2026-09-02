@@ -127,7 +127,7 @@ class GalleryWatcher(
 
                 if (matchUri != null) {
                     Log.d(TAG, "New Meta image detected: $matchInfo")
-                    onNewImageDetected(matchUri!!)
+                    onNewImageDetected(matchUri)
                 } else {
                     Log.d(TAG, "Gallery change had no new Meta image (scanned $scanned new rows).")
                 }

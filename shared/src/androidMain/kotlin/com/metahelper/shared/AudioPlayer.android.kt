@@ -47,7 +47,7 @@ internal class AndroidAudioPlayer(private val context: Context) : AudioPlayer {
         }
     }
 
-    override fun playAudio(audioBytes: ByteArray, onComplete: () -> Unit = {}) {
+    override fun playAudio(audioBytes: ByteArray, onComplete: () -> Unit) {
         Log.d("AudioPlayer", "Attempting to play ${audioBytes.size} bytes of audio")
         try {
             stop()

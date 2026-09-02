@@ -58,13 +58,10 @@ sequenceDiagram
 
 ```text
 MetaHelper/
-├── backend/   Java 21 · Spring Boot 3 — vision → TTS → audio pipeline
-│   └── app/
-│       ├── main.py             GET / (health), POST /process-image
-│       └── services/
-│           ├── vision.py       Gemini (gemini-3-pro-preview) — reads & solves the problem
-│           ├── TtsService.java  Azure Speech neural voice + fallback
-│           └── audio.py        pydub playback-gain scaling
+├── backend/   Java 26 · Spring Boot 4.1.1 — vision → TTS → audio pipeline
+│   └── src/main/java/com/metahelper/
+│       ├── controller/ImageController.java  GET / and POST /process-image
+│       └── service/                          Gemini, Azure Speech, and ffmpeg pipeline
 ├── shared/    Kotlin Multiplatform — shared business logic
 │   └── src/
 │       ├── commonMain/kotlin/com/metahelper/shared/
@@ -88,7 +85,7 @@ MetaHelper/
 
 ## Backend — setup
 
-Requires Java 21 and `ffmpeg` (used for audio export). Azure Speech is used for text-to-speech.
+Requires Java 26, Gradle 9.7.1, and `ffmpeg` (used for audio export). Azure Speech is used for text-to-speech.
 
 ```bash
 cd backend
@@ -153,11 +150,11 @@ Point the app's `ApiClient`at your backend — the live instance at`https://meta
 
 ## Self-hosting
 
-The backend ships with a `Dockerfile`(Java 21,`ffmpeg` baked in):
+The backend ships with a `Dockerfile` (Java 26, `ffmpeg` baked in):
 
 ```bash
 docker build -t metahelper-backend ./backend
-docker run -p 8000:8000 --env-file backend/.env metahelper-backend
+docker run -p 8080:8080 --env-file backend/.env metahelper-backend
 ```
 
 The hosted backend at **<https://metahelper.onrender.com>** is deployed on [Render](https://render.com). Free-tier instances sleep when idle, so the first request after a quiet period may take a few seconds to wake.
