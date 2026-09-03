@@ -44,7 +44,7 @@ class WearableService : Service() {
             Log.e("WearableService", "SDK Initialization failed: $error")
         }
 
-        Log.d("WearableService", "Initializing shared GlassesManager...")
+        Log.d("WearableService", "Initializing app GlassesManager...")
         glassesManager = GlassesManager(backendUrl = "https://metahelper.onrender.com", context = this)
         Log.d("WearableService", "Service fully initialized")
     }
