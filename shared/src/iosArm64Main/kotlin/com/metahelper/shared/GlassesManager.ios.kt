@@ -26,7 +26,7 @@ import platform.UIKit.UIAlertControllerStyleAlert
 import platform.UIKit.UIApplication
 
 internal class GlassesManagerImpl(
-    private val backendUrl: String = "https://metahelper.onrender.com",
+    private val backendUrl: String = "http://localhost:8080",
     private val context: Any
 ) : GlassesManager {
     private val apiClient = ApiClient(backendUrl)

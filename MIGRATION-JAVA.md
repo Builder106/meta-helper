@@ -15,7 +15,7 @@ Previously, MetaHelper was a split-ecosystem project: Kotlin on Android, Python 
 - **Framework:** Java 26 + Spring Boot 4.1.1
 - **Build Tool:** Gradle 9.7.1 (Kotlin DSL)
 - **HTTP/Routing:** Spring Web (Multipart file handling)
-- **Deployment:** Dockerized Spring Boot app deployed on Render
+- **Deployment:** Dockerized Spring Boot app deployable through self-hosted Coolify
 
 ## Component Migration Strategy (Completed)
 

@@ -36,8 +36,8 @@ class ApiClient(private val baseUrl: String) {
         install(ContentNegotiation) {
             json(Json { ignoreUnknownKeys = true })
         }
-        // Render free-tier instances cold-start (~30-60s) and then Gemini + TTS add
-        // more latency, well past default timeouts. Use generous timeouts.
+        // Gemini and TTS can take longer than default client timeouts. Use
+        // generous timeouts for the image-processing request.
         install(HttpTimeout) {
             requestTimeoutMillis = 120_000
             connectTimeoutMillis = 20_000

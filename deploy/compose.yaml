@@ -1,0 +1,20 @@
+services:
+  metahelper-backend:
+    image: ghcr.io/builder106/meta-helper:${METAHELPER_IMAGE_TAG:-latest}
+    pull_policy: always
+    restart: unless-stopped
+    ports:
+      - "${METAHELPER_BIND_ADDRESS:-127.0.0.1}:${METAHELPER_PORT:-8080}:8080"
+    environment:
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-1.5-flash}
+      AZURE_SPEECH_KEY: ${AZURE_SPEECH_KEY:-}
+      AZURE_SPEECH_REGION: ${AZURE_SPEECH_REGION:-}
+      AZURE_SPEECH_VOICE: ${AZURE_SPEECH_VOICE:-en-US-GuyNeural}
+      AUDIO_AMPLITUDE_MULTIPLIER: ${AUDIO_AMPLITUDE_MULTIPLIER:-0.1}
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--show-error", "http://127.0.0.1:8080/"]
+      interval: 30s
+      timeout: 5s
+      start_period: 45s
+      retries: 3

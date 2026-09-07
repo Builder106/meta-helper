@@ -45,7 +45,10 @@ class WearableService : Service() {
         }
 
         Log.d("WearableService", "Initializing app GlassesManager...")
-        glassesManager = GlassesManager(backendUrl = "https://metahelper.onrender.com", context = this)
+        glassesManager = GlassesManager(
+            backendUrl = BuildConfig.METAHELPER_BACKEND_URL,
+            context = this
+        )
         Log.d("WearableService", "Service fully initialized")
     }
 

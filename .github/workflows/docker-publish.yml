@@ -1,13 +1,14 @@
 name: Build and Publish Container Image
 
 on:
-  push:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
     branches: [main]
-    tags: ['v*.*.*']
   workflow_dispatch:
 
 concurrency:
-  group: docker-ghcr-${{ github.ref }}
+  group: docker-ghcr-${{ github.event.workflow_run.head_sha || github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -21,10 +22,19 @@ env:
 jobs:
   build-and-push:
     name: Build & Push to GHCR
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-24.04
+    env:
+      SOURCE_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+      COOLIFY_WEBHOOK: ${{ secrets.COOLIFY_WEBHOOK }}
+      COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
@@ -46,8 +56,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
-            type=sha,prefix=sha-,format=short
-            type=semver,pattern={{version}}
+            type=raw,value=sha-${{ env.SOURCE_SHA }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v7
@@ -61,3 +70,14 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Skip Coolify deployment until configured
+        if: env.COOLIFY_WEBHOOK == '' || env.COOLIFY_TOKEN == ''
+        run: echo "::notice title=Coolify deployment skipped::Add COOLIFY_WEBHOOK and COOLIFY_TOKEN repository secrets to enable deployment."
+
+      - name: Trigger Coolify deployment
+        if: env.COOLIFY_WEBHOOK != '' && env.COOLIFY_TOKEN != ''
+        run: |
+          curl --fail-with-body --silent --show-error \
+            --request GET "$COOLIFY_WEBHOOK" \
+            --header "Authorization: Bearer $COOLIFY_TOKEN"

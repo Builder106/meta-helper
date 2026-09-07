@@ -13,6 +13,7 @@ Thanks for your interest in contributing. This guide covers how to set up both h
 | `android/` | Kotlin + Jetpack Compose app using the Meta Wearables SDK. Detects glasses photos, posts them to the backend, and plays the spoken response. |
 | `iosApp/` | iOS + Compose Multiplatform app using the shared module and mwdat-ios SDK. |
 | `assets/` | Shared brand assets (banner, logo) referenced by the README. |
+| `deploy/` | Portable Docker Compose deployment definition. |
 | `.github/workflows/ci.yml` | Continuous integration workflow. |
 
 ### How a request flows
@@ -64,10 +65,10 @@ Tests live in `backend/src/test/`.
 
 ```bash
 docker build -t metahelper-backend ./backend
-docker run -p 8000:8000 --env-file backend/.env metahelper-backend
+docker run -p 8080:8080 --env-file backend/.env metahelper-backend
 ```
 
-The deployed backend lives at <https://metahelper.onrender.com> (Render).
+For a hosted deployment, use the [self-hosting guide](docs/deployment.md).
 
 ## Shared module (`shared/`)
 

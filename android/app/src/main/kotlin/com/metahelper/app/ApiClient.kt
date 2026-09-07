@@ -9,9 +9,8 @@ import java.util.concurrent.TimeUnit
 import android.util.Log
 
 class ApiClient(private val baseUrl: String) {
-    // Render free-tier instances cold-start (~30-60s) and then Gemini + TTS add
-    // more latency, well past OkHttp's ~10s defaults. Use generous timeouts and
-    // let OkHttp retry a dropped connection while the instance spins up.
+    // Gemini and TTS can take longer than OkHttp's ~10s defaults. Use generous
+    // timeouts for the image-processing request.
     private val client = OkHttpClient.Builder()
         .connectTimeout(20, TimeUnit.SECONDS)
         .readTimeout(120, TimeUnit.SECONDS)

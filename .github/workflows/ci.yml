@@ -84,69 +84,46 @@ jobs:
         run: ./gradlew :shared:assemble --warning-mode fail
 
   # ---------------------------------------------------------------------------
-  # Android — Kotlin + Jetpack Compose. The Meta Wearables SDK is resolved from
-  # GitHub Packages, which requires auth. Without the GH_PACKAGES_TOKEN secret
-  # the build cannot resolve the SDK, so the job cleanly skips its real work
-  # (and succeeds) instead of failing the workflow with a red X.
-  #
-  # `if:` can't read secrets directly, so we project the secret's presence into
-  # a job-level env var and gate each meaningful step on it.
+  # Android — Kotlin + Jetpack Compose. The package token is required because
+  # the Meta Wearables SDK is resolved from GitHub Packages. Missing credentials
+  # are a configuration failure, not a reason to skip this gate.
   # ---------------------------------------------------------------------------
   android:
     name: Android (Kotlin / Jetpack Compose)
     needs: [secrets, backend]
     runs-on: ubuntu-24.04
-    continue-on-error: true
-    env:
-      HAS_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN != '' && 'true' || 'false' }}
     steps:
-      - name: Notice when the Meta SDK token is absent
-        if: env.HAS_TOKEN != 'true'
-        run: |
-          echo "::notice title=Android build skipped::The Android build is skipped until the GH_PACKAGES_TOKEN secret is configured."
-          echo "The Meta Wearables SDK (com.meta.wearable:mwdat-*) is published to GitHub Packages"
-          echo "at https://maven.pkg.github.com/facebook/meta-wearables-dat-android and requires auth."
-          echo "Add a repository secret named GH_PACKAGES_TOKEN — a GitHub PAT with the read:packages"
-          echo "scope — and this job will build and test the Android app on the next run."
-
       - name: Check out repository
-        if: env.HAS_TOKEN == 'true'
         uses: actions/checkout@v7
 
       - name: Set up JDK 21 (Temurin)
-        if: env.HAS_TOKEN == 'true'
         uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '21'
 
       - name: Set up Gradle
-        if: env.HAS_TOKEN == 'true'
         uses: gradle/actions/setup-gradle@v6
 
       - name: Android lint
-        if: env.HAS_TOKEN == 'true'
         working-directory: ./android
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
         run: ./gradlew lintDebug --warning-mode fail
 
       - name: Run unit tests and assemble debug APK
-        if: env.HAS_TOKEN == 'true'
         working-directory: ./android
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
         run: ./gradlew testDebugUnitTest assembleDebug --warning-mode fail
 
       - name: Enable KVM
-        if: env.HAS_TOKEN == 'true'
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
       - name: Run emulator smoke test
-        if: env.HAS_TOKEN == 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34

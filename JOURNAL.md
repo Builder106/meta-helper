@@ -4,6 +4,18 @@
 > things happen — retrospectives need this raw material to land.
 > Reverse-chronological; one paragraph max per entry.
 
+## 2026-09-07 — Installed self-hosted Coolify alongside existing services #decision
+
+Installed the current Coolify Compose stack on the shared Linux ARM64 host using persistent data under `/data/coolify`. Because nginx already owns ports 80 and 443, the Coolify dashboard and realtime services are bound to localhost on ports 8000, 6001, and 6002; the existing workloads remained running. This establishes the deployment control plane, but MetaHelper has not yet been deployed or cut over from Render; public routing and TLS still need an explicit nginx/domain decision.
+
+## 2026-09-07 — Enabled Coolify localhost server management #security
+
+Generated Coolify's dedicated Ed25519 host key and authorized only its public half for root SSH. Coolify can now connect to the host for the onboarding "This machine" server option; the key material remains on the host and was not exposed.
+
+## 2026-09-07 — Restored Coolify localhost key metadata #fix
+
+The manual Compose setup had the host key and localhost server row but was missing Coolify's encrypted `private_keys` row at reserved ID `0`, which caused onboarding to call `getPublicKey()` on a null relationship. Restored that metadata from the existing host key and verified the relation and public-key derivation without exposing key material.
+
 ## 2026-09-01 — Restored the shared Android KMP variant #fix
 
 The Android CI build could not resolve `:shared` because the shared module published only common and iOS variants. Added the Android KMP library target, retained the Meta Wearables dependency and package authentication for all shared builds, repaired the Android `expect`/`actual` declarations, and kept the app service on its existing Android manager. Android/shared/iOS remain on their Java 21-compatible toolchains.

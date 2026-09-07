@@ -250,7 +250,7 @@ fun MainScreen(manager: GlassesManager) {
         }
 
         Text(
-            text = "Cloud: Connected to Render",
+            text = "Backend: Self-hosted deployment",
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center

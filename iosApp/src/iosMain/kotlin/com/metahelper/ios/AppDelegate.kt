@@ -11,6 +11,7 @@ import com.metahelper.shared.GlassesManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import platform.Foundation.NSBundle
 import platform.Foundation.NSObject
 import platform.Foundation.NSString
 import platform.UIKit.UIApplication
@@ -26,6 +27,14 @@ class AppDelegate : UIApplicationDelegate {
     private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var window: UIWindow? = null
 
+    private fun configuredBackendUrl(): String {
+        val configuredUrl = NSBundle.mainBundle.objectForInfoDictionaryKey(
+            "MetaHelperBackendURL"
+        ) as? String
+        return configuredUrl?.takeIf { it.isNotBlank() && !it.startsWith("$(") }
+            ?: "http://localhost:8080"
+    }
+
     override fun application(
         application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: platform.Foundation.NSDictionary<*, *>?
@@ -34,7 +43,7 @@ class AppDelegate : UIApplicationDelegate {
 
         // Initialize shared GlassesManager (gallery polling + backend + audio)
         glassesManager = GlassesManager(
-            backendUrl = "https://metahelper.onrender.com",
+            backendUrl = configuredBackendUrl(),
             context = Unit
         )
 

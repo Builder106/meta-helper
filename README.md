@@ -8,7 +8,7 @@
 [![Kotlin / Android](https://img.shields.io/badge/Android-Kotlin%20%2B%20Compose-3DDC84.svg?logo=android&logoColor=white)](https://developer.android.com/)
 [![iOS / Compose Multiplatform](https://img.shields.io/badge/iOS-Compose%20Multiplatform-000000.svg?logo=apple&logoColor=white)](https://www.jetbrains.com/lp/compose-multiplatform/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](#license)
-[![Backend: live](https://img.shields.io/badge/backend-live-success.svg)](https://metahelper.onrender.com)
+[![Backend: self-hosted](https://img.shields.io/badge/backend-self--hosted-6f42c1.svg)](docs/deployment.md)
 
 > **Hands-free audio programming assistant for Meta Ray-Ban smart glasses.** Snap a photo of code on a screen, whiteboard, or paper, and hear the explanation spoken directly into your ears.
 
@@ -18,7 +18,7 @@ Reading code on physical whiteboards, presentation slides, or printed handouts c
 
 MetaHelper turns Meta Ray-Ban smart glasses into an audio coding companion. When you capture a photo of code, the app reads the syntax verbatim, identifies syntax errors or logic bugs using Gemini Vision AI, and speaks a clear explanation directly through the open-ear glasses speakers.
 
-**Backend status:** Live on Render ([metahelper.onrender.com](https://metahelper.onrender.com))
+**Backend deployment:** Self-host the Dockerized Spring Boot service with [Coolify](docs/deployment.md), or run the included Compose definition on any Docker host.
 
 ## How it works
 
@@ -146,7 +146,9 @@ Provide the token one of two ways:
 
 On sync, the build log prints `SUCCESS: github_token loaded (...)`when the token is found, or an`ERROR: github_token NOT FOUND` message when it is missing.
 
-Point the app's `ApiClient`at your backend — the live instance at`https://metahelper.onrender.com`, or your own local/self-hosted server.
+Point the app's `ApiClient` at your backend. Android accepts the URL through
+the `metahelper.backend.url` Gradle property; iOS reads `MetaHelperBackendURL`
+from `Info.plist`. See the [self-hosted deployment guide](docs/deployment.md).
 
 ## Self-hosting
 
@@ -157,7 +159,7 @@ docker build -t metahelper-backend ./backend
 docker run -p 8080:8080 --env-file backend/.env metahelper-backend
 ```
 
-The hosted backend at **<https://metahelper.onrender.com>** is deployed on [Render](https://render.com). Free-tier instances sleep when idle, so the first request after a quiet period may take a few seconds to wake.
+For the hosted deployment path, use the [Coolify instructions](docs/deployment.md). The backend image is published to GHCR after the main CI workflow succeeds, and Coolify can redeploy it through a repository webhook.
 
 ## License
 

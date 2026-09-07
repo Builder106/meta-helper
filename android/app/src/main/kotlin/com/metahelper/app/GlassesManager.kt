@@ -15,7 +15,7 @@ import java.io.InputStream
  */
 class GlassesManager(
     private val context: Context,
-    private val backendUrl: String = "https://metahelper.onrender.com"
+    private val backendUrl: String = BuildConfig.METAHELPER_BACKEND_URL
 ) {
     private val apiClient = ApiClient(backendUrl)
     private val audioPlayer = AudioPlayer(context).apply {

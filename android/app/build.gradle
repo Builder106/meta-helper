@@ -7,12 +7,19 @@ android {
     namespace = 'com.metahelper.app'
     compileSdk = 37
 
+    def backendUrl = project.findProperty('metahelper.backend.url') ?:
+        System.getenv('METAHELPER_BACKEND_URL') ?:
+        'http://10.0.2.2:8080'
+    def escapedBackendUrl = backendUrl.replace('\\', '\\\\').replace('"', '\\"')
+
     defaultConfig {
         applicationId = "com.metahelper.app"
         minSdk = 29
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
+        buildConfigField 'String', 'METAHELPER_BACKEND_URL', "\"${escapedBackendUrl}\""
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -32,6 +39,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = '1.5.1'
