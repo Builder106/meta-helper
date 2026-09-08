@@ -52,6 +52,14 @@ class GalleryWatcher(
     }
 
     fun startWatching() {
+        startWatchingInternal(onBaselineComplete = {})
+    }
+
+    internal fun startWatchingForTest(onBaselineComplete: () -> Unit) {
+        startWatchingInternal(onBaselineComplete)
+    }
+
+    private fun startWatchingInternal(onBaselineComplete: () -> Unit) {
         Log.d(TAG, "Starting to watch gallery...")
         context.contentResolver.registerContentObserver(contentUri, true, contentObserver)
         // Baseline the high-water mark to the current newest image, so we only
@@ -59,6 +67,7 @@ class GalleryWatcher(
         scope.launch {
             lastSeenId = queryNewestImageId()
             Log.d(TAG, "Baseline newest image id = $lastSeenId")
+            onBaselineComplete()
         }
     }
 

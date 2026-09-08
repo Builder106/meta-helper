@@ -109,13 +109,13 @@ jobs:
         working-directory: ./android
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        run: ./gradlew lintDebug --warning-mode fail
+        run: ./gradlew :app:lintDebug --warning-mode fail
 
       - name: Run unit tests and assemble debug APK
         working-directory: ./android
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        run: ./gradlew testDebugUnitTest assembleDebug --warning-mode fail
+        run: ./gradlew :app:testDebugUnitTest :app:assembleDebug --warning-mode fail
 
       - name: Enable KVM
         run: |
