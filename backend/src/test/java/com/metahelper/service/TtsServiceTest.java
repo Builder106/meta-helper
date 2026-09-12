@@ -72,16 +72,16 @@ public class TtsServiceTest {
     @Test
     public void testBuildSsmlAddsSectionsPausesAndEscapesText() {
         String ssml = TtsService.buildSsml(
-                "VERBATIM READ-OUT:\nif open paren a less than b close paren:\n\nEXPLANATION:\nUse a < b & continue.",
+                "VERBATIM READ-OUT:\nif open paren a less than b close paren:\n\nEXPLANATION:\nUse a < b & continue.\n\nKeep going.",
                 "en-US-AriaNeural", "narration-professional", "-4%");
 
-        assertTrue(ssml.contains("<voice name=\"en-US-AriaNeural\">");
-        assertTrue(ssml.contains("<mstts:express-as style=\"narration-professional\">");
-        assertTrue(ssml.contains("<prosody rate=\"-4%\">");
+        assertTrue(ssml.contains("<voice name=\"en-US-AriaNeural\">"));
+        assertTrue(ssml.contains("<mstts:express-as style=\"narration-professional\">"));
+        assertTrue(ssml.contains("<prosody rate=\"-4%\">"));
         assertTrue(ssml.contains("Code read-out."));
         assertTrue(ssml.contains("Explanation."));
         assertTrue(ssml.contains("a &lt; b &amp; continue."));
-        assertTrue(ssml.contains("<break time=\"180ms\"/>"));
+        assertTrue(ssml.contains("<break time=\"300ms\"/>"));
         assertTrue(ssml.contains("<break time=\"500ms\"/>"));
         assertTrue(ssml.contains("<break time=\"650ms\"/>"));
     }
@@ -153,6 +153,13 @@ public class TtsServiceTest {
     public void testDefaultConstructor() {
         TtsService defaultService = new TtsService("key", "eastus", "en-US-GuyNeural");
         assertNotNull(defaultService);
+    }
+
+    @Test
+    public void testConfiguredConstructor() {
+        TtsService configuredService = new TtsService(
+                "key", "eastus", "en-US-AriaNeural", "narration-professional", "-4%");
+        assertNotNull(configuredService);
     }
 
     @Test

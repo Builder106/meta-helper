@@ -25,7 +25,7 @@ public class TtsService {
     private static final Pattern SENTENCE_END = Pattern.compile("([.!?])(?=\\s|$)");
     private static final String DEFAULT_STYLE = "narration-professional";
     private static final String DEFAULT_RATE = "-4%";
-    private static final String CODE_LINE_BREAK = "180ms";
+    private static final String CODE_LINE_BREAK = "300ms";
     private static final String SENTENCE_BREAK = "180ms";
     private static final String PARAGRAPH_BREAK = "500ms";
     private static final String SECTION_BREAK = "650ms";
@@ -50,6 +50,13 @@ public class TtsService {
             @Value("$" + "{azure.speech.style:narration-professional}") String speechStyle,
             @Value("$" + "{azure.speech.rate:-4%}") String speechRate) {
         this(subscriptionKey, region, defaultVoice, speechStyle, speechRate, TtsService::defaultSynthesize);
+    }
+
+    TtsService(
+            String subscriptionKey,
+            String region,
+            String defaultVoice) {
+        this(subscriptionKey, region, defaultVoice, DEFAULT_STYLE, DEFAULT_RATE, TtsService::defaultSynthesize);
     }
 
     TtsService(
