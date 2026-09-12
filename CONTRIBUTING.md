@@ -88,9 +88,9 @@ cd shared
 ./gradlew build
 ```
 
-## Android setup (`android/`)
+## Android CI (`android/`)
 
-Toolchain: Gradle 8.13 (use the bundled `./gradlew`wrapper), Android Gradle Plugin 8.13.2, Kotlin 2.4.10, Jetpack Compose.`compileSdk 37`, `minSdk 29`, `targetSdk 34`. Application id `com.metahelper.app`.
+The Mac checkout is source-only. Android lint, unit tests, APK packaging, and emulator tests run in GitHub Actions on the pinned x86_64 `ubuntu-24.04` runner with Java 21. Keep the bundled Gradle wrapper, source, tests, and lockfiles; do not run Android Gradle commands on the Mac.
 
 ### Meta Wearables SDK — GitHub token required
 
@@ -102,29 +102,12 @@ https://maven.pkg.github.com/facebook/meta-wearables-dat-android
 
 GitHub Packages requires authentication, so you must supply a GitHub personal access token with the **`read:packages`** scope. Without it the Gradle sync cannot resolve the SDK and the Android build fails.
 
-Provide the token one of two ways:
+The workflow supplies the existing `GH_PACKAGES_TOKEN` repository secret as `GITHUB_TOKEN`. Never create a Mac `local.properties` file for this task or place the token in the source checkout.
 
-1. Add it to `android/local.properties` (this file is gitignored — never commit it):
-
-   ```properties
-   github_token=ghp_yourTokenWithReadPackagesScope
-   ```
-
-2. Or export it as an environment variable:
-
-   ```bash
-   export GITHUB_TOKEN=ghp_yourTokenWithReadPackagesScope
-   ```
-
-On sync, `settings.gradle.kts` logs whether the token was found, so check the build output if resolution fails.
 
 ### Android build and test
 
-```bash
-cd android
-./gradlew assembleDebug        # build the debug APK
-./gradlew testDebugUnitTest    # run unit tests
-```
+The CI workflow runs `lintDebug`, `testDebugUnitTest`, `assembleDebug`, and `connectedCheck`, then publishes the `meta-helper-debug-apk` artifact for seven days.
 
 ## iOS setup (`iosApp/`)
 

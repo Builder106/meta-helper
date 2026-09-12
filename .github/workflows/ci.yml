@@ -132,6 +132,14 @@ jobs:
           profile: pixel_6
           script: cd android && ./gradlew connectedCheck --warning-mode fail
 
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: meta-helper-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
+          if-no-files-found: error
+
   # ---------------------------------------------------------------------------
   # iOS — Compose Multiplatform app. Requires macOS for Xcode/CocoaPods.
   # ---------------------------------------------------------------------------

@@ -1,5 +1,13 @@
 # JOURNAL — MetaHelper
 
+## 2026-09-12 — Moved Android packaging to x86_64 CI #decision
+
+The Mac checkout is now source-only for Android work. GitHub Actions remains
+the Android build authority on a pinned x86_64 Linux runner, including the
+Meta Wearables package secret, Gradle checks, emulator smoke test, and a
+seven-day debug APK artifact; the ARM64 verifier remains for compatible
+non-Android work.
+
 > Dated log of decisions, pivots, incidents, and quotes. Add entries as
 > things happen — retrospectives need this raw material to land.
 > Reverse-chronological; one paragraph max per entry.

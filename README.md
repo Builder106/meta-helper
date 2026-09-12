@@ -118,33 +118,15 @@ cd backend
 
 (Tests live in `backend/src/test/`.)
 
-## Android — setup
+## Android — CI build
 
-Requires the Gradle wrapper (included: `./gradlew`), AGP 8.13.2, Kotlin 2.4.10; targets `compileSdk 36`, `minSdk 29`, `targetSdk 34`.
+The Mac checkout is source-only. Android lint, tests, APK packaging, and emulator checks run in the x86_64 GitHub Actions Android job. The job uses Java 21, API 34, and an x86_64 emulator, then publishes a seven-day `meta-helper-debug-apk` artifact.
 
-```bash
-cd android
-./gradlew assembleDebug        # build the debug APK
-./gradlew testDebugUnitTest    # run unit tests
-```
+Android builds are not run on the Mac or the ARM64 verifier. Use the workflow artifact for manual device testing.
 
 **Meta Wearables SDK access (required).**The app depends on the Meta Wearables SDK (`com.meta.wearable:mwdat-core`/`mwdat-camera` `0.3.0`), which is published to**GitHub Packages**at `https://maven.pkg.github.com/facebook/meta-wearables-dat-android`. GitHub Packages requires authentication even for read access, so you must supply a**GitHub Personal Access Token with the `read:packages` scope** or Gradle cannot resolve the SDK and the build will fail.
 
-Provide the token one of two ways:
-
-- Add it to `android/local.properties` (this file is git-ignored — do **not** commit it):
-
-  ```properties
-  github_token=ghp_yourTokenWithReadPackagesScope
-  ```
-
-- Or export it as an environment variable before building:
-
-  ```bash
-  export GITHUB_TOKEN=ghp_yourTokenWithReadPackagesScope
-  ```
-
-On sync, the build log prints `SUCCESS: github_token loaded (...)`when the token is found, or an`ERROR: github_token NOT FOUND` message when it is missing.
+The workflow supplies the existing `GH_PACKAGES_TOKEN` repository secret as `GITHUB_TOKEN`. Do not create a Mac `local.properties` file or place the token in the source checkout.
 
 Point the app's `ApiClient` at your backend. Android accepts the URL through
 the `metahelper.backend.url` Gradle property; iOS reads `MetaHelperBackendURL`
