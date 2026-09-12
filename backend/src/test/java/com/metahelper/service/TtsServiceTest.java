@@ -92,7 +92,7 @@ public class TtsServiceTest {
 
         assertFalse(ssml.contains("mstts:express-as"));
         assertFalse(ssml.contains("<prosody"));
-        assertTrue(ssml.contains("Hello.<break time=\"180ms\"/>"));
+        assertTrue(ssml.contains("Hello.<break time=\"200ms\"/>"));
     }
 
     @Test

@@ -26,7 +26,7 @@ public class TtsService {
     private static final String DEFAULT_STYLE = "narration-professional";
     private static final String DEFAULT_RATE = "-4%";
     private static final String CODE_LINE_BREAK = "300ms";
-    private static final String SENTENCE_BREAK = "180ms";
+    private static final String SENTENCE_BREAK = "200ms";
     private static final String PARAGRAPH_BREAK = "500ms";
     private static final String SECTION_BREAK = "650ms";
 
