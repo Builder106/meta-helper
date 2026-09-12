@@ -1,9 +1,11 @@
 package com.metahelper.app
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.metahelper.app.ui.theme.MetaHelperTheme
 import java.util.concurrent.atomic.AtomicBoolean
@@ -27,6 +29,7 @@ class MainActivityInstrumentationTest {
             }
         }
 
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("MetaHelper").assertIsDisplayed()
         composeTestRule
             .onNodeWithText("Reads code aloud through your glasses.")
@@ -35,7 +38,8 @@ class MainActivityInstrumentationTest {
         composeTestRule
             .onNodeWithText("1. Take a photo with your glasses.", substring = true)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText("Replay Last Answer").performClick()
+        composeTestRule.onNodeWithText("Replay Last Answer").performScrollTo().performClick()
+        composeTestRule.waitForIdle()
 
         assertTrue("Replay action did not invoke the activity callback", replayRequested.get())
     }

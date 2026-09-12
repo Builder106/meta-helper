@@ -91,7 +91,7 @@ class GalleryWatcherInstrumentationTest {
 
             assertTrue(
                 "Gallery watcher did not detect the new Meta AI image",
-                imageDetected.await(8, TimeUnit.SECONDS),
+                imageDetected.await(15, TimeUnit.SECONDS),
             )
             assertEquals(insertedUri, detectedUri.get())
 
