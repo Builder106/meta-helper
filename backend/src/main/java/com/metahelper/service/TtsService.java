@@ -23,13 +23,18 @@ public class TtsService {
     private static final Pattern VERBATIM_SECTION = Pattern.compile("(?im)^\\s*VERBATIM READ-OUT\\s*:\\s*$");
     private static final Pattern EXPLANATION_SECTION = Pattern.compile("(?im)^\\s*EXPLANATION\\s*:\\s*$");
     private static final Pattern SENTENCE_END = Pattern.compile("([.!?])(?=\\s|$)");
+    private static final Pattern TRANSITION_WORD = Pattern.compile(
+            "(?i)\\b(First|Next|Then|Finally|Inside|Otherwise|If)\\b");
+    private static final Pattern COMPLEMENT_WORD = Pattern.compile("(?i)\\bcomplement\\b");
     private static final String DEFAULT_STYLE = "narration-professional";
     private static final String DEFAULT_RATE = "-4%";
     private static final String CODE_LINE_BREAK = "400ms";
+    private static final String CODE_COMMENT_BREAK = "550ms";
     private static final String SENTENCE_BREAK = "250ms";
     private static final String TRAILING_BREAK = "300ms";
     private static final String PARAGRAPH_BREAK = "500ms";
     private static final String SECTION_BREAK = "650ms";
+    private static final String TRANSITION_PITCH = "+2%";
 
     @FunctionalInterface
     interface SpeechSynthesizerFunction {
@@ -236,7 +241,8 @@ public class TtsService {
         if (nextMatcher.find(contentStart)) contentEnd = nextMatcher.start();
         String content = text.substring(contentStart, contentEnd).trim();
         if (content.isBlank()) return;
-        body.append("<p>").append(escapeXmlText(spokenLabel)).append(".<break time=\"")
+        body.append("<p><prosody pitch=\"").append(TRANSITION_PITCH).append("\">")
+                .append(escapeXmlText(spokenLabel)).append(".</prosody><break time=\"")
                 .append(SECTION_BREAK).append("\"/></p>");
         appendNarration(body, content, code);
         body.append("<break time=\"").append(SECTION_BREAK).append("\"/>");
@@ -252,15 +258,40 @@ public class TtsService {
             }
             String spokenLine = escapeXmlText(line);
             if (!code) {
+                spokenLine = emphasizeTransitions(spokenLine);
+                spokenLine = pronounceComplement(spokenLine);
                 spokenLine = SENTENCE_END.matcher(spokenLine)
                         .replaceAll("$1<break time=\"" + SENTENCE_BREAK + "\"/>");
+            } else {
+                spokenLine = pronounceComplement(spokenLine);
             }
             body.append("<p>").append(spokenLine);
             if (code || index < lines.length - 1) {
-                body.append("<break time=\"").append(code ? CODE_LINE_BREAK : PARAGRAPH_BREAK).append("\"/>");
+                String pause = code
+                        ? (isCodeComment(line) ? CODE_COMMENT_BREAK : CODE_LINE_BREAK)
+                        : PARAGRAPH_BREAK;
+                body.append("<break time=\"").append(pause).append("\"/>");
             }
             body.append("</p>");
         }
+    }
+
+    private static boolean isCodeComment(String line) {
+        String trimmed = line.trim();
+        return trimmed.startsWith("//")
+                || trimmed.startsWith("#")
+                || trimmed.startsWith("/*")
+                || trimmed.startsWith("*");
+    }
+
+    private static String emphasizeTransitions(String escapedText) {
+        return TRANSITION_WORD.matcher(escapedText)
+                .replaceAll("<prosody pitch=\"" + TRANSITION_PITCH + "\">$1</prosody>");
+    }
+
+    private static String pronounceComplement(String escapedText) {
+        return COMPLEMENT_WORD.matcher(escapedText)
+                .replaceAll("<phoneme alphabet=\"ipa\" ph=\"ˈkɑmpləmənt\">$0</phoneme>");
     }
 
     private static String escapeXmlText(String value) {

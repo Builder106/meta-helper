@@ -72,7 +72,7 @@ public class TtsServiceTest {
     @Test
     public void testBuildSsmlAddsSectionsPausesAndEscapesText() {
         String ssml = TtsService.buildSsml(
-                "VERBATIM READ-OUT:\nif open paren a less than b close paren:\n\nEXPLANATION:\nUse a < b & continue.\n\nKeep going.",
+                "VERBATIM READ-OUT:\n// Calculate the complement.\nif open paren a less than b close paren:\n\nEXPLANATION:\nFirst, use a < b & continue.\n\nNext, keep going.",
                 "en-US-AriaNeural", "narration-professional", "-4%");
 
         assertTrue(ssml.contains("<voice name=\"en-US-AriaNeural\">"));
@@ -82,9 +82,13 @@ public class TtsServiceTest {
         assertTrue(ssml.contains("Explanation."));
         assertTrue(ssml.contains("a &lt; b &amp; continue."));
         assertTrue(ssml.contains("<break time=\"400ms\"/>"));
+        assertTrue(ssml.contains("<break time=\"550ms\"/>"));
         assertTrue(ssml.contains("<break time=\"250ms\"/>"));
         assertTrue(ssml.contains("<break time=\"500ms\"/>"));
         assertTrue(ssml.contains("<break time=\"650ms\"/>"));
+        assertTrue(ssml.contains("<prosody pitch=\"+2%\">First</prosody>"));
+        assertTrue(ssml.contains("<prosody pitch=\"+2%\">Next</prosody>"));
+        assertTrue(ssml.contains("<phoneme alphabet=\"ipa\" ph=\"ˈkɑmpləmənt\">complement</phoneme>"));
     }
 
     @Test
