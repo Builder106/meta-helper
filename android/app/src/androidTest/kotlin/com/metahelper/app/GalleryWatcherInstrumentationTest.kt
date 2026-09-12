@@ -63,7 +63,7 @@ class GalleryWatcherInstrumentationTest {
                         "metahelper-instrumentation-${System.nanoTime()}.jpg",
                     )
                     put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-                    put(MediaStore.Images.Media.RELATIVE_PATH, "Download/Meta AI/")
+                    put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Meta AI/")
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                         put(MediaStore.Images.Media.IS_PENDING, 1)
                     }
