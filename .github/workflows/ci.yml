@@ -109,13 +109,13 @@ jobs:
         working-directory: ./android
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        run: ./gradlew lintDebug --warning-mode fail
+        run: ./gradlew :app:lintDebug --warning-mode fail
 
       - name: Run unit tests and assemble debug APK
         working-directory: ./android
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-        run: ./gradlew testDebugUnitTest assembleDebug --warning-mode fail
+        run: ./gradlew :app:testDebugUnitTest :app:assembleDebug --warning-mode fail
 
       - name: Enable KVM
         run: |
@@ -131,6 +131,14 @@ jobs:
           arch: x86_64
           profile: pixel_6
           script: cd android && ./gradlew connectedCheck --warning-mode fail
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: meta-helper-android-test-results
+          path: android/app/build/reports/androidTests/connected/debug
+          retention-days: 7
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4

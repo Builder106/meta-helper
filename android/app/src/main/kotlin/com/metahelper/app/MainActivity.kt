@@ -162,6 +162,16 @@ private val StatusGreen = Color(0xFF2E7D32)
 
 @Composable
 fun MainScreen(manager: GlassesManager) {
+    MainScreenContent(onReplayLastAudio = manager::replayLastAudio)
+}
+
+@Composable
+internal fun MainScreenForTest(onReplayLastAudio: () -> Unit) {
+    MainScreenContent(onReplayLastAudio = onReplayLastAudio)
+}
+
+@Composable
+private fun MainScreenContent(onReplayLastAudio: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -238,7 +248,7 @@ fun MainScreen(manager: GlassesManager) {
         }
 
         OutlinedButton(
-            onClick = { manager.replayLastAudio() },
+            onClick = onReplayLastAudio,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
