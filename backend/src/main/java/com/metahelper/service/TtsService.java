@@ -25,8 +25,9 @@ public class TtsService {
     private static final Pattern SENTENCE_END = Pattern.compile("([.!?])(?=\\s|$)");
     private static final String DEFAULT_STYLE = "narration-professional";
     private static final String DEFAULT_RATE = "-4%";
-    private static final String CODE_LINE_BREAK = "300ms";
-    private static final String SENTENCE_BREAK = "200ms";
+    private static final String CODE_LINE_BREAK = "400ms";
+    private static final String SENTENCE_BREAK = "250ms";
+    private static final String TRAILING_BREAK = "300ms";
     private static final String PARAGRAPH_BREAK = "500ms";
     private static final String SECTION_BREAK = "650ms";
 
@@ -207,6 +208,7 @@ public class TtsService {
             appendSection(body, cleanText, EXPLANATION_SECTION, "Explanation", false);
         } else {
             appendNarration(body, cleanText, false);
+            body.append("<break time=\"").append(TRAILING_BREAK).append("\"/>");
         }
 
         StringBuilder ssml = new StringBuilder("<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" ");

@@ -81,7 +81,8 @@ public class TtsServiceTest {
         assertTrue(ssml.contains("Code read-out."));
         assertTrue(ssml.contains("Explanation."));
         assertTrue(ssml.contains("a &lt; b &amp; continue."));
-        assertTrue(ssml.contains("<break time=\"300ms\"/>"));
+        assertTrue(ssml.contains("<break time=\"400ms\"/>"));
+        assertTrue(ssml.contains("<break time=\"250ms\"/>"));
         assertTrue(ssml.contains("<break time=\"500ms\"/>"));
         assertTrue(ssml.contains("<break time=\"650ms\"/>"));
     }
@@ -92,7 +93,8 @@ public class TtsServiceTest {
 
         assertFalse(ssml.contains("mstts:express-as"));
         assertFalse(ssml.contains("<prosody"));
-        assertTrue(ssml.contains("Hello.<break time=\"200ms\"/>"));
+        assertTrue(ssml.contains("Hello.<break time=\"250ms\"/>"));
+        assertTrue(ssml.contains("<break time=\"300ms\"/>"));
     }
 
     @Test
