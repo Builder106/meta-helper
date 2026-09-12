@@ -8,6 +8,10 @@
 
 The backend now emits structured verbatim-code and explanation sections, synthesizes them with Azure SSML, and defaults to Aria professional narration at a slightly reduced rate. Voice, style, and rate remain deployment-configurable; deliberate code, sentence, paragraph, and section pauses stay in the backend. The Android API remains unchanged and no permanent staging environment is introduced.
 
+## 2026-09-12 — Started bounded audio narration review #iteration
+
+The first OpenAI audio review rated the two-sum recording 4/5 for naturalness, found the transcript mostly accurate, and identified minor rushing in code lines. Increased the backend code-line SSML pause from 180 ms to 300 ms as the first single-variable iteration; voice, style, rate, sentence pauses, and gain remain unchanged. After Java 26 was provisioned on the Linux ARM64 verifier, the full backend suite passed: 41 tests with the 100% JaCoCo coverage gate.
+
 ## 2026-09-07 — Installed self-hosted Coolify alongside existing services #decision
 
 Installed the current Coolify Compose stack on the shared Linux ARM64 host using persistent data under `/data/coolify`. Because nginx already owns ports 80 and 443, the Coolify dashboard and realtime services are bound to localhost on ports 8000, 6001, and 6002; the existing workloads remained running. This establishes the deployment control plane, but MetaHelper has not yet been deployed or cut over from Render; public routing and TLS still need an explicit nginx/domain decision.
