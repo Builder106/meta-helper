@@ -4,6 +4,10 @@
 > things happen — retrospectives need this raw material to land.
 > Reverse-chronological; one paragraph max per entry.
 
+## 2026-09-12 — Added SSML technical narration #decision
+
+The backend now emits structured verbatim-code and explanation sections, synthesizes them with Azure SSML, and defaults to Aria professional narration at a slightly reduced rate. Voice, style, and rate remain deployment-configurable; deliberate code, sentence, paragraph, and section pauses stay in the backend. The Android API remains unchanged and no permanent staging environment is introduced.
+
 ## 2026-09-07 — Installed self-hosted Coolify alongside existing services #decision
 
 Installed the current Coolify Compose stack on the shared Linux ARM64 host using persistent data under `/data/coolify`. Because nginx already owns ports 80 and 443, the Coolify dashboard and realtime services are bound to localhost on ports 8000, 6001, and 6002; the existing workloads remained running. This establishes the deployment control plane, but MetaHelper has not yet been deployed or cut over from Render; public routing and TLS still need an explicit nginx/domain decision.

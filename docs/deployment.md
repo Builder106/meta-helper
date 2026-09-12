@@ -54,6 +54,12 @@ Optional variables and their defaults are defined in
 [`deploy/compose.yaml`](../deploy/compose.yaml) and
 [`backend/.env.example`](../backend/.env.example).
 
+Speech uses SSML by default for natural technical narration. The optional
+voice settings are `AZURE_SPEECH_VOICE` (`en-US-AriaNeural`),
+`AZURE_SPEECH_STYLE` (`narration-professional`), and `AZURE_SPEECH_RATE`
+(`-4%`). Leave the style blank to use SSML pauses and pacing without an
+expressive style.
+
 ## Automatic deployment
 
 The container workflow runs after the `CI` workflow succeeds on `main`. It
