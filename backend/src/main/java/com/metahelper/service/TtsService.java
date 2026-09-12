@@ -20,6 +20,15 @@ public class TtsService {
     private static final Pattern FENCE = Pattern.compile("\\x60{3}[^\\n]*");
     private static final Pattern HEADING = Pattern.compile("(?m)^\\s{0,3}#{1,6}\\s+");
     private static final Pattern BULLET = Pattern.compile("(?m)^\\s*[-*+]\\s+");
+    private static final Pattern VERBATIM_SECTION = Pattern.compile("(?im)^\\s*VERBATIM READ-OUT\\s*:\\s*$");
+    private static final Pattern EXPLANATION_SECTION = Pattern.compile("(?im)^\\s*EXPLANATION\\s*:\\s*$");
+    private static final Pattern SENTENCE_END = Pattern.compile("([.!?])(?=\\s|$)");
+    private static final String DEFAULT_STYLE = "narration-professional";
+    private static final String DEFAULT_RATE = "-4%";
+    private static final String CODE_LINE_BREAK = "180ms";
+    private static final String SENTENCE_BREAK = "180ms";
+    private static final String PARAGRAPH_BREAK = "500ms";
+    private static final String SECTION_BREAK = "650ms";
 
     @FunctionalInterface
     interface SpeechSynthesizerFunction {
@@ -29,14 +38,18 @@ public class TtsService {
     private final String subscriptionKey;
     private final String region;
     private final String defaultVoice;
+    private final String speechStyle;
+    private final String speechRate;
     private final SpeechSynthesizerFunction speechSynthesizerFunction;
 
     @Autowired
     public TtsService(
             @Value("$" + "{azure.speech.key:}") String subscriptionKey,
             @Value("$" + "{azure.speech.region:}") String region,
-            @Value("$" + "{azure.speech.voice:en-US-GuyNeural}") String defaultVoice) {
-        this(subscriptionKey, region, defaultVoice, TtsService::defaultSynthesize);
+            @Value("$" + "{azure.speech.voice:en-US-AriaNeural}") String defaultVoice,
+            @Value("$" + "{azure.speech.style:narration-professional}") String speechStyle,
+            @Value("$" + "{azure.speech.rate:-4%}") String speechRate) {
+        this(subscriptionKey, region, defaultVoice, speechStyle, speechRate, TtsService::defaultSynthesize);
     }
 
     TtsService(
@@ -44,9 +57,21 @@ public class TtsService {
             String region,
             String defaultVoice,
             SpeechSynthesizerFunction speechSynthesizerFunction) {
+        this(subscriptionKey, region, defaultVoice, DEFAULT_STYLE, DEFAULT_RATE, speechSynthesizerFunction);
+    }
+
+    TtsService(
+            String subscriptionKey,
+            String region,
+            String defaultVoice,
+            String speechStyle,
+            String speechRate,
+            SpeechSynthesizerFunction speechSynthesizerFunction) {
         this.subscriptionKey = subscriptionKey;
         this.region = region;
         this.defaultVoice = defaultVoice;
+        this.speechStyle = speechStyle == null ? "" : speechStyle.trim();
+        this.speechRate = speechRate == null ? "" : speechRate.trim();
         this.speechSynthesizerFunction = speechSynthesizerFunction;
     }
 
@@ -61,12 +86,14 @@ public class TtsService {
         }
         logger.info("Synthesizing speech for " + cleanText.length() + " characters...");
         try {
-            return speechSynthesizerFunction.synthesize(subscriptionKey, region, defaultVoice, cleanText);
+            return speechSynthesizerFunction.synthesize(
+                    subscriptionKey, region, defaultVoice, buildSsml(cleanText, defaultVoice, speechStyle, speechRate));
         } catch (Exception firstFailure) {
             String fallbackVoice = defaultVoice.equals("en-US-AriaNeural") ? "en-US-GuyNeural" : "en-US-AriaNeural";
             logger.warning("TTS Error with " + defaultVoice + ": " + firstFailure.getMessage());
             try {
-                return speechSynthesizerFunction.synthesize(subscriptionKey, region, fallbackVoice, cleanText);
+                return speechSynthesizerFunction.synthesize(
+                        subscriptionKey, region, fallbackVoice, buildSsml(cleanText, fallbackVoice, "", speechRate));
             } catch (Exception fallbackFailure) {
                 logger.severe("Final TTS Failure: " + fallbackFailure.getMessage());
                 if (fallbackFailure instanceof IOException ioException) throw ioException;
@@ -76,7 +103,7 @@ public class TtsService {
     }
 
     interface SpeechSynthesizerAdapter extends AutoCloseable {
-        SpeechSynthesisResult speakText(String text) throws Exception;
+        SpeechSynthesisResult speakSsml(String ssml) throws Exception;
         @Override
         void close();
     }
@@ -102,8 +129,8 @@ public class TtsService {
         SpeechSynthesizer synthesizer = defaultSpeechSynthesizerCreator.create(config);
         return new SpeechSynthesizerAdapter() {
             @Override
-            public SpeechSynthesisResult speakText(String text) throws Exception {
-                return synthesizer.SpeakTextAsync(text).get();
+            public SpeechSynthesisResult speakSsml(String ssml) throws Exception {
+                return synthesizer.SpeakSsmlAsync(ssml).get();
             }
 
             @Override
@@ -115,7 +142,7 @@ public class TtsService {
 
     static SynthesizerExecutor defaultSynthesizerExecutor = (speechConfig, text) -> {
         try (SpeechSynthesizerAdapter synthesizer = defaultSynthesizerFactory.create(speechConfig);
-             SpeechSynthesisResult result = synthesizer.speakText(text)) {
+             SpeechSynthesisResult result = synthesizer.speakSsml(text)) {
             if (result.getReason() != ResultReason.SynthesizingAudioCompleted) {
                 throw new IOException("Azure Speech synthesis did not complete: " + result.getReason());
             }
@@ -161,5 +188,78 @@ public class TtsService {
         text = BULLET.matcher(text).replaceAll("");
         text = text.replace("|", " ");
         return text.replaceAll("[ \\t]{2,}", " ").trim();
+    }
+
+    static String buildSsml(String text, String voice, String style, String rate) {
+        String cleanText = text == null ? "" : text.trim();
+        StringBuilder body = new StringBuilder();
+        boolean hasSections = VERBATIM_SECTION.matcher(cleanText).find() || EXPLANATION_SECTION.matcher(cleanText).find();
+
+        if (hasSections) {
+            appendSection(body, cleanText, VERBATIM_SECTION, "Code read-out", true);
+            appendSection(body, cleanText, EXPLANATION_SECTION, "Explanation", false);
+        } else {
+            appendNarration(body, cleanText, false);
+        }
+
+        StringBuilder ssml = new StringBuilder("<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" ");
+        ssml.append("xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"en-US\">");
+        ssml.append("<voice name=\"").append(escapeXmlAttribute(voice)).append("\">");
+        if (rate != null && !rate.isBlank()) {
+            ssml.append("<prosody rate=\"").append(escapeXmlAttribute(rate)).append("\">");
+        }
+        if (style != null && !style.isBlank()) {
+            ssml.append("<mstts:express-as style=\"").append(escapeXmlAttribute(style)).append("\">");
+        }
+        ssml.append(body);
+        if (style != null && !style.isBlank()) ssml.append("</mstts:express-as>");
+        if (rate != null && !rate.isBlank()) ssml.append("</prosody>");
+        return ssml.append("</voice></speak>").toString();
+    }
+
+    private static void appendSection(StringBuilder body, String text, Pattern sectionPattern, String spokenLabel, boolean code) {
+        var matcher = sectionPattern.matcher(text);
+        if (!matcher.find()) return;
+        int contentStart = matcher.end();
+        int contentEnd = text.length();
+        Pattern nextSection = sectionPattern == VERBATIM_SECTION ? EXPLANATION_SECTION : VERBATIM_SECTION;
+        var nextMatcher = nextSection.matcher(text);
+        if (nextMatcher.find(contentStart)) contentEnd = nextMatcher.start();
+        String content = text.substring(contentStart, contentEnd).trim();
+        if (content.isBlank()) return;
+        body.append("<p>").append(escapeXmlText(spokenLabel)).append(".<break time=\"")
+                .append(SECTION_BREAK).append("\"/></p>");
+        appendNarration(body, content, code);
+        body.append("<break time=\"").append(SECTION_BREAK).append("\"/>");
+    }
+
+    private static void appendNarration(StringBuilder body, String text, boolean code) {
+        String[] lines = text.split("\\R", -1);
+        for (int index = 0; index < lines.length; index++) {
+            String line = lines[index].trim();
+            if (line.isBlank()) {
+                body.append("<break time=\"").append(PARAGRAPH_BREAK).append("\"/>");
+                continue;
+            }
+            String spokenLine = escapeXmlText(line);
+            if (!code) {
+                spokenLine = SENTENCE_END.matcher(spokenLine)
+                        .replaceAll("$1<break time=\"" + SENTENCE_BREAK + "\"/>");
+            }
+            body.append("<p>").append(spokenLine);
+            if (code || index < lines.length - 1) {
+                body.append("<break time=\"").append(code ? CODE_LINE_BREAK : PARAGRAPH_BREAK).append("\"/>");
+            }
+            body.append("</p>");
+        }
+    }
+
+    private static String escapeXmlText(String value) {
+        return value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+                .replace("\"", "&quot;").replace("'", "&apos;");
+    }
+
+    private static String escapeXmlAttribute(String value) {
+        return escapeXmlText(value == null ? "" : value);
     }
 }

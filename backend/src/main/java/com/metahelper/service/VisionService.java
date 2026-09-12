@@ -29,14 +29,17 @@ public class VisionService {
         Identify what the image contains (source code, terminal/error output, a diagram, or technical text) and detect the programming language automatically.
         If it's too blurry, cropped, or unreadable, say so plainly and ask the user to reframe and retake the photo — never guess at hidden content.
 
-        For SOURCE CODE, give TWO layers, in this order:
+        For SOURCE CODE, give TWO plain-text sections, in this order. Put each section label on its own line exactly as shown, with no Markdown heading markers:
 
-        1. VERBATIM READ-OUT: read the code exactly as written so the listener can follow and transcribe it.
+        VERBATIM READ-OUT:
+        EXPLANATION:
+
+        In VERBATIM READ-OUT, read the code exactly as written so the listener can follow and transcribe it. Put each source-code line on its own output line.
            - Speak symbols as words: "open brace", "close brace", "semicolon", "equals", "plus plus", "open paren", "close paren".
            - Make block structure clear (e.g. "inside the loop", "back at the top level").
            - Example: "for open-paren int i equals zero semicolon i less than ten semicolon i plus plus close-paren open-brace".
 
-        2. EXPLANATION: in plain English, what the code does and why, block by block.
+        In EXPLANATION, use plain English to say what the code does and why, block by block.
            - Use connective words like "first", "then", "this returns".
            - Example: "This is a for-loop with an integer i starting at zero that runs while i is less than ten, incrementing i each time."
 

@@ -70,6 +70,32 @@ public class TtsServiceTest {
     }
 
     @Test
+    public void testBuildSsmlAddsSectionsPausesAndEscapesText() {
+        String ssml = TtsService.buildSsml(
+                "VERBATIM READ-OUT:\nif open paren a less than b close paren:\n\nEXPLANATION:\nUse a < b & continue.",
+                "en-US-AriaNeural", "narration-professional", "-4%");
+
+        assertTrue(ssml.contains("<voice name=\"en-US-AriaNeural\">");
+        assertTrue(ssml.contains("<mstts:express-as style=\"narration-professional\">");
+        assertTrue(ssml.contains("<prosody rate=\"-4%\">");
+        assertTrue(ssml.contains("Code read-out."));
+        assertTrue(ssml.contains("Explanation."));
+        assertTrue(ssml.contains("a &lt; b &amp; continue."));
+        assertTrue(ssml.contains("<break time=\"180ms\"/>"));
+        assertTrue(ssml.contains("<break time=\"500ms\"/>"));
+        assertTrue(ssml.contains("<break time=\"650ms\"/>"));
+    }
+
+    @Test
+    public void testBuildSsmlCanDisableStyleAndRate() {
+        String ssml = TtsService.buildSsml("Hello.", "en-US-AriaNeural", "", "");
+
+        assertFalse(ssml.contains("mstts:express-as"));
+        assertFalse(ssml.contains("<prosody"));
+        assertTrue(ssml.contains("Hello.<break time=\"180ms\"/>"));
+    }
+
+    @Test
     public void testTextToSpeechFallbackSuccess() throws Exception {
         AtomicInteger attempts = new AtomicInteger(0);
         TtsService service = new TtsService(
@@ -142,9 +168,9 @@ public class TtsServiceTest {
             };
             try (SpeechConfig config = SpeechConfig.fromSubscription("key", "eastus");
                  TtsService.SpeechSynthesizerAdapter synthesizer = TtsService.defaultSynthesizerFactory.create(config)) {
-                assertSame(result, synthesizer.speakText("Hello"));
+                assertSame(result, synthesizer.speakSsml("<speak>Hello</speak>"));
             }
-            assertEquals("Hello", created.get().text);
+            assertEquals("<speak>Hello</speak>", created.get().text);
             assertTrue(created.get().closed);
         } finally {
             TtsService.defaultSpeechSynthesizerCreator = original;
@@ -207,7 +233,7 @@ public class TtsServiceTest {
         com.microsoft.cognitiveservices.speech.SpeechSynthesisResult mockResult =
                 org.mockito.Mockito.mock(com.microsoft.cognitiveservices.speech.SpeechSynthesisResult.class);
 
-        org.mockito.Mockito.when(mockSynthesizer.speakText(org.mockito.ArgumentMatchers.anyString())).thenReturn(mockResult);
+        org.mockito.Mockito.when(mockSynthesizer.speakSsml(org.mockito.ArgumentMatchers.anyString())).thenReturn(mockResult);
         org.mockito.Mockito.when(mockResult.getReason()).thenReturn(com.microsoft.cognitiveservices.speech.ResultReason.SynthesizingAudioCompleted);
         org.mockito.Mockito.when(mockResult.getAudioData()).thenReturn("test-audio".getBytes());
 
@@ -228,7 +254,7 @@ public class TtsServiceTest {
         com.microsoft.cognitiveservices.speech.SpeechSynthesisResult mockResult =
                 org.mockito.Mockito.mock(com.microsoft.cognitiveservices.speech.SpeechSynthesisResult.class);
 
-        org.mockito.Mockito.when(mockSynthesizer.speakText(org.mockito.ArgumentMatchers.anyString())).thenReturn(mockResult);
+        org.mockito.Mockito.when(mockSynthesizer.speakSsml(org.mockito.ArgumentMatchers.anyString())).thenReturn(mockResult);
         org.mockito.Mockito.when(mockResult.getReason()).thenReturn(com.microsoft.cognitiveservices.speech.ResultReason.Canceled);
 
         TtsService.SpeechSynthesizerFactory original = TtsService.defaultSynthesizerFactory;
@@ -250,7 +276,7 @@ public class TtsServiceTest {
         com.microsoft.cognitiveservices.speech.SpeechSynthesisResult mockResult =
                 org.mockito.Mockito.mock(com.microsoft.cognitiveservices.speech.SpeechSynthesisResult.class);
 
-        org.mockito.Mockito.when(mockSynthesizer.speakText(org.mockito.ArgumentMatchers.anyString())).thenReturn(mockResult);
+        org.mockito.Mockito.when(mockSynthesizer.speakSsml(org.mockito.ArgumentMatchers.anyString())).thenReturn(mockResult);
         org.mockito.Mockito.when(mockResult.getReason()).thenReturn(com.microsoft.cognitiveservices.speech.ResultReason.SynthesizingAudioCompleted);
         org.mockito.Mockito.when(mockResult.getAudioData()).thenReturn(null);
 
@@ -283,8 +309,8 @@ public class TtsServiceTest {
         }
 
         @Override
-        public Future<SpeechSynthesisResult> SpeakTextAsync(String text) {
-            this.text = text;
+        public Future<SpeechSynthesisResult> SpeakSsmlAsync(String ssml) {
+            this.text = ssml;
             return CompletableFuture.completedFuture(result);
         }
 
