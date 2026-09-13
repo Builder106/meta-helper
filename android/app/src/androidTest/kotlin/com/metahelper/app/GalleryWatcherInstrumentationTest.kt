@@ -37,11 +37,7 @@ class GalleryWatcherInstrumentationTest {
         }
 
         val permission = imageReadPermission()
-        val alreadyHadPermission = ContextCompat.checkSelfPermission(
-            context,
-            permission,
-        ) == PackageManager.PERMISSION_GRANTED
-        if (!alreadyHadPermission) {
+        if (ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
             instrumentation.uiAutomation.grantRuntimePermission(context.packageName, permission)
         }
 
@@ -103,12 +99,6 @@ class GalleryWatcherInstrumentationTest {
                 watcher.stopWatching()
             }
             insertedUri?.let { resolver.delete(it, null, null) }
-            if (!alreadyHadPermission) {
-                instrumentation.uiAutomation.revokeRuntimePermission(
-                    context.packageName,
-                    permission,
-                )
-            }
         }
     }
 
