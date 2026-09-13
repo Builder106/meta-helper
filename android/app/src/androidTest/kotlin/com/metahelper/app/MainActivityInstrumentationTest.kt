@@ -1,11 +1,9 @@
 package com.metahelper.app
 
-import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.metahelper.app.ui.theme.MetaHelperTheme
 import java.util.concurrent.atomic.AtomicBoolean
@@ -17,7 +15,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class MainActivityInstrumentationTest {
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    val composeTestRule = createComposeRule()
 
     @Test
     fun primaryScreen_showsGalleryWorkflow_andReplayInvokesCallback() {
@@ -38,7 +36,7 @@ class MainActivityInstrumentationTest {
         composeTestRule
             .onNodeWithText("1. Take a photo with your glasses.", substring = true)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText("Replay Last Answer").performScrollTo().performClick()
+        composeTestRule.onNodeWithText("Replay Last Answer").assertIsDisplayed().performClick()
         composeTestRule.waitForIdle()
 
         assertTrue("Replay action did not invoke the activity callback", replayRequested.get())

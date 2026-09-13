@@ -137,7 +137,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: meta-helper-android-test-results
-          path: android/app/build/reports/androidTests/connected/debug
+          path: |
+            android/app/build/reports/androidTests/connected/debug
+            android/app/build/outputs/androidTest-results/connected/debug
           retention-days: 7
 
       - name: Upload debug APK

@@ -54,6 +54,7 @@ android {
         // instead of throwing "not mocked"), so we can test pure logic without
         // pulling in Robolectric.
         unitTests.returnDefaultValues = true
+        animationsDisabled = true
     }
     lint {
         abortOnError = false
