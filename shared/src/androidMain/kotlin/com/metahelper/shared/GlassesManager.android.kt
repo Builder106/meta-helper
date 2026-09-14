@@ -11,7 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-actual typealias PlatformContext = Context
+actual class PlatformContext(val context: Context)
 
 private var applicationContext: Context? = null
 
@@ -26,7 +26,7 @@ private class AndroidGlassesManager : GlassesManager {
 
 @Suppress("UNUSED_PARAMETER")
 actual fun createGlassesManager(backendUrl: String, context: PlatformContext): GlassesManager {
-    applicationContext = context.applicationContext
+    applicationContext = context.context.applicationContext
     return AndroidGlassesManager()
 }
 

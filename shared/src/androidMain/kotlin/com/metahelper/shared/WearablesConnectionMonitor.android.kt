@@ -41,5 +41,5 @@ internal class AndroidWearablesConnectionMonitor(
 }
 
 actual fun createWearablesConnectionMonitor(context: PlatformContext): WearablesConnectionMonitor {
-    return AndroidWearablesConnectionMonitor(context)
+    return AndroidWearablesConnectionMonitor(context.context)
 }

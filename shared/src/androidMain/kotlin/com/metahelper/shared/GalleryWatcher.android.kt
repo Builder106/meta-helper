@@ -131,7 +131,7 @@ actual fun createGalleryWatcher(
     context: PlatformContext,
     onNewImageDetected: (String) -> Unit
 ): GalleryWatcher {
-    return AndroidGalleryWatcher(context) { uri ->
+    return AndroidGalleryWatcher(context.context) { uri ->
         onNewImageDetected(uri.toString())
     }
 }

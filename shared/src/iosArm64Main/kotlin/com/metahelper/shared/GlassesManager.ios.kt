@@ -148,7 +148,7 @@ actual fun loadImageBytes(imageUri: String, callback: (ByteArray?) -> Unit) {
     val identifier = imageUri
 
     val fetchOptions = PHFetchOptions()
-    fetchOptions.predicate = NSPredicate.predicateWithFormat("localIdentifier == %@", identifier as NSString)
+    fetchOptions.predicate = NSPredicate.predicateWithFormat("localIdentifier == %@", identifier)
 
     val assets = PHAsset.fetchAssetsWithOptions(fetchOptions)
     if (assets.count == 0uL) {

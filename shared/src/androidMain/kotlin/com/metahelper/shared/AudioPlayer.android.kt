@@ -108,5 +108,5 @@ internal class AndroidAudioPlayer(private val context: Context) : AudioPlayer {
 }
 
 actual fun createAudioPlayer(context: PlatformContext): AudioPlayer {
-    return AndroidAudioPlayer(context)
+    return AndroidAudioPlayer(context.context)
 }
