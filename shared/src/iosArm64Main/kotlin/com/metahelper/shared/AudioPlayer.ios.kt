@@ -125,7 +125,7 @@ private class AudioPlayerDelegate(
     }
 }
 
-actual fun createAudioPlayer(context: Any): AudioPlayer {
+actual fun createAudioPlayer(context: PlatformContext): AudioPlayer {
     return IosAudioPlayer()
 }
 

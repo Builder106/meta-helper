@@ -56,5 +56,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
     compilerOptions {
         allWarningsAsErrors.set(true)
         freeCompilerArgs.add("-Xopt-in=kotlin.RequiresOptIn")
+        freeCompilerArgs.add("-Xexpect-actual-classes")
     }
 }

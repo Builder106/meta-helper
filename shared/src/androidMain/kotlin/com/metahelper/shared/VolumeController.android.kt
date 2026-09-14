@@ -35,6 +35,6 @@ internal class AndroidVolumeController(
     }
 }
 
-actual fun createVolumeController(context: Any): VolumeController {
-    return AndroidVolumeController(context as Context)
+actual fun createVolumeController(context: PlatformContext): VolumeController {
+    return AndroidVolumeController(context.context)
 }

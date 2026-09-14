@@ -128,10 +128,10 @@ fun isMetaImagePath(path: String): Boolean =
     path.contains("Ray-Ban", ignoreCase = true)
 
 actual fun createGalleryWatcher(
-    context: Any,
+    context: PlatformContext,
     onNewImageDetected: (String) -> Unit
 ): GalleryWatcher {
-    return AndroidGalleryWatcher(context as Context) { uri ->
+    return AndroidGalleryWatcher(context.context) { uri ->
         onNewImageDetected(uri.toString())
     }
 }

@@ -25,6 +25,6 @@ internal class IosWearablesConnectionMonitor : WearablesConnectionMonitor {
     }
 }
 
-actual fun createWearablesConnectionMonitor(context: Any): WearablesConnectionMonitor {
+actual fun createWearablesConnectionMonitor(context: PlatformContext): WearablesConnectionMonitor {
     return IosWearablesConnectionMonitor()
 }

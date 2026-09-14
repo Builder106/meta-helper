@@ -10,6 +10,6 @@ internal class IosVolumeController : VolumeController {
     }
 }
 
-actual fun createVolumeController(context: Any): VolumeController {
+actual fun createVolumeController(context: PlatformContext): VolumeController {
     return IosVolumeController()
 }

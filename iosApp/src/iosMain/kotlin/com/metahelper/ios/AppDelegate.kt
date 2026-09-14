@@ -8,6 +8,8 @@ import androidx.compose.ui.platform.ComposeUIViewController
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.metahelper.shared.GlassesManager
+import com.metahelper.shared.PlatformContext
+import com.metahelper.shared.createGlassesManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -42,9 +44,9 @@ class AppDelegate : UIApplicationDelegate {
         println("iOS App: Starting MetaHelper...")
 
         // Initialize shared GlassesManager (gallery polling + backend + audio)
-        glassesManager = GlassesManager(
+        glassesManager = createGlassesManager(
             backendUrl = configuredBackendUrl(),
-            context = Unit
+            context = PlatformContext()
         )
 
         println("iOS App: MetaHelper initialized with gallery polling")

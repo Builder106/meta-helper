@@ -155,7 +155,7 @@ private class PhotoLibraryChangeObserver(
 }
 
 actual fun createGalleryWatcher(
-    context: Any,
+    context: PlatformContext,
     onNewImageDetected: (String) -> Unit
 ): GalleryWatcher {
     return IosGalleryWatcher { assetIdentifier ->
