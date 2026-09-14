@@ -40,6 +40,6 @@ internal class AndroidWearablesConnectionMonitor(
     }
 }
 
-actual fun createWearablesConnectionMonitor(context: Any): WearablesConnectionMonitor {
-    return AndroidWearablesConnectionMonitor(context as android.content.Context)
+actual fun createWearablesConnectionMonitor(context: PlatformContext): WearablesConnectionMonitor {
+    return AndroidWearablesConnectionMonitor(context)
 }

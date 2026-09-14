@@ -25,9 +25,11 @@ import platform.UIKit.UIAlertController
 import platform.UIKit.UIAlertControllerStyleAlert
 import platform.UIKit.UIApplication
 
+actual class PlatformContext
+
 internal class GlassesManagerImpl(
     private val backendUrl: String = "http://localhost:8080",
-    private val context: Any
+    private val context: PlatformContext
 ) : GlassesManager {
     private val apiClient = ApiClient(backendUrl)
     private val audioPlayer = createAudioPlayer(context)
@@ -37,7 +39,7 @@ internal class GlassesManagerImpl(
     }
     private val wearablesMonitor = createWearablesConnectionMonitor(context)
     private var lastAudioResponse: ByteArray? = null
-    private var lastProcessedUri: Any? = null
+    private var lastProcessedUri: String? = null
     private val serviceScope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
 
     override var onStatusUpdate: ((String) -> Unit)? = null
@@ -63,14 +65,14 @@ internal class GlassesManagerImpl(
         }
     }
 
-    private fun onNewGalleryImage(imageUri: Any) {
+    private fun onNewGalleryImage(imageUri: String) {
         if (imageUri == lastProcessedUri) return
         lastProcessedUri = imageUri
         logDebug("GlassesManager", "Processing new gallery image: $imageUri")
         processGalleryImage(imageUri)
     }
 
-    private fun processGalleryImage(imageUri: Any) {
+    private fun processGalleryImage(imageUri: String) {
         updateStatus("New photo detected! Reading data...")
         loadImageBytes(imageUri) { bytes ->
             if (bytes != null) {
@@ -136,14 +138,14 @@ actual fun logError(tag: String, msg: String) {
     NSLog("%s ERROR: %s", tag, msg)
 }
 
-actual fun createGlassesManager(backendUrl: String, context: Any): GlassesManager {
+actual fun createGlassesManager(backendUrl: String, context: PlatformContext): GlassesManager {
     return GlassesManagerImpl(backendUrl, context)
 }
 
 // Platform-specific image loading from URI/identifier
 @OptIn(ExperimentalForeignApi::class)
-actual fun loadImageBytes(imageUri: Any, callback: (ByteArray?) -> Unit) {
-    val identifier = imageUri as? String ?: return callback(null)
+actual fun loadImageBytes(imageUri: String, callback: (ByteArray?) -> Unit) {
+    val identifier = imageUri
 
     val fetchOptions = PHFetchOptions()
     fetchOptions.predicate = NSPredicate.predicateWithFormat("localIdentifier == %@", identifier as NSString)

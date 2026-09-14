@@ -11,6 +11,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+actual typealias PlatformContext = Context
+
 private var applicationContext: Context? = null
 
 private class AndroidGlassesManager : GlassesManager {
@@ -23,17 +25,17 @@ private class AndroidGlassesManager : GlassesManager {
 }
 
 @Suppress("UNUSED_PARAMETER")
-actual fun createGlassesManager(backendUrl: String, context: Any): GlassesManager {
-    applicationContext = (context as Context).applicationContext
+actual fun createGlassesManager(backendUrl: String, context: PlatformContext): GlassesManager {
+    applicationContext = context.applicationContext
     return AndroidGlassesManager()
 }
 
-actual fun loadImageBytes(imageUri: Any, callback: (ByteArray?) -> Unit) {
+actual fun loadImageBytes(imageUri: String, callback: (ByteArray?) -> Unit) {
     val context = applicationContext
-    val uri = when (imageUri) {
-        is Uri -> imageUri
-        is String -> Uri.parse(imageUri)
-        else -> null
+    val uri = try {
+        Uri.parse(imageUri)
+    } catch (e: Exception) {
+        null
     }
 
     if (context == null || uri == null) {

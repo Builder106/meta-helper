@@ -17,15 +17,20 @@ interface GlassesManager {
 }
 
 /**
+ * Platform-specific context abstraction (android.content.Context on Android, empty wrapper on iOS).
+ */
+expect class PlatformContext
+
+/**
  * Factory for creating platform-specific GlassesManager implementations.
  */
-expect fun createGlassesManager(backendUrl: String, context: Any): GlassesManager
+expect fun createGlassesManager(backendUrl: String, context: PlatformContext): GlassesManager
 
 /**
  * Platform-specific image loading from URI/identifier.
  * Actual implementation in platform-specific source sets.
  */
-expect fun loadImageBytes(imageUri: Any, callback: (ByteArray?) -> Unit)
+expect fun loadImageBytes(imageUri: String, callback: (ByteArray?) -> Unit)
 
 /**
  * Interface for playing audio responses from the backend.
@@ -42,7 +47,7 @@ interface AudioPlayer {
 /**
  * Factory for creating platform-specific AudioPlayer implementations.
  */
-expect fun createAudioPlayer(context: Any): AudioPlayer
+expect fun createAudioPlayer(context: PlatformContext): AudioPlayer
 
 /**
  * Interface for controlling device media volume during audio playback.
@@ -57,7 +62,7 @@ interface VolumeController {
 /**
  * Factory for creating platform-specific VolumeController implementations.
  */
-expect fun createVolumeController(context: Any): VolumeController
+expect fun createVolumeController(context: PlatformContext): VolumeController
 
 /**
  * Interface for monitoring Meta Wearables SDK connection state.
@@ -79,7 +84,7 @@ sealed interface ConnectionState {
 /**
  * Factory for creating platform-specific WearablesConnectionMonitor implementations.
  */
-expect fun createWearablesConnectionMonitor(context: Any): WearablesConnectionMonitor
+expect fun createWearablesConnectionMonitor(context: PlatformContext): WearablesConnectionMonitor
 
 /**
  * Interface for watching the photo gallery for new Meta AI / Ray-Ban photos.
@@ -92,7 +97,7 @@ interface GalleryWatcher {
 /**
  * Factory for creating platform-specific GalleryWatcher implementations.
  */
-expect fun createGalleryWatcher(context: Any, onNewImageDetected: (String) -> Unit): GalleryWatcher
+expect fun createGalleryWatcher(context: PlatformContext, onNewImageDetected: (String) -> Unit): GalleryWatcher
 
 /**
  * Logging utility (expect/actual for platform-specific logging)
