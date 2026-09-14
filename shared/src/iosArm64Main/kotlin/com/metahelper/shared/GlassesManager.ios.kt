@@ -1,3 +1,4 @@
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 package com.metahelper.shared
 
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -148,7 +149,7 @@ actual fun loadImageBytes(imageUri: String, callback: (ByteArray?) -> Unit) {
     val identifier = imageUri
 
     val fetchOptions = PHFetchOptions()
-    fetchOptions.predicate = NSPredicate.predicateWithFormat("localIdentifier == %@", identifier)
+    fetchOptions.predicate = NSPredicate.predicateWithFormat("localIdentifier == %@", identifier as NSString)
 
     val assets = PHAsset.fetchAssetsWithOptions(fetchOptions)
     if (assets.count == 0uL) {
