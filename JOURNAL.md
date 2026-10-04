@@ -1,5 +1,9 @@
 # JOURNAL — MetaHelper
 
+## 2026-10-03 — Relaxed warning mode on Android and Shared Gradle targets #fix #decision
+
+Adjusted `org.gradle.warning.mode` from `fail` to `all` in `android/gradle.properties` and updated `--warning-mode all` across Android and Shared jobs in `.github/workflows/ci.yml`. Gradle 9.8.0 emits deprecation notices on external plugin APIs scheduled for removal in future Gradle versions (Android Gradle Plugin 9.4.1's `Configuration.setVisible` and Kotlin Gradle Plugin 2.4.20's `KotlinNativeBundleArtifactsTypes`); relaxing the failure gate allows Gradle wrapper dependency updates to succeed while continuing to log deprecation warnings.
+
 ## 2026-09-12 — Moved Android packaging to x86_64 CI #decision
 
 The Mac checkout is now source-only for Android work. GitHub Actions remains
