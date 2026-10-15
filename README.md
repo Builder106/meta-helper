@@ -24,33 +24,9 @@ MetaHelper turns Meta Ray-Ban smart glasses into an audio coding companion. When
 
 When you take a photo with your glasses, the photo syncs to your phone. MetaHelper's mobile companion app detects the new image, sends it to the cloud vision engine, and speaks the solution through the glasses. Double-tapping the glasses stem replays the audio.
 
-```mermaid
-sequenceDiagram
-    actor User as User (glasses)
-    participant GW as Android · GalleryWatcher / iOS · PhotosObserver
-    participant GM as Android/iOS · GlassesManager
-    participant API as Android/iOS · ApiClient
-    participant BE as Backend · Spring Boot (Java)
-    participant V as vision.py · Gemini
-    participant T as Azure Speech · Java SDK
-    participant A as audio.py · pydub / ffmpeg
-    participant AP as Android/iOS · AudioPlayer
+![MetaHelper photo-to-audio flow](assets/diagrams/photo-to-audio.png)
 
-    User->>GW: Take photo of a coding problem
-    GW->>GM: New gallery photo detected (MediaStore / Photos framework)
-    GM->>API: Read image bytes
-    API->>BE: multipart POST /process-image (file)
-    BE->>V: Read & solve the problem (gemini-3-pro-preview)
-    V-->>BE: Solution text (verbatim + narrative)
-    BE->>T: Synthesize speech (en-US-GuyNeural)
-    T-->>BE: MP3 audio
-    BE->>A: Scale playback gain
-    A-->>BE: Quieted MP3
-    BE-->>API: 200 · audio/mpeg (MP3 bytes)
-    API->>AP: Hand off audio
-    AP-->>User: Speak the solution
-    User->>AP: Double-tap glasses to replay
-```
+Android GalleryWatcher or iOS PhotosObserver detects a new photo. GlassesManager passes its bytes through ApiClient to Spring Boot. Gemini produces solution text, Azure Speech synthesizes it, and audio.py scales the MP3 gain. The app plays the returned audio through the glasses; a double-tap replays it. [Editable HTML source](assets/diagrams/photo-to-audio.html).
 
 > **Capture note:**Photo capture currently works through**gallery polling** — the glasses take the photo through Meta AI natively and the app reads it from the phone gallery (`READ_MEDIA_IMAGES` on Android, Photos framework on iOS). The Meta Wearables SDK's direct-capture path (`StreamSession`on Android,`MWDAT` on iOS) is stubbed/in-progress and is the intended future approach.
 
