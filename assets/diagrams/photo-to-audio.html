@@ -1,54 +1,152 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>A photo becomes spoken code help</title>
-<style>body{margin:0;padding:24px;background:#F8FAFC;color:#141728;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:960px;min-width:0;margin:0 auto}.figure-scroll{width:100%;overflow-x:auto}svg{display:block;width:100%;min-width:960px}@media print{.figure-scroll{overflow-x:visible}svg{min-width:0}}</style></head>
-<body><main><div class="figure-scroll"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" role="img" aria-labelledby="photo-to-audio-title photo-to-audio-desc">
-<title id="photo-to-audio-title">A photo becomes spoken code help</title>
-<desc id="photo-to-audio-desc">Mobile capture, server processing, and playback on the glasses. The backend calls Gemini, synthesizes speech with Azure, scales the MP3, then returns bytes to the mobile app.</desc>
-<defs><marker id="photo-to-audio-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L7 4 L1 7" fill="none" stroke="#4F46E5" stroke-width="1.5"/></marker></defs>
-<rect width="960" height="600" fill="#FFFFFF"/>
-<text x="40" y="52" font-size="27" font-weight="700" fill="#141728">A photo becomes spoken code help</text>
-<text x="40" y="80" font-size="14" font-weight="400" fill="#475569">Mobile capture, server processing, and playback on the glasses.</text>
-<line x1="40" y1="94" x2="920" y2="94" stroke="#CBD5E1"/>
-<rect x="40" y="120" width="244" height="402" rx="8" fill="#F8FAFC" stroke="#D5DDE5"/>
-<rect x="308" y="120" width="320" height="402" rx="8" fill="#F8FAFC" stroke="#D5DDE5"/>
-<rect x="652" y="120" width="268" height="402" rx="8" fill="#F8FAFC" stroke="#D5DDE5"/>
-<path d="M162 264 V298" fill="none" stroke="#4F46E5" stroke-width="1.8" marker-end="url(#photo-to-audio-arrow)"/>
-<path d="M264 354 H334" fill="none" stroke="#4F46E5" stroke-width="1.8" marker-end="url(#photo-to-audio-arrow)"/>
-<path d="M588 354 H676" fill="none" stroke="#4F46E5" stroke-width="1.8" marker-end="url(#photo-to-audio-arrow)"/>
-<path d="M462 298 V210 H676" fill="none" stroke="#4F46E5" stroke-width="1.8" marker-end="url(#photo-to-audio-arrow)"/>
-<path d="M840 250 V282 H520 V298" fill="none" stroke="#4F46E5" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#photo-to-audio-arrow)"/>
-<path d="M676 390 H588" fill="none" stroke="#4F46E5" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#photo-to-audio-arrow)"/>
-<path d="M462 410 V430" fill="none" stroke="#4F46E5" stroke-width="1.8" marker-end="url(#photo-to-audio-arrow)"/>
-<path d="M334 468 H264" fill="none" stroke="#4F46E5" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#photo-to-audio-arrow)"/>
-<text x="56" y="147" font-size="15" font-weight="700" fill="#141728">Glasses and mobile</text>
-<text x="324" y="147" font-size="15" font-weight="700" fill="#141728">Spring Boot backend</text>
-<text x="668" y="147" font-size="15" font-weight="700" fill="#141728">External services</text>
-<rect x="60" y="164" width="204" height="100" rx="6" fill="#FFFFFF" stroke="#B8C5D2" stroke-width="1.2"/>
-<text x="74" y="191" font-size="15" font-weight="700" fill="#141728">Photo captured</text>
-<text x="74" y="214" font-size="12" font-weight="400" fill="#141728">Android GalleryWatcher or</text>
-<text x="74" y="231" font-size="12" font-weight="400" fill="#141728">iOS PhotosObserver</text>
-<rect x="60" y="298" width="204" height="112" rx="6" fill="#FFFFFF" stroke="#B8C5D2" stroke-width="1.2"/>
-<text x="74" y="325" font-size="15" font-weight="700" fill="#141728">GlassesManager</text>
-<text x="74" y="348" font-size="12" font-weight="400" fill="#141728">Read bytes through ApiClient</text>
-<text x="74" y="365" font-size="12" font-weight="400" fill="#141728">POST /process-image</text>
-<rect x="334" y="298" width="254" height="112" rx="6" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.2"/>
-<text x="348" y="325" font-size="15" font-weight="700" fill="#141728">Spring Boot</text>
-<text x="348" y="348" font-size="12" font-weight="400" fill="#141728">Receives multipart file</text>
-<text x="348" y="365" font-size="12" font-weight="400" fill="#141728">Returns 200 audio/mpeg</text>
-<rect x="676" y="150" width="224" height="100" rx="6" fill="#FFFFFF" stroke="#B8C5D2" stroke-width="1.2"/>
-<text x="690" y="177" font-size="15" font-weight="700" fill="#141728">Gemini via vision.py</text>
-<text x="690" y="200" font-size="12" font-weight="400" fill="#141728">Solve coding problem</text>
-<text x="690" y="217" font-size="12" font-weight="400" fill="#141728">Verbatim + narrative text</text>
-<rect x="676" y="298" width="224" height="112" rx="6" fill="#FFFFFF" stroke="#B8C5D2" stroke-width="1.2"/>
-<text x="690" y="325" font-size="15" font-weight="700" fill="#141728">Azure Speech</text>
-<text x="690" y="348" font-size="12" font-weight="400" fill="#141728">en-US-GuyNeural</text>
-<text x="690" y="365" font-size="12" font-weight="400" fill="#141728">MP3 audio</text>
-<rect x="334" y="430" width="254" height="72" rx="6" fill="#FFFFFF" stroke="#B8C5D2" stroke-width="1.2"/>
-<text x="348" y="457" font-size="15" font-weight="700" fill="#141728">audio.py</text>
-<text x="348" y="480" font-size="12" font-weight="400" fill="#141728">pydub / ffmpeg gain</text>
-<rect x="60" y="430" width="204" height="72" rx="6" fill="#FFFFFF" stroke="#B8C5D2" stroke-width="1.2"/>
-<text x="74" y="457" font-size="15" font-weight="700" fill="#141728">AudioPlayer</text>
-<text x="74" y="480" font-size="12" font-weight="400" fill="#141728">Speak; double-tap replays</text>
-<line x1="40" y1="542" x2="920" y2="542" stroke="#CBD5E1"/>
-<text x="40" y="566" font-size="12" font-weight="400" fill="#475569">The backend calls Gemini, synthesizes speech with Azure, scales the MP3, then returns bytes to the mobile app.</text>
-</svg></div></main></body></html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MetaHelper photo to audio</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=IBM+Plex+Sans:wght@400;600&display=swap">
+<style>
+:root { color-scheme: light dark; --bg: #ffffff; --ink: #1f2328; --muted: #59636e; --edge: #59636e; --box: #8c959f; --group: #d1d9e0; --groupfill: #f6f8fa; --accent: #0969da; }
+@media (prefers-color-scheme: dark) { :root { --bg: #0d1117; --ink: #f0f6fc; --muted: #9198a1; --edge: #9198a1; --box: #656c76; --group: #3d444d; --groupfill: #151b23; --accent: #4493f8; } }
+html, body { margin: 0; background: var(--bg); }
+main { max-width: 712px; margin: 0 auto; }
+svg { display: block; width: 100%; height: auto; }
+text { font-family: "IBM Plex Sans", system-ui, sans-serif; fill: var(--ink); }
+.mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+.muted { fill: var(--muted); }
+.accent-text { fill: var(--accent); }
+.bg, .halo { fill: var(--bg); }
+.node { fill: var(--bg); stroke-width: 1.25; }
+.node.box { stroke: var(--box); }
+.node.accent { stroke: var(--accent); stroke-width: 2; }
+.group { fill: var(--groupfill); stroke: var(--group); }
+.boundary { fill: none; stroke: var(--box); stroke-dasharray: 6 6; }
+.edge { fill: none; stroke: var(--edge); stroke-width: 1.5; }
+.edge.accent { stroke: var(--accent); stroke-width: 2; }
+.edge.dashed { stroke-dasharray: 6 5; }
+.lifeline { fill: none; stroke: var(--group); stroke-dasharray: 4 5; }
+.tip { fill: var(--edge); }
+.tip-accent { fill: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 712 418" role="img" aria-labelledby="diagram-title diagram-desc">
+<title id="diagram-title">MetaHelper photo to audio</title>
+<desc id="diagram-desc">The phone app posts a new photo to the backend at /process-image. The backend sends the photo to Gemini and gets answer text back. It sends the text to Azure Speech and gets an MP3 back. It lowers the volume with ffmpeg and returns the audio/mpeg bytes to the phone app.</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path class="tip" d="M0,0 L10,5 L0,10 Z"/></marker>
+<marker id="arrow-accent" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path class="tip-accent" d="M0,0 L10,5 L0,10 Z"/></marker>
+</defs>
+<rect class="bg" width="712" height="418"/>
+<rect class="node box" x="16.0" y="16" width="152" height="42" rx="6"/>
+<text x="92" y="42" font-size="16" text-anchor="middle" font-weight="600">Phone app</text>
+<rect class="node box" x="192.0" y="16" width="152" height="42" rx="6"/>
+<text x="268" y="42" font-size="16" text-anchor="middle" font-weight="600">Backend</text>
+<rect class="node box" x="368.0" y="16" width="152" height="42" rx="6"/>
+<text x="444" y="42" font-size="16" text-anchor="middle" font-weight="600">Gemini</text>
+<rect class="node box" x="544.0" y="16" width="152" height="42" rx="6"/>
+<text x="620" y="42" font-size="16" text-anchor="middle" font-weight="600">Azure Speech</text>
+<path class="lifeline" d="M92,58 V402"/>
+<path class="lifeline" d="M268,58 V402"/>
+<path class="lifeline" d="M444,58 V402"/>
+<path class="lifeline" d="M620,58 V402"/>
+<path class="edge" d="M92,98 L268,98" marker-end="url(#arrow)"/>
+<rect class="halo" x="94.87" y="77" width="170.26" height="19"/>
+<text x="180" y="90" font-size="14" class="label mono" text-anchor="middle">POST /process-image</text>
+<path class="edge" d="M268,144 L444,144" marker-end="url(#arrow)"/>
+<rect class="halo" x="332.4" y="123" width="47.2" height="19"/>
+<text x="356" y="136" font-size="14" class="label" text-anchor="middle">photo</text>
+<path class="edge dashed" d="M444,190 L268,190" marker-end="url(#arrow)"/>
+<rect class="halo" x="308.88" y="169" width="94.24" height="19"/>
+<text x="356" y="182" font-size="14" class="label" text-anchor="middle">answer text</text>
+<path class="edge" d="M268,236 L620,236" marker-end="url(#arrow)"/>
+<rect class="halo" x="424.32" y="215" width="39.36" height="19"/>
+<text x="444" y="228" font-size="14" class="label" text-anchor="middle">text</text>
+<path class="edge dashed" d="M620,282 L268,282" marker-end="url(#arrow)"/>
+<rect class="halo" x="428.24" y="261" width="31.52" height="19"/>
+<text x="444" y="274" font-size="14" class="label" text-anchor="middle">MP3</text>
+<path class="edge" d="M268,316 L298,316 L298,336 L268,336" marker-end="url(#arrow)"/>
+<rect class="halo" x="304" y="317" width="102.08" height="19"/>
+<text x="308" y="330" font-size="14" class="label">lower volume</text>
+<path class="edge dashed" d="M268,374 L92,374" marker-end="url(#arrow)"/>
+<rect class="halo" x="133.3" y="353" width="93.4" height="19"/>
+<text x="180" y="366" font-size="14" class="label mono" text-anchor="middle">audio/mpeg</text>
+</svg>
+</main>
+<script type="application/json" id="diagram-spec">
+{
+  "title": "MetaHelper photo to audio",
+  "desc": "The phone app posts a new photo to the backend at /process-image. The backend sends the photo to Gemini and gets answer text back. It sends the text to Azure Speech and gets an MP3 back. It lowers the volume with ffmpeg and returns the audio/mpeg bytes to the phone app.",
+  "width": 720,
+  "sequence": {
+    "spacing": 176,
+    "box_w": 152,
+    "x0": 16,
+    "top": 16,
+    "step": 46,
+    "participants": [
+      {
+        "id": "phone",
+        "label": "Phone app"
+      },
+      {
+        "id": "backend",
+        "label": "Backend"
+      },
+      {
+        "id": "gemini",
+        "label": "Gemini"
+      },
+      {
+        "id": "azure",
+        "label": "Azure Speech"
+      }
+    ],
+    "messages": [
+      {
+        "from": "phone",
+        "to": "backend",
+        "label": "POST /process-image",
+        "mono": true
+      },
+      {
+        "from": "backend",
+        "to": "gemini",
+        "label": "photo"
+      },
+      {
+        "from": "gemini",
+        "to": "backend",
+        "label": "answer text",
+        "dashed": true
+      },
+      {
+        "from": "backend",
+        "to": "azure",
+        "label": "text"
+      },
+      {
+        "from": "azure",
+        "to": "backend",
+        "label": "MP3",
+        "dashed": true
+      },
+      {
+        "from": "backend",
+        "to": "backend",
+        "label": "lower volume"
+      },
+      {
+        "from": "backend",
+        "to": "phone",
+        "label": "audio/mpeg",
+        "dashed": true,
+        "mono": true
+      }
+    ]
+  }
+}
+</script>
+</body>
+</html>

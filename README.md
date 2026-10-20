@@ -24,9 +24,12 @@ MetaHelper turns Meta Ray-Ban smart glasses into an audio coding companion. When
 
 When you take a photo with your glasses, the photo syncs to your phone. MetaHelper's mobile companion app detects the new image, sends it to the cloud vision engine, and speaks the solution through the glasses. Double-tapping the glasses stem replays the audio.
 
-![MetaHelper photo-to-audio flow](assets/diagrams/photo-to-audio.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/diagrams/photo-to-audio-dark.png">
+  <img src="assets/diagrams/photo-to-audio.png" alt="The phone app posts the photo to the backend. The backend sends it to Gemini and gets answer text, sends the text to Azure Speech and gets an MP3, lowers the volume, and returns the audio to the phone." width="712">
+</picture>
 
-Android GalleryWatcher or iOS PhotosObserver detects a new photo. GlassesManager passes its bytes through ApiClient to Spring Boot. Gemini produces solution text, Azure Speech synthesizes it, and audio.py scales the MP3 gain. The app plays the returned audio through the glasses; a double-tap replays it. [Editable HTML source](assets/diagrams/photo-to-audio.html).
+Android GalleryWatcher or iOS PhotosObserver detects a new photo, and GlassesManager posts its bytes through ApiClient to the Spring Boot backend. The backend asks Gemini for the answer, has Azure Speech read it aloud as an MP3, and lowers the volume with ffmpeg before it returns the audio. The app plays it through the glasses; a double-tap replays it. [Editable HTML source](assets/diagrams/photo-to-audio.html).
 
 > **Capture note:**Photo capture currently works through**gallery polling** — the glasses take the photo through Meta AI natively and the app reads it from the phone gallery (`READ_MEDIA_IMAGES` on Android, Photos framework on iOS). The Meta Wearables SDK's direct-capture path (`StreamSession`on Android,`MWDAT` on iOS) is stubbed/in-progress and is the intended future approach.
 
