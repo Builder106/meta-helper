@@ -122,6 +122,12 @@ docker run -p 8080:8080 --env-file backend/.env metahelper-backend
 
 For the hosted deployment path, use the [Coolify instructions](docs/deployment.md). The backend image is published to GHCR after the main CI workflow succeeds, and Coolify can redeploy it through a repository webhook.
 
+## Website
+
+The static Astro site lives in [`web/`](web/). It presents MetaHelper as a whiteboard you can look around, with a plain-text transcript at `/transcript`. Its spoken examples were written for the site, and the Listen button uses the visitor's browser voice.
+
+Run `npm ci` and `npm run dev` from `web/` on a build host. Run `npm run build` there to produce the static `dist/` directory. Before publishing, replace the provisional domain in `web/astro.config.mjs`, `web/src/data/site.ts`, and `web/public/robots.txt`; those values set the canonical URLs and sitemap.
+
 ## License
 
 MetaHelper is released under the MIT License. See [LICENSE](./LICENSE) for the full text.

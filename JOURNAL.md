@@ -1,5 +1,9 @@
 # JOURNAL — MetaHelper
 
+## 2026-10-24: Add a static whiteboard website #decision
+
+The new `web/` Astro site presents MetaHelper as a board that visitors can look around and includes a readable transcript for smaller screens and reduced motion. Its narrated examples are written for the site and use the visitor's browser voice; they do not claim to be recordings or live responses from the app. Blender and Glaxnimate source files are kept with the site so the artwork can be revised. The published domain remains provisional until hosting is chosen.
+
 ## 2026-10-19: Redraw the photo-to-audio flow from the controller #decision
 
 The figure is now a sequence diagram taken from `ImageController`. The old figure and README named `vision.py` and `audio.py`, which are not in the repo; Gemini, Azure Speech, and the ffmpeg volume step all run in the Java backend.
