@@ -1,0 +1,24 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import Sheet from '../components/Sheet.astro';
+import { nextUnit, site, units, type Unit } from '../data/site';
+
+export function getStaticPaths() {
+  return units.map((unit) => ({ params: { unit: unit.slug }, props: { unit } }));
+}
+const { unit } = Astro.props as { unit: Unit };
+const photo = unit.slug === 'glasses' ? { src: site.glasses.photo, alt: site.glasses.alt } : { unit };
+---
+<Base page="unit" unit={unit.slug} title={`${unit.title}, read aloud`} description={unit.summary}>
+  <Hero />
+  <Sheet
+    title={unit.title}
+    lede={unit.lede}
+    readout={unit.readout}
+    explanation={unit.explanation}
+    links={unit.links}
+    photo={photo}
+    next={nextUnit(unit.slug)}
+  />
+</Base>

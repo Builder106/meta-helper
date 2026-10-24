@@ -1,0 +1,21 @@
+---
+// The whiteboard. It persists across navigation: only the page layer and the sheet swap.
+import { order, places, unitBySlug } from '../data/site';
+import Panel from './Panel.astro';
+import Erased from './marks/Erased.astro';
+const units = order.map((s) => unitBySlug(s)!);
+const e = places.erased;
+---
+<div class="window window--board" id="board" transition:persist="board" data-window>
+  <div class="plane" data-camera>
+    <picture class="plane__surface">
+      <source media="(min-width: 900px)" srcset="/img/board-2800.webp" width="2800" height="1600" />
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="" width="2800" height="1600"
+        fetchpriority="high" decoding="async" draggable="false" />
+    </picture>
+    {units.map((u) => <Panel unit={u} />)}
+    <div class="place place--erased" style={`--x:${e.x};--y:${e.y};--w:${e.w};--r:-0.5`} data-place="erased" aria-hidden="true">
+      <Erased />
+    </div>
+  </div>
+</div>

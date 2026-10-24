@@ -1,0 +1,77 @@
+---
+// One unit of the board, written in marker. As a link it opens the unit (capture); as a print
+// it is the decorative copy inside the answer sheet's photo.
+import type { Unit } from '../data/site';
+import Bug from './marks/Bug.astro';
+import Pipeline from './marks/Pipeline.astro';
+import Callouts from './marks/Callouts.astro';
+import Ticks from './marks/Ticks.astro';
+
+interface Props { unit: Unit; print?: boolean }
+const { unit, print = false } = Astro.props;
+const Tag = print ? 'div' : 'a';
+const Title = print ? 'p' : 'h2';
+const style = `--x:${unit.at.x};--y:${unit.at.y};--w:${unit.at.w};--r:${unit.at.r}`;
+const attrs = print
+  ? { 'aria-hidden': 'true', inert: true }
+  : { href: `/${unit.slug}`, 'data-unit': unit.slug, 'data-title': unit.title };
+---
+<Tag class:list={['panel', `panel--${unit.slug}`]} style={style} {...attrs}>
+  <Title class="panel__title">{unit.title}</Title>
+
+  {unit.slug === 'sum' && (
+    <pre class="panel__code"><code>int sum(int a[], int n) {'{'}
+    int total = 0;
+    for (int i = 0; i <span class="bug-mark">&lt;=<Bug /></span> n; i++)
+        total += a[i];
+    return total;
+{'}'}</code></pre>
+  )}
+
+  {unit.slug === 'pipeline' && <Pipeline />}
+
+  {unit.slug === 'glasses' && (
+    <>
+      <span class="glasses__label glasses__label--camera">camera</span>
+      <span class="glasses__label glasses__label--light">capture light</span>
+      <Callouts />
+      <img class="tray-phone" src="/img/tray.webp" width="1300" height="480" loading="lazy" decoding="async"
+        alt="The marker tray under the board: two markers, an eraser and the glasses, folded." />
+      <p class="glasses__note">tap the arm twice to hear it again</p>
+    </>
+  )}
+
+  {unit.slug === 'who' && (
+    <p class="panel__text">For anyone who has to read code they can’t see well: the slide from the back row, the whiteboard in a lecture, a printout, someone else’s screen.</p>
+  )}
+
+  {unit.slug === 'notes' && (
+    <div class="notes panel__text">
+      <Ticks />
+      <ul class="notes__list">
+      <li><span class="notes__date">17 Dec 2025</span><span>photo in, MP3 out</span></li>
+      <li><span class="notes__date">18 Dec 2025</span><span>watch the gallery instead</span></li>
+      <li><span class="notes__date">16 Jun 2026</span><span>first answer from real glasses</span></li>
+      <li><span class="notes__date">17 Jun 2026</span><span>retry when Gemini is busy</span></li>
+      </ul>
+    </div>
+  )}
+
+  {unit.slug === 'run' && (
+    <>
+      <pre class="panel__code"><code>docker build -t metahelper-backend ./backend
+docker run -p 8080:8080 \
+  --env-file backend/.env \
+  metahelper-backend</code></pre>
+      <p class="panel__small">needs GOOGLE_API_KEY, AZURE_SPEECH_KEY, AZURE_SPEECH_REGION</p>
+    </>
+  )}
+
+  {unit.slug === 'source' && (
+    <p class="panel__text">
+      <span class="panel__blue">github.com/Builder106/meta-helper</span><br />
+      MIT License<br />
+      <span class="panel__small">Kotlin + Spring Boot</span>
+    </p>
+  )}
+</Tag>

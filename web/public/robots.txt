@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://metahelper.yinkavaughan.me/sitemap-index.xml

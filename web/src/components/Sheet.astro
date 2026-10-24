@@ -1,0 +1,74 @@
+---
+// A site-written answer to the panel the visitor selected, arranged as a read-out and explanation.
+import type { Unit } from '../data/site';
+import { site } from '../data/site';
+import Panel from './Panel.astro';
+import Erased from './marks/Erased.astro';
+import Waveform from './marks/Waveform.astro';
+
+interface Props {
+  title: string;
+  lede: string;
+  readout: string[];
+  explanation: string[];
+  links?: { label: string; href: string }[];
+  photo: { unit: Unit } | { src: string; alt: string } | { erased: true };
+  next?: Unit;
+  status?: string;
+}
+const { title, lede, readout, explanation, links, photo, next, status = 'Photo taken. Reading it out.' } = Astro.props;
+const k = 'unit' in photo ? Math.min(195 / photo.unit.at.w, 0.5) : 0;
+const kMobile = 'unit' in photo ? Math.min(147 / photo.unit.at.w, 0.5) : 0;
+---
+<article class="sheet" data-sheet aria-labelledby="sheet-title">
+  <div class="sheet__inner" data-sheet-body>
+    <div class="sheet__top">
+      <figure class="photo" data-photo>
+        {'unit' in photo && (
+          <div class="photo__print" style={`--w:${photo.unit.at.w};--k:${k};--k-mobile:${kMobile}`}><Panel unit={photo.unit} print /></div>
+        )}
+        {'src' in photo && <img src={photo.src} alt={photo.alt} width="1600" height="1000" decoding="async" />}
+        {'erased' in photo && <div class="photo__print" style="--w:620;--k:0.36" aria-hidden="true"><Erased /></div>}
+      </figure>
+      <p class="sheet__status" data-status><strong>{status.split('. ')[0]}.</strong>{status.split('. ').slice(1).join('. ')}</p>
+    </div>
+
+    <h1 id="sheet-title" class="sheet__title">{title}</h1>
+    <p class="sheet__lede">{lede}</p>
+
+    <div class="controls">
+      <button class="btn" type="button" data-listen aria-pressed="false" hidden><Waveform /><span>Listen</span></button>
+      <button class="btn" type="button" data-replay><span>Read it again</span></button>
+      <a class="close pen" href="/" data-close>Back to the board</a>
+    </div>
+
+    <section aria-labelledby="sheet-readout">
+      <h2 id="sheet-readout" class="label">Verbatim read-out</h2>
+      <ol class="readout" data-speak>
+        {readout.map((line) => <li><span>{line}</span></li>)}
+      </ol>
+    </section>
+    <section aria-labelledby="sheet-explanation">
+      <h2 id="sheet-explanation" class="label">Explanation</h2>
+      <div class="explanation" data-speak>
+        {explanation.map((p) => <p>{p}</p>)}
+      </div>
+    </section>
+
+    {links && (
+      <ul class="sheet__links">
+        {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+      </ul>
+    )}
+
+    <p class="sheet__note">{site.note} <span data-voice-note hidden>{site.voiceNote}</span></p>
+
+    {next && (
+      <a class="next" href={`/${next.slug}`} data-next>
+        <span class="next__kicker">Next panel</span>
+        <span class="next__title">{next.title}</span>
+        <span class="next__arrow" aria-hidden="true">→</span>
+      </a>
+    )}
+  </div>
+</article>

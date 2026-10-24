@@ -1,0 +1,49 @@
+/* Tokens from DESIGN.md: a lecture-room whiteboard and the smoked lens of the glasses. */
+
+@font-face {
+  font-family: 'Hand';
+  src: url('/fonts/hand-300_800-normal.woff2') format('woff2');
+  font-weight: 300 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face { font-family: 'Voice'; src: url('/fonts/voice-400-normal.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Voice'; src: url('/fonts/voice-500-normal.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Voice'; src: url('/fonts/voice-600-normal.woff2') format('woff2'); font-weight: 600; font-style: normal; font-display: swap; }
+
+:root {
+  --c-board: #eceff0;
+  --c-wall: #c9ced1;
+  --c-ink: #1b1e24;
+  --c-blue: #2246b8;
+  --c-red: #c0272d;
+  --c-muted: #585e65;
+  --c-lens: #0f1214;
+  --c-voice: #e8ecee;
+  --c-hush: #9ba4a9;
+  --c-line: rgb(232 236 238 / 0.14);
+  --c-flash: #ffffff;
+
+  --f-hand: 'Hand', 'Comic Sans MS', 'Segoe Print', cursive;
+  --f-voice: 'Voice', ui-sans-serif, system-ui, sans-serif;
+
+  /* Voice scale (the answer sheet and the corners) */
+  --t-xl: clamp(2.4rem, 1.6rem + 2.6vw, 3.75rem);
+  --t-l: clamp(1.4rem, 1.2rem + 0.7vw, 1.75rem);
+  --t-body: clamp(1rem, 0.96rem + 0.18vw, 1.125rem);
+  --t-s: 0.875rem;
+  --t-xs: 0.8125rem;
+
+  --gutter: clamp(1rem, 0.6rem + 1.4vw, 2.25rem);
+  --sheet-w: clamp(26rem, 44vw, 44rem);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --z-board: 0;
+  --z-page: 1;
+  --z-reticle: 30;
+  --z-sheet: 40;
+  --z-corners: 50;
+  --z-curtain: 90;
+}

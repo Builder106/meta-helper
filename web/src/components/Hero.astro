@@ -1,0 +1,23 @@
+---
+// The sentence written across the middle of the board. A heading on the home page, plain text
+// on every other page (each of those has its own h1 in the sheet).
+import { places, site } from '../data/site';
+import Underline from './marks/Underline.astro';
+import Start from './marks/Start.astro';
+interface Props { heading?: boolean }
+const { heading = false } = Astro.props;
+const Title = heading ? 'h1' : 'p';
+const h = places.hero;
+---
+<div class="window window--page" data-window>
+  <div class="plane" data-camera>
+    <div class="place place--hero" style={`--x:${h.x};--y:${h.y};--w:${h.w};--r:-0.4`} data-place="hero">
+      <Title class="hero__title" data-hero-title>
+        {site.hero.title.map((line) => <span class="line">{line} </span>)}
+      </Title>
+      <Underline />
+      <p class="hero__body" data-hero-body>{site.hero.body}</p>
+      <p class="hero__start" data-hero-start aria-hidden="true">{site.hero.start} <Start /></p>
+    </div>
+  </div>
+</div>

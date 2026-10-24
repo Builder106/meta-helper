@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import { order, site, unitBySlug } from '../data/site';
+const units = order.map((s) => unitBySlug(s)!);
+---
+<Base page="transcript" title="Transcript" description="Everything written on the MetaHelper board as plain text: each panel read out word for word, then explained, with links to the source.">
+  <Hero />
+  <article class="sheet sheet--wide" data-sheet aria-labelledby="sheet-title">
+    <div class="sheet__inner" data-sheet-body>
+      <h1 id="sheet-title" class="sheet__title">Transcript</h1>
+      <p class="sheet__lede">Everything on the board, as text, in the order MetaHelper would read it to you.</p>
+      <div class="controls"><a class="close pen" href="/" data-close>Back to the board</a></div>
+      {units.map((u) => (
+        <section class="transcript__unit" aria-labelledby={`t-${u.slug}`}>
+          <h2 id={`t-${u.slug}`}><a href={`/${u.slug}`}>{u.title}</a></h2>
+          <h3 class="label">Verbatim read-out</h3>
+          <ol class="readout">{u.readout.map((line) => <li><span>{line}</span></li>)}</ol>
+          <h3 class="label">Explanation</h3>
+          <div class="explanation">{u.explanation.map((p) => <p>{p}</p>)}</div>
+          {u.links && <ul class="sheet__links">{u.links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul>}
+        </section>
+      ))}
+      <p class="sheet__note">{site.note}</p>
+    </div>
+  </article>
+</Base>

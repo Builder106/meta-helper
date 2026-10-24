@@ -1,0 +1,16 @@
+---
+import { site } from '../data/site';
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+<header class="corners">
+  <a class="corner corner--tl brand pen" href="/" aria-label="MetaHelper, back to the board">
+    <img src="/favicon.svg" alt="" width="26" height="26" />
+    MetaHelper
+  </a>
+  <nav class="corner corner--tr" aria-label="Site">
+    <a class="pen" href="/transcript" aria-current={path === '/transcript' ? 'page' : undefined}>Transcript</a>
+    <a class="pen" href={site.repo}>Source</a>
+  </nav>
+  <p class="corner corner--bl gaze" aria-hidden="true">Looking at <span class="gaze__name" data-gaze-name>the board</span></p>
+  <p class="corner corner--br hint"><span class="hint--pointer">{site.hint.pointer}</span><span class="hint--touch">{site.hint.touch}</span></p>
+</header>

@@ -1,0 +1,11 @@
+---
+// The camera's viewfinder, which doubles as your gaze. Decorative: focus and links carry the meaning.
+import Reticle from './marks/Reticle.astro';
+---
+<div id="reticle" transition:persist="reticle" aria-hidden="true">
+  <span class="reticle__c reticle__c--tl"><Reticle /></span>
+  <span class="reticle__c reticle__c--tr"><Reticle /></span>
+  <span class="reticle__c reticle__c--br"><Reticle /></span>
+  <span class="reticle__c reticle__c--bl"><Reticle /></span>
+  <span class="reticle__tag" data-reticle-tag></span>
+</div>
