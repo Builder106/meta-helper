@@ -72,6 +72,7 @@ tasks.jacocoTestReport {
 }
 
 tasks.withType<JavaCompile>().configureEach {
+    options.compilerArgs.add("-Xlint:deprecation")
     options.compilerArgs.add("-Werror")
 }
 

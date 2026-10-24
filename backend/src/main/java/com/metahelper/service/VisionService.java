@@ -146,7 +146,7 @@ public class VisionService {
                 if (content != null && content.has("parts") && content.get("parts").isArray() && content.get("parts").size() > 0) {
                     JsonNode textNode = content.get("parts").get(0).get("text");
                     if (textNode != null) {
-                        return textNode.asText();
+                        return textNode.asString();
                     }
                 }
             }
