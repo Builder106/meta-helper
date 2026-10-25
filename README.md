@@ -124,9 +124,9 @@ For the hosted deployment path, use the [Coolify instructions](docs/deployment.m
 
 ## Website
 
-The static Astro site lives in [`web/`](web/). It presents MetaHelper as a whiteboard you can look around, with a plain-text transcript at `/transcript`. Its spoken examples were written for the site, and the Listen button uses the visitor's browser voice.
+The static Astro site lives in [`web/`](web/) and is hosted on Vercel at <https://meta-helper.vercel.app>. It presents MetaHelper as a whiteboard you can look around, with a plain-text transcript at `/transcript`. Its spoken examples were written for the site, and the Listen button uses the visitor's browser voice.
 
-Run `npm ci` and `npm run dev` from `web/` on a build host. Run `npm run build` there to produce the static `dist/` directory. Before publishing, replace the provisional domain in `web/astro.config.mjs`, `web/src/data/site.ts`, and `web/public/robots.txt`; those values set the canonical URLs and sitemap.
+Run `npm ci` and `npm run dev` from `web/` on a build host. Run `npm run build` there to produce the static `dist/` directory. Deployments are managed with the Vercel CLI from the linked repository root. See [`web/README.md`](web/README.md).
 
 ## License
 

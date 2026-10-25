@@ -1,5 +1,9 @@
 # JOURNAL — MetaHelper
 
+## 2026-10-24: Host the whiteboard website on Vercel #decision
+
+The static Astro website is live at https://meta-helper.vercel.app, hosted under the SankofaForge Vercel team. The project uses `web/` as its root directory with the Astro framework preset. Production URLs, sitemaps, and robots.txt were set to the Vercel domain, and deployments are driven with the Vercel CLI.
+
 ## 2026-10-24: Add a static whiteboard website #decision
 
 The new `web/` Astro site presents MetaHelper as a board that visitors can look around and includes a readable transcript for smaller screens and reduced motion. Its narrated examples are written for the site and use the visitor's browser voice; they do not claim to be recordings or live responses from the app. Blender and Glaxnimate source files are kept with the site so the artwork can be revised. The published domain remains provisional until hosting is chosen.
