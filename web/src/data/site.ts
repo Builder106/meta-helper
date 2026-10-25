@@ -1,6 +1,5 @@
 // Every visible string on the site lives here.
-// Assumptions (placeholder: true below, and listed in DESIGN.md):
-//   - site.url is a guessed production domain.
+// Assumptions (listed in DESIGN.md):
 //   - The code unit follows the backend prompt's two-part format. Other units use those same
 //     headings for the site. All wording was written for this site, not recorded from the app.
 //   - The glasses in the Blender renders are a generic pair of camera glasses, not Meta's product.
@@ -22,7 +21,7 @@ export type Unit = {
 
 export const site = {
   name: 'MetaHelper',
-  url: 'https://metahelper.yinkavaughan.me', // placeholder: true
+  url: 'https://meta-helper.vercel.app',
   repo: 'https://github.com/Builder106/meta-helper',
   title: 'MetaHelper | Hear the code in front of you',
   description:

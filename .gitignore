@@ -195,5 +195,9 @@ Thumbs.db
 *.rar
 hs_err_pid*
 
+# Vercel
+.vercel/
+.env*
+
 # Docker
 .docker/

@@ -1,9 +1,10 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
-// Placeholder production URL: canonical, OG and the sitemap depend on it.
+// Production URL: canonical, OG and the sitemap read it. Also in src/data/site.ts
+// and public/robots.txt.
 export default defineConfig({
-  site: 'https://metahelper.yinkavaughan.me',
+  site: 'https://meta-helper.vercel.app',
   integrations: [sitemap()],
   prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
   build: { inlineStylesheets: 'auto' },

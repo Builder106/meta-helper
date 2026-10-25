@@ -13,9 +13,8 @@
   source and the self-hosting guide.
 - **Assets:** README, JOURNAL.md, the Gemini prompt in `VisionService.java`, deployment docs.
   The existing indigo app-tile logo stays in the README; the site draws its own mark.
-- **Assumptions (placeholder: true in `src/data/site.ts`):**
-  - The production URL (`https://metahelper.yinkavaughan.me`) is a guess until the owner
-    picks a domain.
+- **Assumptions (listed in `src/data/site.ts`):**
+  - The production URL is `https://meta-helper.vercel.app` on Vercel.
   - The code example follows the two-section format in the backend prompt. The other panels
     use the same presentation for the site. All wording was written for the site and is not
     recorded model output. The page says so.
