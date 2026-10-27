@@ -34,9 +34,9 @@ dependencyResolutionManagement {
                            ?: System.getenv("GITHUB_TOKEN")
 
                 if (token == null || token.isEmpty()) {
-                    println("ERROR: github_token NOT FOUND in local.properties")
+                    println("ERROR: github_token is unset")
                 } else {
-                    println("SUCCESS: github_token loaded (Starts with: ${token.take(4)}...)")
+                    println("INFO: github_token is set")
                 }
                 password = token
             }

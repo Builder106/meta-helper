@@ -1,5 +1,13 @@
 # JOURNAL — MetaHelper
 
+## 2026-10-27: Scope container publishing permission #ci #security
+
+The workflow defaults to read-only repository access, and its image job holds package write permission.
+
+## 2026-10-27: Build the site and backend artifact in CI #ci #decision
+
+CI now builds the Astro site and the Spring Boot JAR. The site job audits production npm packages. Android lint errors block the job. Gradle logs whether `github_token` is set without printing token characters.
+
 ## 2026-10-24: Host the whiteboard website on Vercel #decision
 
 The static Astro website is live at https://meta-helper.vercel.app, hosted under the SankofaForge Vercel team. The project uses `web/` as its root directory with the Astro framework preset. Production URLs, sitemaps, and robots.txt were set to the Vercel domain, and deployments are driven with the Vercel CLI.

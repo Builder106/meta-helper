@@ -13,7 +13,6 @@ concurrency:
 
 permissions:
   contents: read
-  packages: write
 
 env:
   REGISTRY: ghcr.io
@@ -22,6 +21,8 @@ env:
 jobs:
   build-and-push:
     name: Build & Push to GHCR
+    permissions:
+      packages: write
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')

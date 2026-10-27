@@ -58,6 +58,36 @@ jobs:
         working-directory: ./backend
         run: ./gradlew clean test jacocoTestReport jacocoTestCoverageVerification --warning-mode fail
 
+      - name: Build Spring Boot JAR
+        working-directory: ./backend
+        run: ./gradlew bootJar --warning-mode fail
+
+  site:
+    name: Website (Astro)
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install site dependencies
+        working-directory: ./web
+        run: npm ci
+
+      - name: Audit production dependencies
+        working-directory: ./web
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Build Astro site
+        working-directory: ./web
+        run: npm run build
+
   # ---------------------------------------------------------------------------
   # Shared — Kotlin Multiplatform module. Runs on macOS for CocoaPods/iOS targets.
   # ---------------------------------------------------------------------------

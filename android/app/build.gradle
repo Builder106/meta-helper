@@ -57,7 +57,7 @@ android {
         animationsDisabled = true
     }
     lint {
-        abortOnError = false
+        abortOnError = true
         warningsAsErrors = false
     }
 }
