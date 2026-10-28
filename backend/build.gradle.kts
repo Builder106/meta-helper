@@ -1,7 +1,7 @@
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "4.1.1"
+    id("org.springframework.boot") version "4.1.2"
 }
 
 group = "com.metahelper"
@@ -24,13 +24,13 @@ repositories {
 }
 
 dependencies {
-    implementation(platform("org.springframework.boot:spring-boot-dependencies:4.1.1"))
+    implementation(platform("org.springframework.boot:spring-boot-dependencies:4.1.2"))
     implementation("org.springframework.boot:spring-boot-starter-jackson")
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
-    implementation("com.microsoft.cognitiveservices.speech:client-sdk:1.52.0@jar")
-    compileOnly(platform("org.springframework.boot:spring-boot-dependencies:4.1.1"))
+    implementation("com.microsoft.cognitiveservices.speech:client-sdk:1.53.0@jar")
+    compileOnly(platform("org.springframework.boot:spring-boot-dependencies:4.1.2"))
     compileOnly("org.projectlombok:lombok")
-    annotationProcessor(platform("org.springframework.boot:spring-boot-dependencies:4.1.1"))
+    annotationProcessor(platform("org.springframework.boot:spring-boot-dependencies:4.1.2"))
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
