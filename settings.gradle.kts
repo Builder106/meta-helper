@@ -7,8 +7,8 @@ pluginManagement {
     plugins {
         id("org.jetbrains.kotlin.multiplatform") version "2.4.21"
         id("org.jetbrains.kotlin.plugin.compose") version "2.4.21"
-        id("com.android.application") version "9.4.1"
-        id("com.android.kotlin.multiplatform.library") version "9.4.1"
+        id("com.android.application") version "9.5.0"
+        id("com.android.kotlin.multiplatform.library") version "9.5.0"
     }
 }
 
