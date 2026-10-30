@@ -61,6 +61,17 @@ function render(t: number) {
   for (const l of layers) l.style.transform = value;
 }
 
+function resetNudgers() {
+  qx = gsap.quickTo(cam, 'x', { duration: 0.7, ease: ease.soft });
+  qy = gsap.quickTo(cam, 'y', { duration: 0.7, ease: ease.soft });
+}
+
+function stopCameraMotion() {
+  glide?.kill();
+  gsap.killTweensOf(cam, 'x,y');
+  resetNudgers();
+}
+
 /** Where the camera must be for a board point to sit at a screen point. */
 function camFor(ux: number, uy: number, sx: number, sy: number) {
   return clampTo(ux - sx / cam.s, uy - sy / cam.s);
@@ -78,8 +89,7 @@ export function frameTarget(el: HTMLElement, expectSheet = false) {
 }
 
 export function jumpTo(p: { x: number; y: number }) {
-  glide?.kill();
-  gsap.killTweensOf(cam, 'x,y');
+  stopCameraMotion();
   Object.assign(aim, p);
   cam.x = p.x;
   cam.y = p.y;
@@ -87,12 +97,13 @@ export function jumpTo(p: { x: number; y: number }) {
 }
 
 export function glideTo(p: { x: number; y: number }, duration?: number) {
-  glide?.kill();
-  gsap.killTweensOf(cam, 'x,y');
+  stopCameraMotion();
   Object.assign(aim, p);
   const d = duration ?? gsap.utils.clamp(0.45, 1.1, Math.hypot(p.x - cam.x, p.y - cam.y) / 1500);
   if (prefersReducedMotion() || d < 0.05) {
-    jumpTo(p);
+    cam.x = p.x;
+    cam.y = p.y;
+    render(gsap.ticker.time);
     return gsap.timeline();
   }
   glide = gsap.to(cam, { x: p.x, y: p.y, duration: d, ease: ease.inOut });
@@ -123,8 +134,7 @@ const insideUi = (t: EventTarget | null) =>
 
 export function initCamera() {
   cam.s = fitScale();
-  qx = gsap.quickTo(cam, 'x', { duration: 0.7, ease: ease.soft });
-  qy = gsap.quickTo(cam, 'y', { duration: 0.7, ease: ease.soft });
+  resetNudgers();
   gsap.ticker.add((t) => render(t));
   document.addEventListener('astro:after-swap', collect);
 
