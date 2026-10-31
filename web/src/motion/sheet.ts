@@ -2,7 +2,7 @@
 // with the browser's voice, lighting each word as it is said.
 import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText';
-import { ease, onPage, prefersReducedMotion } from '../engine';
+import { ease, onPage, prefersReducedMotion } from '@/engine';
 import { nav } from './nav';
 
 gsap.registerPlugin(SplitText);

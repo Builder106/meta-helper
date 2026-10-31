@@ -1,7 +1,7 @@
 ---
-import Base from '../layouts/Base.astro';
-import Hero from '../components/Hero.astro';
-import { order, site, unitBySlug } from '../data/site';
+import Base from '@/layouts/Base.astro';
+import Hero from '@/components/Hero.astro';
+import { order, site, unitBySlug } from '@/data/site';
 const units = order.map((s) => unitBySlug(s)!);
 ---
 <Base page="transcript" title="Transcript" description="Everything written on the MetaHelper board as plain text: each panel read out word for word, then explained, with links to the source.">

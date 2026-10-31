@@ -2,8 +2,8 @@
 // intro (the hero sentence is written in marker). Runs once on the client before the first page.
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ease, isCanvas, onPage, prefersReducedMotion, setTransition } from '../engine';
-import { drawOn } from '../engine/glax';
+import { ease, isCanvas, onPage, prefersReducedMotion, setTransition } from '@/engine';
+import { drawOn } from '@/engine/glax';
 import { collect, frameTarget, glideTo, jumpTo } from './camera';
 import { collectReticle, initReticle, lock, release, setBase } from './reticle';
 import { initCamera } from './camera';

@@ -1,9 +1,9 @@
 ---
 import { ClientRouter } from 'astro:transitions';
-import { site } from '../data/site';
-import Board from '../components/Board.astro';
-import Corners from '../components/Corners.astro';
-import Reticle from '../components/Reticle.astro';
+import { site } from '@/data/site';
+import Board from '@/components/Board.astro';
+import Corners from '@/components/Corners.astro';
+import Reticle from '@/components/Reticle.astro';
 import '../styles/tokens.css';
 import '../styles/site.css';
 
@@ -71,8 +71,8 @@ const hasSheet = page !== 'home';
     <Reticle />
     <div id="curtain" transition:persist="curtain" aria-hidden="true"><div class="curtain__panel"></div></div>
     <script>
-      import { start } from '../engine/astro';
-      import { setupMotion } from '../motion/setup';
+      import { start } from '@/engine/astro';
+      import { setupMotion } from '@/motion/setup';
       start(setupMotion);
     </script>
   </body>

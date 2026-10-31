@@ -1,8 +1,8 @@
 ---
-import Base from '../layouts/Base.astro';
-import Hero from '../components/Hero.astro';
-import Sheet from '../components/Sheet.astro';
-import { notFound, unitBySlug } from '../data/site';
+import Base from '@/layouts/Base.astro';
+import Hero from '@/components/Hero.astro';
+import Sheet from '@/components/Sheet.astro';
+import { notFound, unitBySlug } from '@/data/site';
 ---
 <Base page="missing" title={notFound.title} description="This address points at a wiped corner of the MetaHelper board. Go back to the board, or read every panel in the transcript.">
   <Hero />

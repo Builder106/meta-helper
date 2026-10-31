@@ -1,7 +1,7 @@
 // The camera over the board (wide screens). One transform on every [data-camera] layer, applied
 // on the GSAP ticker. Input moves an aim point; the camera eases toward it.
 import { gsap } from 'gsap';
-import { ease, isCanvas, prefersReducedMotion } from '../engine';
+import { ease, isCanvas, prefersReducedMotion } from '@/engine';
 
 export const BOARD = { w: 2800, h: 1600 };
 export const cam = { x: 0, y: 0, s: 1 };

@@ -1,6 +1,6 @@
 ---
 // The whiteboard. It persists across navigation: only the page layer and the sheet swap.
-import { order, places, unitBySlug } from '../data/site';
+import { order, places, unitBySlug } from '@/data/site';
 import Panel from './Panel.astro';
 import Erased from './marks/Erased.astro';
 const units = order.map((s) => unitBySlug(s)!);

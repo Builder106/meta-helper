@@ -2,7 +2,7 @@
 // Locked, its corners close around a panel: on hover and focus, on the panel in the middle of
 // the screen on touch and phones, and on the photographed panel while its answer is open.
 import { gsap } from 'gsap';
-import { isCanvas, isTouch, prefersReducedMotion } from '../engine';
+import { isCanvas, isTouch, prefersReducedMotion } from '@/engine';
 import { sheetWidth } from './camera';
 
 type Why = 'hover' | 'focus' | 'gaze' | 'capture';
