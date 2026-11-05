@@ -9,7 +9,7 @@ version = "1.0"
 kotlin {
     android {
         namespace = "com.metahelper.shared"
-        compileSdk = 34
+        compileSdk = 35
         minSdk = 29
         compilerOptions {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
