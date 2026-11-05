@@ -25,7 +25,7 @@ on:
 # Cancel superseded runs on the same ref so only the latest commit is verified.
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
