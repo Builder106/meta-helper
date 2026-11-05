@@ -104,7 +104,7 @@ class GlassesManager(
                 // capture readiness — gallery capture works whether or not the
                 // glasses are "linked", so avoid an alarming "Disconnected" that
                 // reads as if the app is broken.
-                isGlassesConnected = (state is RegistrationState.Registered)
+                isGlassesConnected = (state == RegistrationState.REGISTERED)
                 updateStatus(
                     if (isGlassesConnected) "Glasses linked · watching for photos"
                     else "Watching gallery for new photos"

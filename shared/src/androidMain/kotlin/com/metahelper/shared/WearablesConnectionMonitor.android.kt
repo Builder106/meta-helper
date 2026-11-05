@@ -21,13 +21,13 @@ internal class AndroidWearablesConnectionMonitor(
         scope.launch {
             Wearables.registrationState.collect { state ->
                 when (state) {
-                    is RegistrationState.Registered -> {
+                    RegistrationState.REGISTERED -> {
                         _connectionState.value = ConnectionState.Connected("registered")
                     }
-                    is RegistrationState.Available,
-                    is RegistrationState.Registering,
-                    is RegistrationState.Unavailable,
-                    is RegistrationState.Unregistering -> {
+                    RegistrationState.AVAILABLE,
+                    RegistrationState.REGISTERING,
+                    RegistrationState.UNAVAILABLE,
+                    RegistrationState.UNREGISTERING -> {
                         _connectionState.value = ConnectionState.Disconnected
                     }
                 }
