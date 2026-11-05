@@ -85,9 +85,9 @@ dependencies {
 
     // Meta Wearables SDK (DAT) — core only, for connection/registration state.
     // Capture is driven by GalleryWatcher, so the camera (StreamSession) artifact
-    // is not needed; re-add 'com.meta.wearable:mwdat-camera:0.3.0' if/when the
+    // is not needed; re-add 'com.meta.wearable:mwdat-camera:0.7.0' if/when the
     // SDK direct-capture path is revived (requires a registered APPLICATION_ID).
-    implementation 'com.meta.wearable:mwdat-core:0.3.0'
+    implementation 'com.meta.wearable:mwdat-core:0.7.0'
 
     // Testing
     testImplementation 'junit:junit:4.13.2'

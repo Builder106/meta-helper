@@ -39,7 +39,7 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
         }
         androidMain.dependencies {
-            implementation("com.meta.wearable:mwdat-core:0.3.0")
+            implementation("com.meta.wearable:mwdat-core:0.7.0")
         }
         iosArm64Main.dependencies {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
