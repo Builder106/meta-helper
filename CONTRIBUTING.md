@@ -100,6 +100,37 @@ Website builds remain available through `web/`'s npm scripts. Android verificati
 stays in x86_64 CI, and shared/iOS verification requires the documented macOS
 environment.
 
+## Offline knowledge lookup
+
+Search the curated local technical runbooks with Node.js 24+:
+
+```sh
+node scripts/knowledge.mjs java jdk
+node scripts/knowledge.mjs --json --limit 3 ffmpeg
+node scripts/knowledge.mjs --help
+```
+
+The command works from any directory when invoked by its script path. It builds
+an in-memory inverted index of `docs/runbooks/*.md` and finds sections containing
+all query terms. Matching ignores case, normalizes Unicode, and splits punctuation
+into whole tokens. Titles receive extra ranking weight; ties sort by source path
+and line. Results contain repository-relative file paths, one-based section lines,
+titles, and excerpts (at most 240 characters). The default limit is five.
+`--json` returns `{ query, results }`, with a numeric `score` per result.
+
+No matches exits 0 with an empty result; invalid arguments exit 2 and corpus read
+failures exit 1. Queries allow up to 256 characters and 16 distinct terms; limits
+must be integers from 1 to 20. The curated corpus allows 1..128 regular Markdown
+files, up to 256 KiB each and 4 MiB total. Symlinks and other files are excluded.
+Lookup writes no files, executes no commands, and makes no network requests.
+
+To curate a runbook, add a Markdown file under `docs/runbooks/` with one `# Title`
+and `## Section` headings. Keep procedures consistent with their repository
+sources and omit credentials. Run the tooling verification workflow after editing;
+it discovers the lookup tests automatically. No index rebuild command is needed:
+each invocation reads the current files. See the
+[acceptance specification](docs/specs/offline-knowledge-lookup.md).
+
 ## Backend setup (`backend/`)
 
 Requires Java 26, Gradle 9.7.1, and `ffmpeg` (for audio processing). Azure Speech credentials are required for TTS.

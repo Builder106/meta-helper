@@ -1,5 +1,9 @@
 # JOURNAL — MetaHelper
 
+## 2026-11-06: Index curated runbooks locally #decision
+
+Implement offline knowledge lookup as a one-shot Node standard-library command alongside the existing developer tooling. Curated Markdown runbooks use section-level postings with weighted title matches, all-term intersection, deterministic ranking, and file/line references. Build the bounded index in memory per invocation so edits cannot leave a persisted index stale; expose reusable search for repeated queries within a process. Keep the corpus explicit under docs/runbooks, with no network calls, background daemon, frontend, or changes to the image-to-audio API. Existing tooling verification automatically discovers the new command and tests.
+
 ## 2026-11-06: Add bounded one-shot verification workflows #decision
 
 Keep workflow automation in a standalone Node standard-library runner alongside diagnostics. Fixed tooling and backend workflows reuse the offline prerequisite audit, run sequentially with fail-fast exit codes and per-command deadlines, and offer a JSON dry run. Tooling CI uses the same runner; backend verification retains the existing Gradle tests, coverage gate, warning policy, and JAR build. Gradle runs without a persistent daemon. Avoid a generic shell-command configuration or scheduler; website and mobile workflows retain their existing npm and platform-specific CI boundaries.

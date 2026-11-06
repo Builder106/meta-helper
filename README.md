@@ -93,6 +93,15 @@ Copy `backend/.env.example`to`backend/.env` and fill in your values:
 | `GET` | `/` | — | JSON health check |
 | `POST` | `/process-image` | multipart form, field`file`(image) | `audio/mpeg` MP3 bytes |
 
+## Offline knowledge lookup
+
+Search curated technical runbooks offline with
+`node scripts/knowledge.mjs <query...>`, for example
+`node scripts/knowledge.mjs java jdk`. Results include file paths and section
+line numbers. Use `--json` for automation and `--limit 1..20` to cap results.
+Requires only Node.js 24+, with no package installation or credentials.
+See [offline knowledge lookup](CONTRIBUTING.md#offline-knowledge-lookup).
+
 ## Tests
 
 Run tooling and backend checks together with `node scripts/workflow.mjs verify`

@@ -9,7 +9,7 @@ Production engineering and tooling helper roadmap.
 
 ## v1.2 — Interactive Assistant Modes
 
-- [ ] **Offline Knowledge Lookup**: Fast indexed search across curated technical runbooks.
+- [x] **Offline Knowledge Lookup**: Fast indexed search across curated technical runbooks.
 - [ ] **Diagnostic Log Parsing**: Automated regex log anomaly classifier.
 
 ## Out of Scope
