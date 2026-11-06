@@ -41,16 +41,8 @@ jobs:
         with:
           node-version: 24
 
-      - name: Check diagnostic script syntax
-        run: |
-          node --check scripts/doctor.mjs
-          node --check scripts/tests/doctor.test.mjs
-
-      - name: Test environment diagnostics
-        run: node --test scripts/tests/*.test.mjs
-
-      - name: Audit runner shell
-        run: node scripts/doctor.mjs --profile shell
+      - name: Verify repository tooling
+        run: node scripts/workflow.mjs verify-tools
 
   secrets:
     name: Secret scan

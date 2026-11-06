@@ -5,7 +5,7 @@ Production engineering and tooling helper roadmap.
 ## v1.1 — CLI Telemetry & Automation
 
 - [x] **Environment Diagnostics**: Automated sanity auditing for developer dependencies and shell environments.
-- [ ] **Workflow Automation**: One-shot script orchestrators for recurring system tasks.
+- [x] **Workflow Automation**: One-shot script orchestrators for recurring system tasks.
 
 ## v1.2 — Interactive Assistant Modes
 

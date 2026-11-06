@@ -64,6 +64,42 @@ node --check scripts/doctor.mjs
 node --check scripts/tests/doctor.test.mjs
 ```
 
+## Workflow automation
+
+Use the one-shot workflow runner with Node.js 24+ (no npm install required):
+
+```sh
+node scripts/workflow.mjs verify-tools
+node scripts/workflow.mjs verify-backend
+node scripts/workflow.mjs verify
+node scripts/workflow.mjs verify --dry-run
+```
+
+`verify-tools` audits shell prerequisites, checks the syntax of the top-level
+`scripts/*.mjs` and `scripts/tests/*.test.mjs` files, and runs all tooling tests.
+CI uses this same command. `verify-backend` audits backend prerequisites, then
+runs the bundled Gradle wrapper with `clean`, unit tests, the existing JaCoCo
+report and 100% coverage gate, and `bootJar`, with warnings treated as errors.
+It requires JDK 26 and ffmpeg; Gradle may download dependencies from its configured
+repositories. `verify` (also the default when no name is supplied) runs tooling
+followed by backend verification.
+
+The runner resolves paths from its own checkout, so it works from any directory.
+It runs fixed commands directly, stops at the first failure, and streams their
+output. Each tooling command has a 60-second deadline; the backend command has
+a 15-minute deadline. A deadline kills the command and fails the workflow.
+Gradle runs with `--no-daemon`; workflows do not start application servers,
+install system packages, load `.env` files, deploy, or push. Normal Gradle caches
+and build outputs are written. Build output is streamed unchanged, so avoid
+configuring tools to print credentials. `--dry-run` prints a JSON plan with
+commands, arguments, working directories, and deadlines without running them.
+Exit codes are 0 for success (including dry runs), 1 for a failed, unavailable,
+or timed-out step, and 2 for invalid arguments.
+
+Website builds remain available through `web/`'s npm scripts. Android verification
+stays in x86_64 CI, and shared/iOS verification requires the documented macOS
+environment.
+
 ## Backend setup (`backend/`)
 
 Requires Java 26, Gradle 9.7.1, and `ffmpeg` (for audio processing). Azure Speech credentials are required for TTS.

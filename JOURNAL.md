@@ -1,5 +1,9 @@
 # JOURNAL — MetaHelper
 
+## 2026-11-06: Add bounded one-shot verification workflows #decision
+
+Keep workflow automation in a standalone Node standard-library runner alongside diagnostics. Fixed tooling and backend workflows reuse the offline prerequisite audit, run sequentially with fail-fast exit codes and per-command deadlines, and offer a JSON dry run. Tooling CI uses the same runner; backend verification retains the existing Gradle tests, coverage gate, warning policy, and JAR build. Gradle runs without a persistent daemon. Avoid a generic shell-command configuration or scheduler; website and mobile workflows retain their existing npm and platform-specific CI boundaries.
+
 ## 2026-11-06: Add offline environment diagnostics #decision
 
 Use a standalone Node standard-library command for shell, backend, and website prerequisite audits, reusing the website's Node.js 24 baseline without an npm install. Version queries run without a shell and have fixed time and output limits; reports include remedies and optional JSON, with no credential values or raw subprocess output. Diagnostics stay read-only and local, while Android and iOS builds retain their existing CI/platform boundaries. Fixture-based tests run in CI independently of the application builds.

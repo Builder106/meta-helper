@@ -95,6 +95,11 @@ Copy `backend/.env.example`to`backend/.env` and fill in your values:
 
 ## Tests
 
+Run tooling and backend checks together with `node scripts/workflow.mjs verify`
+(Node.js 24+, JDK 26, and ffmpeg). Use `verify-tools` or `verify-backend` to run
+one workflow, or append `--dry-run` to inspect its commands. See
+[workflow automation](CONTRIBUTING.md#workflow-automation) for deadlines and exit codes.
+
 ```bash
 cd backend
 ./gradlew test
