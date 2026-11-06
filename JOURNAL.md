@@ -1,5 +1,9 @@
 # JOURNAL — MetaHelper
 
+## 2026-11-06: Upgrade macOS runner to macos-15 in CI #ci #decision
+
+GitHub Actions retired `macos-14` hosted runner images, causing the `shared` (KMP) and `ios` (Compose Multiplatform) workflow jobs to fail with `The configuration 'macos-14-arm64-us-default' is not supported`. Updated both jobs in `ci.yml` to target `macos-15`.
+
 ## 2026-11-06: Add automated regex log anomaly classifier #decision
 
 Implement diagnostic log parsing as a one-shot Node.js standard-library command alongside existing developer tooling. Automated regex rules classify process crashes, out-of-memory errors, service unavailability (502/503/504), rate-limit throttling (429), timeouts, authentication failures, runtime exceptions with multi-line stack traces, subprocess pipeline failures, build/test failures, resource exhaustion, and deprecation warnings. Normalize log signatures across timestamps, thread IDs, and memory addresses to cluster repeating incidents into deduplicated reports with line references and actionable remedies. Support file inputs, piped stdin, custom regex patterns, and threshold gating via `--fail-on`. No network calls, background daemon, frontend, or external packages are introduced; existing verification workflows discover the command and tests automatically.
