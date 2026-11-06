@@ -64,6 +64,11 @@ MetaHelper/
 
 ## Backend — setup
 
+Audit your local prerequisites first with `node scripts/doctor.mjs` (Node.js 24+).
+Use `--profile backend`, `--profile web`, or `--profile shell` to check just that
+environment, and `--json` for automation. Failures include a suggested fix and
+exit with status 1. See [environment diagnostics](CONTRIBUTING.md#environment-diagnostics).
+
 Requires Java 26, Gradle 9.7.1, and `ffmpeg` (used for audio export). Azure Speech is used for text-to-speech.
 
 ```bash

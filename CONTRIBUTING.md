@@ -28,6 +28,42 @@ Glasses photo
   → Android/iOS AudioPlayer plays it (double-tap / next-track on glasses to replay)
 ```
 
+## Environment diagnostics
+
+Run the offline prerequisite audit from the repository root with Node.js 24+;
+it uses only Node's standard library and does not require `npm ci`:
+
+```sh
+node scripts/doctor.mjs
+node scripts/doctor.mjs --profile backend
+node scripts/doctor.mjs --profile web --json
+node scripts/doctor.mjs --profile shell
+```
+
+The default `all` profile checks PATH entries, the configured login shell, Git,
+the backend's JDK 26 runtime/compiler, ffmpeg, bundled Gradle wrapper files,
+Node.js 24+ (the website CI baseline), npm, and the local Astro installation.
+Backend Java checks honor `JAVA_HOME` before PATH, matching the Gradle wrapper.
+Unset `SHELL` produces a warning so noninteractive environments can still pass.
+Exit codes are 0 for no failures, 1 for failed checks, and 2 for invalid arguments.
+JSON reports contain `profile`, `ok`, and a `checks` array with `name`, `status`,
+and `message` fields. Warnings do not make `ok` false.
+
+The audit never installs packages, runs builds, loads shell startup files or
+`.env` files, or contacts external services. Each tool version query has a
+five-second deadline and a 64 KiB output limit. Reports omit environment values
+and raw subprocess output. This checks local prerequisites, not credential
+validity, dependency integrity, or Gradle daemon/toolchain overrides. Android
+builds remain in x86_64 CI; iOS builds require the documented macOS environment.
+
+Run the fixture-based diagnostic tests without installing dependencies:
+
+```sh
+node --test scripts/tests/*.test.mjs
+node --check scripts/doctor.mjs
+node --check scripts/tests/doctor.test.mjs
+```
+
 ## Backend setup (`backend/`)
 
 Requires Java 26, Gradle 9.7.1, and `ffmpeg` (for audio processing). Azure Speech credentials are required for TTS.

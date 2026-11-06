@@ -31,6 +31,27 @@ permissions:
   contents: read
 
 jobs:
+  diagnostics:
+    name: Environment diagnostics
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Check diagnostic script syntax
+        run: |
+          node --check scripts/doctor.mjs
+          node --check scripts/tests/doctor.test.mjs
+
+      - name: Test environment diagnostics
+        run: node --test scripts/tests/*.test.mjs
+
+      - name: Audit runner shell
+        run: node scripts/doctor.mjs --profile shell
+
   secrets:
     name: Secret scan
     runs-on: ubuntu-24.04

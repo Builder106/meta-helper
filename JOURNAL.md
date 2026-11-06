@@ -1,5 +1,9 @@
 # JOURNAL — MetaHelper
 
+## 2026-11-06: Add offline environment diagnostics #decision
+
+Use a standalone Node standard-library command for shell, backend, and website prerequisite audits, reusing the website's Node.js 24 baseline without an npm install. Version queries run without a shell and have fixed time and output limits; reports include remedies and optional JSON, with no credential values or raw subprocess output. Diagnostics stay read-only and local, while Android and iOS builds retain their existing CI/platform boundaries. Fixture-based tests run in CI independently of the application builds.
+
 ## 2026-10-27: Scope container publishing permission #ci #security
 
 The workflow defaults to read-only repository access, and its image job holds package write permission.
