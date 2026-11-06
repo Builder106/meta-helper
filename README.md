@@ -102,6 +102,15 @@ line numbers. Use `--json` for automation and `--limit 1..20` to cap results.
 Requires only Node.js 24+, with no package installation or credentials.
 See [offline knowledge lookup](CONTRIBUTING.md#offline-knowledge-lookup).
 
+## Diagnostic log parsing
+
+Classify errors, rate limits, and service anomalies in logs with
+`node scripts/logs.mjs [options] [files...]` or piped stdin.
+Results cluster repeating failures by signature, report root cause stack traces,
+and provide actionable remediation steps. Use `--json` for automation and
+`--fail-on error` to gate CI pipelines. Requires only Node.js 24+, with no package
+installation or credentials. See [diagnostic log parsing](CONTRIBUTING.md#diagnostic-log-parsing).
+
 ## Tests
 
 Run tooling and backend checks together with `node scripts/workflow.mjs verify`

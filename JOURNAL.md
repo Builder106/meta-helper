@@ -1,5 +1,9 @@
 # JOURNAL — MetaHelper
 
+## 2026-11-06: Add automated regex log anomaly classifier #decision
+
+Implement diagnostic log parsing as a one-shot Node.js standard-library command alongside existing developer tooling. Automated regex rules classify process crashes, out-of-memory errors, service unavailability (502/503/504), rate-limit throttling (429), timeouts, authentication failures, runtime exceptions with multi-line stack traces, subprocess pipeline failures, build/test failures, resource exhaustion, and deprecation warnings. Normalize log signatures across timestamps, thread IDs, and memory addresses to cluster repeating incidents into deduplicated reports with line references and actionable remedies. Support file inputs, piped stdin, custom regex patterns, and threshold gating via `--fail-on`. No network calls, background daemon, frontend, or external packages are introduced; existing verification workflows discover the command and tests automatically.
+
 ## 2026-11-06: Index curated runbooks locally #decision
 
 Implement offline knowledge lookup as a one-shot Node standard-library command alongside the existing developer tooling. Curated Markdown runbooks use section-level postings with weighted title matches, all-term intersection, deterministic ranking, and file/line references. Build the bounded index in memory per invocation so edits cannot leave a persisted index stale; expose reusable search for repeated queries within a process. Keep the corpus explicit under docs/runbooks, with no network calls, background daemon, frontend, or changes to the image-to-audio API. Existing tooling verification automatically discovers the new command and tests.

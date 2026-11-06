@@ -131,6 +131,40 @@ it discovers the lookup tests automatically. No index rebuild command is needed:
 each invocation reads the current files. See the
 [acceptance specification](docs/specs/offline-knowledge-lookup.md).
 
+## Diagnostic log parsing
+
+Audit and classify anomalies in application and build logs with Node.js 24+:
+
+```sh
+node scripts/logs.mjs backend.log
+cat backend.log | node scripts/logs.mjs -
+node scripts/logs.mjs --json --severity error backend.log
+node scripts/logs.mjs --fail-on error ci-build.log
+node scripts/logs.mjs --pattern "DEAD_DAT_CAMERA" app.log
+node scripts/logs.mjs --help
+```
+
+The command parses single-line and multi-line logs, grouping stack traces with
+their initiating event and clustering repeating failures into deduplicated anomaly
+signatures. Built-in regular expression rules classify process panics, out-of-memory
+conditions, upstream service unavailability (502/503/504), rate limit throttling (429),
+network timeouts, authentication/permission errors, uncaught runtime exceptions,
+subprocess failures, build/test gates, resource exhaustion, and deprecation warnings.
+
+Each reported anomaly includes its category, severity level, total occurrences,
+source line numbers, a bounded sample excerpt, and an actionable remediation step.
+Use `--json` for machine-readable summary metrics and anomaly clusters, `--severity`
+to filter minimum severity (`critical`, `error`, `warn`, `all`), `--category` to isolate
+specific failure domains, and `--limit 1..100` to bound results.
+
+`--fail-on <critical|error|warn>` exits 1 if any anomaly at or above the threshold
+is detected, making it suitable for CI log auditing and pre-flight gates.
+Normal runs exit 0; invalid CLI options or invalid regex patterns exit 2; unreadable
+inputs or file size violations exit 1. Input is bounded to 10 MiB per file and 100,000
+lines total, refusing symlinks and non-files. Log parsing requires no external packages,
+writes no files, runs no daemon, and makes no network requests. See the
+[acceptance specification](docs/specs/diagnostic-log-parsing.md).
+
 ## Backend setup (`backend/`)
 
 Requires Java 26, Gradle 9.7.1, and `ffmpeg` (for audio processing). Azure Speech credentials are required for TTS.
