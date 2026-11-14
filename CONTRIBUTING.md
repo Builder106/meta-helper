@@ -241,7 +241,6 @@ GitHub Packages requires authentication, so you must supply a GitHub personal ac
 
 The workflow supplies the existing `GH_PACKAGES_TOKEN` repository secret as `GITHUB_TOKEN`. Never create a Mac `local.properties` file for this task or place the token in the source checkout.
 
-
 ### Android build and test
 
 The CI workflow runs `lintDebug`, `testDebugUnitTest`, `assembleDebug`, and `connectedCheck`, then publishes the `meta-helper-debug-apk` artifact for seven days.

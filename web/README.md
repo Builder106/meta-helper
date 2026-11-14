@@ -34,4 +34,3 @@ vercel deploy --prod
 ## Artwork
 
 The whiteboard and glasses artwork are authored with Blender and Glaxnimate. See [`DESIGN.md`](DESIGN.md) for art direction and design notes.
-
