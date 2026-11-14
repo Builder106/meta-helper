@@ -1,16 +1,16 @@
 # Meta-Helper Roadmap
 
-Production engineering and tooling helper roadmap.
+Plans for development tooling and assistant modes.
 
 ## v1.1 — CLI Telemetry & Automation
 
-- [x] **Environment Diagnostics**: Automated sanity auditing for developer dependencies and shell environments.
-- [x] **Workflow Automation**: One-shot script orchestrators for recurring system tasks.
+- [x] **Environment Diagnostics**: Check developer dependencies and shell environments.
+- [x] **Workflow Automation**: Run recurring system tasks through one-shot scripts.
 
 ## v1.2 — Interactive Assistant Modes
 
-- [x] **Offline Knowledge Lookup**: Fast indexed search across curated technical runbooks.
-- [x] **Diagnostic Log Parsing**: Automated regex log anomaly classifier.
+- [x] **Offline Knowledge Lookup**: Search curated technical runbooks with a local index.
+- [x] **Diagnostic Log Parsing**: Classify log anomalies using regular expressions.
 
 ## Out of Scope
 
