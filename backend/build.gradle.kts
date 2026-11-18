@@ -27,7 +27,7 @@ dependencies {
     implementation(platform("org.springframework.boot:spring-boot-dependencies:4.1.2"))
     implementation("org.springframework.boot:spring-boot-starter-jackson")
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
-    implementation("com.microsoft.cognitiveservices.speech:client-sdk:1.53.0@jar")
+    implementation("com.microsoft.cognitiveservices.speech:client-sdk:1.53.1@jar")
     compileOnly(platform("org.springframework.boot:spring-boot-dependencies:4.1.2"))
     compileOnly("org.projectlombok:lombok")
     annotationProcessor(platform("org.springframework.boot:spring-boot-dependencies:4.1.2"))
