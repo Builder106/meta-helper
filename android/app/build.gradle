@@ -5,7 +5,11 @@ plugins {
 
 android {
     namespace = 'com.metahelper.app'
-    compileSdk = 37
+    compileSdk {
+        version = release(37) {
+            minorApiLevel = 1
+        }
+    }
 
     def backendUrl = project.findProperty('metahelper.backend.url') ?:
         System.getenv('METAHELPER_BACKEND_URL') ?:
